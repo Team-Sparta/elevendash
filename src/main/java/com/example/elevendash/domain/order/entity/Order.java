@@ -2,11 +2,11 @@ package com.example.elevendash.domain.order.entity;
 
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.catalina.Store;
 
 @Entity
 @Getter
