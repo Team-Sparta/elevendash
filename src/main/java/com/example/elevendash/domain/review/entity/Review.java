@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name="review")
+@Table(name="reviews")
 public class Review extends BaseTimeEntity {
 
     @Id
