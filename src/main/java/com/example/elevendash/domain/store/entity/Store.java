@@ -21,7 +21,7 @@ public class Store extends BaseTimeEntity {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false, updatable = false, name = "store_id")
+    @Column(name = "id")
     private Long id;
 
     /**

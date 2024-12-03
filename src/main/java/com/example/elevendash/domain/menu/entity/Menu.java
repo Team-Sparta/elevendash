@@ -9,13 +9,16 @@ import java.util.List;
 
 @Entity
 @Getter
+@Table(
+        name = "menus"
+)
 public class Menu extends BaseTimeEntity {
     /**
      * 식별자 생성
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false, updatable = false, name = "menu_id")
+    @Column(name = "id")
     private Long id;
     /**
      * 필드 변수
@@ -32,12 +35,14 @@ public class Menu extends BaseTimeEntity {
      * store와 1대1 연결
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = Store.class)
+    @JoinColumn(name = "store_id")
     private Store store;
 
     /**
      * category와 ManyToOne 연결
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = Category.class)
+    @JoinColumn(name = "category_id")
     private Category category;
 
     /**
