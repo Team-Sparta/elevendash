@@ -9,7 +9,6 @@ import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
