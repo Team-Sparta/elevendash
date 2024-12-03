@@ -14,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Table(name = "stores")
 public class Store extends BaseTimeEntity {
     /**
      * 식별자 생성

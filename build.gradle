@@ -44,6 +44,16 @@ dependencies {
     // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // jjwt
+    implementation 'io.jsonwebtoken:jjwt:0.12.5'
+
+    // Encoder
+    implementation 'at.favre.lib:bcrypt:0.10.2'
+
+
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
