@@ -72,6 +72,7 @@ public class Member extends BaseTimeEntity {
         this.role = signUpRequest.role() != null ? role : MemberRole.CUSTOMER;
     }
 
+
     public void deleteAccount() {
         this.deletedAt = LocalDateTime.now();
         this.profileImage = null;
