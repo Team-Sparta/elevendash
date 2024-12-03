@@ -2,6 +2,7 @@ package com.example.elevendash.domain.order.entity;
 
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ public class Order extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long id;
 
     @Column(nullable = false)
     private String orderStatus;
@@ -34,8 +35,8 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long orderId, String orderStatus, String manuName, String cart) {
-        this.orderId = orderId;
+    public Order(Long id, String orderStatus, String manuName, String cart) {
+        this.id = id;
         this.orderStatus = orderStatus;
         this.manuName = manuName;
         this.cart = cart;
