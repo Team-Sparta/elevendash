@@ -21,7 +21,7 @@ public class Store extends BaseTimeEntity {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(unique = true, nullable = false, updatable = false, name = "store_id")
+    @Column(name = "id")
     private Long id;
 
     /**
@@ -54,7 +54,7 @@ public class Store extends BaseTimeEntity {
      * 멤버와 manyToOne 연결
      */
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "id")
     private Member member;
 
     /**

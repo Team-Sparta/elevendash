@@ -6,13 +6,16 @@ import lombok.Getter;
 
 @Entity
 @Getter
+@Table(
+        name = "menu_options"
+)
 public class MenuOption extends BaseTimeEntity {
     /**
      * 식별자 생성
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "menu_option_id", nullable = false, updatable = false, unique = true)
+    @Column(name = "id")
     private Long id;
     /**
      * 필드 변수
