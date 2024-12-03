@@ -3,14 +3,16 @@ package com.example.elevendash.domain.member.entity;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.member.enums.Provider;
+import com.example.elevendash.domain.order.entity.Order;
+import com.example.elevendash.domain.review.entity.Review;
+import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
-import com.example.elevendash.global.validation.ValidPassword;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -51,6 +53,14 @@ public class Member extends BaseTimeEntity {
     @Column(name = "role", nullable = false, columnDefinition = "varchar(20) comment '권한'")
     private MemberRole role;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<Store> stores = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<Order> orders = new ArrayList<>();
 
     @Builder
     private Member(SignUpRequest signUpRequest) {
@@ -61,7 +71,6 @@ public class Member extends BaseTimeEntity {
         this.providerId = signUpRequest.providerId();
         this.role = signUpRequest.role() != null ? role : MemberRole.CUSTOMER;
     }
-
 
     public void deleteAccount() {
         this.deletedAt = LocalDateTime.now();
