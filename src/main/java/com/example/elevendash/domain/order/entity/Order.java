@@ -32,8 +32,8 @@ public class Order extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne
-    @JoinColumn(name = "menu_id", nullable = false)
-    private Menu mune;
+    @JoinColumn(name = "store_id", nullable = false)
+    private Store store;
 
     public Order(Long id, String orderStatus, String manuName, String cart) {
         this.id = id;
