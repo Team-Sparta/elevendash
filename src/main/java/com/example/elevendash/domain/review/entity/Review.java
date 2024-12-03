@@ -19,7 +19,7 @@ public class Review extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "content", nullable = false)
@@ -27,9 +27,6 @@ public class Review extends BaseTimeEntity {
 
     @Column(name = "star_rating", nullable = false)
     private int starRating;
-
-    @OneToOne(mappedBy = "review")
-    private Comment comment;
 
     @OneToOne
     @JoinColumn(name="order_id", unique = true)
@@ -40,7 +37,7 @@ public class Review extends BaseTimeEntity {
     private Store store;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     public Review(CreateReviewDto dto){
