@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.member.controller;
 
+import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.response.SignUpResponse;
 import com.example.elevendash.domain.member.service.MemberService;
 import com.example.elevendash.global.exception.code.SuccessCode;
@@ -19,7 +20,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/sign-up")
-    public ResponseEntity<CommonResponse<SignUpResponse>> singUp(@Validated @RequestBody SingUpRequest request) {
+    public ResponseEntity<CommonResponse<SignUpResponse>> singUp(@Validated @RequestBody SignUpRequest request) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT, memberService.signUp(request));
     }
 }

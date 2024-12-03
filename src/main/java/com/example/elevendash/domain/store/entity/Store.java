@@ -1,6 +1,7 @@
 package com.example.elevendash.domain.store.entity;
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Table(name = "stores")
 public class Store extends BaseTimeEntity {
     /**
      * 식별자 생성
