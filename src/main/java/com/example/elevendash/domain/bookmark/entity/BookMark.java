@@ -16,8 +16,10 @@ public class BookMark extends BaseTimeEntity {
     private Long id;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "member_id")
     Member member;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "store_id")
     Store store;
 }

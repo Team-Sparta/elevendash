@@ -35,12 +35,14 @@ public class Menu extends BaseTimeEntity {
      * store와 1대1 연결
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = Store.class)
+    @JoinColumn(name = "store_id")
     private Store store;
 
     /**
      * category와 ManyToOne 연결
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = Category.class)
+    @JoinColumn(name = "category_id")
     private Category category;
 
     /**

@@ -32,6 +32,7 @@ public class MenuOption extends BaseTimeEntity {
      * Menu와 ManyToOne 관계
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = Menu.class)
+    @JoinColumn(name = "menu_id")
     private Menu menu;
 
     /**

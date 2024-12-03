@@ -54,7 +54,7 @@ public class Store extends BaseTimeEntity {
      * 멤버와 manyToOne 연결
      */
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     /**
