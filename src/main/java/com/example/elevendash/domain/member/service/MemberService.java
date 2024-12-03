@@ -10,24 +10,24 @@ import com.example.elevendash.global.exception.code.ErrorCode;
 import com.example.elevendash.global.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
-@Validated
 public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordService passwordService;
 
-    public SignUpResponse signUp(@Validated SignUpRequest request) {
+    public SignUpResponse signUp(SignUpRequest request) {
         validateEmail(request.email());
 
         Member member = Member.builder().signUpRequest(request).build();
 
-        member.setPassword(passwordService.encode(request.password()));
+        if (request.password() != null) {
+            member.setPassword(passwordService.encode(request.password()));
+        }
 
         memberRepository.save(member);
 
