@@ -27,5 +27,4 @@ public class PasswordService {
         BCrypt.Result result = verifyer.verify(rawPassword.toCharArray(), encodedPassword);
         return result.verified;
     }
-
 }
