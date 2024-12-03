@@ -1,7 +1,9 @@
 package com.example.elevendash.domain.review.entity;
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
+import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
