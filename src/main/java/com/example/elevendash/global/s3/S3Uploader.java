@@ -32,13 +32,14 @@ public class S3Uploader {
         String filePath = getFilePath(category, file.getName());
         ObjectMetadata metadata = createMetadataFromFile(file);
 
-        try {
+        try (var inputStream = file.getInputStream()) {
             amazonS3.putObject(
-                    new PutObjectRequest(bucket, filePath, file.getInputStream(), metadata)
+                    new PutObjectRequest(bucket, filePath, inputStream, metadata)
                             .withCannedAcl(CannedAccessControlList.PublicRead)
             );
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            log.error("S3 파일 업로드 실패. category: {}, fileName: {}, error: {}",
+                    category, file.getName(), e.getMessage(), e);
             throw new BaseException(ErrorCode.S3_UPLOADER_ERROR);
         }
 
@@ -57,7 +58,12 @@ public class S3Uploader {
     }
 
     private ObjectMetadata createMetadataFromFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new BaseException(ErrorCode.S3_UPLOADER_ERROR);
+        }
         ObjectMetadata metadata = new ObjectMetadata();
+
         metadata.setContentType(file.getContentType());
         metadata.setContentLength(file.getSize());
         return metadata;
@@ -70,7 +76,13 @@ public class S3Uploader {
     }
 
     private String getUrlFromBucket(String fileKey) {
-        return amazonS3.getUrl(bucket, fileKey).toString();
+        try {
+            return amazonS3.getUrl(bucket, fileKey).toString();
+        } catch (Exception e) {
+            log.error("S3 URL 생성 실패. bucket: {}, fileKey: {}, error: {}",
+                    bucket, fileKey, e.getMessage(), e);
+            throw new BaseException(ErrorCode.S3_UPLOADER_ERROR);
+        }
     }
 
 }

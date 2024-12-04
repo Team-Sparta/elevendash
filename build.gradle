@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.0'
+    id 'org.springframework.boot' version '3.3.2'
     id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -52,6 +52,12 @@ dependencies {
 
     // Encoder
     implementation 'at.favre.lib:bcrypt:0.10.2'
+
+    // oauth2
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
 
     // AWS S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
