@@ -3,8 +3,10 @@ package com.example.elevendash.domain.store.service;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
+import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
@@ -89,6 +91,24 @@ public class StoreService {
         // soft delete
         deleteStore.delete();
         return new DeleteStoreResponseDto(deleteStore.getId());
+    }
+
+    @Transactional
+    public UpdateStoreResponseDto updateStore(Member member, Long storeId,MultipartFile multipartFile, UpdateStoreRequestDto dto) {
+        // 오픈 마감시간 검증
+        if(!isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
+            throw new BaseException(ErrorCode.NOT_VALID_OPEN_TIME);
+        }
+        // OWNER 권한 검증
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
+        }
+        String storeImage = convert(multipartFile);
+        Store updateStore = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        updateStore.update(dto.getStoreName(),dto.getStoreDescription(),dto.getStoreAddress()
+                ,dto.getStorePhone(),dto.getLeastAmount(),storeImage,dto.getOpenTime(),dto.getCloseTime());
+        return new UpdateStoreResponseDto(updateStore.getId());
     }
 
     /**
