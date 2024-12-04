@@ -1,10 +1,12 @@
 package com.example.elevendash.domain.member.controller;
 
-import com.example.elevendash.domain.member.dto.MemberProfileResponse;
+import com.example.elevendash.domain.member.dto.response.MemberProfileResponse;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
+import com.example.elevendash.domain.member.dto.request.OAuthLoginRequest;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
+import com.example.elevendash.domain.member.dto.response.OAuthLoginResponse;
 import com.example.elevendash.domain.member.dto.response.SignUpResponse;
 import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.entity.Member;
@@ -34,6 +36,12 @@ public class MemberController {
     public ResponseEntity<CommonResponse<EmailLoginResponse>> emailLogin(@Valid @RequestBody EmailLoginRequest request) {
         return CommonResponse.success(SuccessCode.SUCCESS, memberService.emailLogin(request));
     }
+
+    @PostMapping("/login/kakao")
+    public ResponseEntity<CommonResponse<OAuthLoginResponse>> kakaoLogin(@Valid @RequestBody OAuthLoginRequest request) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.oAuthLogin(request));
+    }
+
 
     @GetMapping("/{memberId}/profile")
     public ResponseEntity<CommonResponse<MemberProfileResponse>> getMemberProfile(

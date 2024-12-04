@@ -4,7 +4,7 @@ import com.example.elevendash.domain.member.enums.Provider;
 
 public record AuthUserInfo(
         String email,
-        Provider provider,
-        String providerId
+        String providerId,
+        Provider provider
 ) {
 }

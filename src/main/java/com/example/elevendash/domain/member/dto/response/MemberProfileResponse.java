@@ -1,4 +1,4 @@
-package com.example.elevendash.domain.member.dto;
+package com.example.elevendash.domain.member.dto.response;
 
 public record MemberProfileResponse(
         Long memberId,
