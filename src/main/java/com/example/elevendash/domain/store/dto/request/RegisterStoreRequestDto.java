@@ -40,7 +40,4 @@ public class RegisterStoreRequestDto {
     @Min(value = 0, message = "최소 주문 금액은 0원 이상이어야 합니다")
     private final Integer leastAmount;
 
-    private final MultipartFile multipartFile;
-
-
 }

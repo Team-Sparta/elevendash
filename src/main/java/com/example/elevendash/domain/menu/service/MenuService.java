@@ -30,6 +30,7 @@ public class MenuService {
     private final CategoryRepository categoryRepository;
     private final MenuOptionRepository menuOptionRepository;
     private final StoreRepository storeRepository;
+    private final StoreService storeService;
 
     /**
      * 메뉴 등록 서비스 메소드
@@ -54,7 +55,7 @@ public class MenuService {
                 .menuPrice(requestDto.getMenuPrice())
                 .store(addMenuStore)
                 .category(category)
-                .menuImage(StoreService.convert(menuImage))
+                .menuImage(storeService.convert(menuImage))
                 .build();
         menuRepository.save(saveMenu);
         return new RegisterMenuResponseDto(saveMenu.getId());

@@ -9,6 +9,8 @@ import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
+import com.example.elevendash.global.s3.S3Service;
+import com.example.elevendash.global.s3.UploadImageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
+    private final S3Service s3Service;
 
     /**
      * 음식점 등록 메소드
@@ -60,6 +63,7 @@ public class StoreService {
                 .member(member)
                 .openTime(dto.getOpenTime())
                 .closeTime(dto.getCloseTime())
+                .storeImage(storeImage)
                 .build();
         storeRepository.save(savedStore);
         return new RegisterStoreResponseDto(savedStore.getId());
@@ -106,12 +110,14 @@ public class StoreService {
     public Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
         return openTime.isBefore(closeTime);
     }
-    /**
-     * 임시 파일 변환 메소드
-     * @param multipartFile
-     * @return
-     */
-    public static String convert (MultipartFile multipartFile) {
-        return "storePictureExample.jpg";
+
+    public String convert (MultipartFile image) {
+        String imageUrl = null;
+
+        if (image != null) {
+            UploadImageInfo uploadImageInfo = s3Service.uploadMemberProfileImage(image);
+            imageUrl = uploadImageInfo.ImageUrl();
+        }
+        return imageUrl;
     }
 }

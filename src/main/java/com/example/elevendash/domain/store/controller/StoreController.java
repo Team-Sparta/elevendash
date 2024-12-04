@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,9 +37,9 @@ public class StoreController {
      * @param loginMember
      * @return
      */
-    @PostMapping("/register")
-    ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(@RequestBody @Valid RegisterStoreRequestDto requestDto,
-                                                                     @RequestParam("image") MultipartFile storeImage,
+    @PostMapping(value ="/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(@RequestPart("request") @Valid RegisterStoreRequestDto requestDto,
+                                                                     @RequestPart("image") MultipartFile storeImage,
                                                                      @LoginMember Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,storeService.registerStore(loginMember,storeImage ,requestDto));
     }
