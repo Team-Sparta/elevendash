@@ -19,9 +19,9 @@ public class ReviewService {
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
 
-    public ReviewResponseDto create(CreateReviewDto dto){
-//        Order findorder = orderRepository.findByIdOrElseThrow(dto.getOrderId());
-//        if(!findorder.getOrderStatus().equals("배달완료")){
+    public ReviewResponseDto create(Long storeId, CreateReviewDto dto){
+//        Order findOrder = orderRepository.findByIdOrElseThrow(dto.getOrderId());
+//        if(!findOrder.getOrderStatus().equals("배달완료")){
 //            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다.");
 //        }
 //        Review review = new Review(dto);
