@@ -2,6 +2,7 @@ package com.example.elevendash.domain.store.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
+import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
@@ -56,6 +57,22 @@ public class StoreService {
                 .build();
         storeRepository.save(savedStore);
         return new RegisterStoreResponseDto(savedStore.getId());
+    }
+
+    @Transactional
+    public DeleteStoreResponseDto deleteStore(Member member, Long storeId) {
+        Optional<Store> deleteStore = storeRepository.findById(storeId);
+        // 상점을 찾지 못한경우 예외
+        if(deleteStore.isEmpty()){
+            throw new BaseException(ErrorCode.NOT_FOUND_STORE);
+        }
+        // 상점의 멤버와 현재 멤버가 일치하지 않은경우 예외
+        if(!deleteStore.get().getMember().equals(member)){
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        // soft delete
+        deleteStore.get().delete();
+        return new DeleteStoreResponseDto(deleteStore.get().getId());
     }
 
     /**
