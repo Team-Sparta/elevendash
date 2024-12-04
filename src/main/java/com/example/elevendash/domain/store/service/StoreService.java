@@ -9,6 +9,8 @@ import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
+import com.example.elevendash.global.s3.S3Service;
+import com.example.elevendash.global.s3.UploadImageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
+    private final S3Service s3Service;
 
     /**
      * 음식점 등록 메소드
@@ -39,16 +42,16 @@ public class StoreService {
     @Transactional
     public RegisterStoreResponseDto registerStore(Member member, MultipartFile multipartFile, RegisterStoreRequestDto dto) {
         // 오픈 마감시간 검증
-        if(isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
-            throw new BaseException("오픈시간이 마감시간보다 빠릅니다",ErrorCode.VALIDATION_ERROR);
+        if(!isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
+            throw new BaseException(ErrorCode.NOT_VALID_OPEN_TIME);
         }
         // 스토어 수 검증
-        if(isValidStoreNumber(member, 3L)) {
-            throw new BaseException("스토어 수가 이미 3개 입니다",ErrorCode.VALIDATION_ERROR);
+        if(!isValidStoreNumber(member, 3L)) {
+            throw new BaseException(ErrorCode.ENOUGH_STORE);
         }
         // OWNER 권한 검증
         if(!member.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException("OWNER만이 상점을 개설할 수 있습니다",ErrorCode.DISABLE_ACCOUNT);
+            throw new BaseException(ErrorCode.NOT_OWNER);
         }
         String storeImage = convert(multipartFile);
         Store savedStore = Store.builder()
@@ -60,6 +63,7 @@ public class StoreService {
                 .member(member)
                 .openTime(dto.getOpenTime())
                 .closeTime(dto.getCloseTime())
+                .storeImage(storeImage)
                 .build();
         storeRepository.save(savedStore);
         return new RegisterStoreResponseDto(savedStore.getId());
@@ -95,7 +99,7 @@ public class StoreService {
      */
     public Boolean isValidStoreNumber(Member member,Long LimitNumber) {
         Long storeNumber = storeRepository.countByMemberAndIsDeleted(member, Boolean.FALSE);
-        return !storeNumber.equals(LimitNumber);
+        return storeNumber <(LimitNumber);
     }
     /**
      * 오픈 마감시간 검증 메소드
@@ -106,12 +110,13 @@ public class StoreService {
     public Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
         return openTime.isBefore(closeTime);
     }
-    /**
-     * 임시 파일 변환 메소드
-     * @param multipartFile
-     * @return
-     */
-    public static String convert (MultipartFile multipartFile) {
-        return "storePictureExample.jpg";
+
+    public String convert (MultipartFile image) {
+        String imageUrl = null;
+        if (image != null) {
+            UploadImageInfo uploadImageInfo = s3Service.uploadMemberProfileImage(image);
+            imageUrl = uploadImageInfo.ImageUrl();
+        }
+        return imageUrl;
     }
 }

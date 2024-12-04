@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,20 +32,23 @@ public class StoreController {
 
     /**
      * 상점 등록 엔드포인트
+     *
      * @param requestDto
      * @param storeImage
      * @param loginMember
      * @return
      */
-    @PostMapping("/register")
-    ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(@RequestBody @Valid RegisterStoreRequestDto requestDto,
-                                                                     @RequestParam("image") MultipartFile storeImage,
-                                                                     @LoginMember Member loginMember) {
-        return CommonResponse.success(SuccessCode.SUCCESS_INSERT,storeService.registerStore(loginMember,storeImage ,requestDto));
+    @PostMapping(value = "/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(
+            @LoginMember Member loginMember,
+            @Valid @RequestPart(value = "request") RegisterStoreRequestDto requestDto,
+            @RequestPart(value = "image") MultipartFile storeImage) {
+        return CommonResponse.success(SuccessCode.SUCCESS_INSERT, storeService.registerStore(loginMember, storeImage, requestDto));
     }
 
     /**
      * 상점 삭제 엔드포인트
+     *
      * @param storeId
      * @param loginMember
      * @return
@@ -52,7 +56,7 @@ public class StoreController {
     @DeleteMapping("/{storeId}")
     ResponseEntity<CommonResponse<DeleteStoreResponseDto>> deleteStore(@PathVariable(name = "storeId") Long storeId,
                                                                        @LoginMember Member loginMember) {
-        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,storeService.deleteStore(loginMember,storeId));
+        return CommonResponse.success(SuccessCode.SUCCESS_DELETE, storeService.deleteStore(loginMember, storeId));
     }
 
 }

@@ -21,10 +21,6 @@ public class UpdateMenuRequestDto {
     @Min(0)
     private Integer menuPrice;
 
-    @Lob
-    @NotBlank
-    private String menuImage;
-
     @NotNull
     private Categories menuCategory;
 }
