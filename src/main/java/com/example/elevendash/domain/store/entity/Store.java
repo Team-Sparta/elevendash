@@ -33,7 +33,8 @@ public class Store extends BaseTimeEntity {
     @Column(nullable = false)
     private String storeName;
 
-    @Lob @Column
+    @Lob
+    @Column
     private String storeDescription;
 
     @Column
@@ -51,7 +52,8 @@ public class Store extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer leastAmount;
 
-    @Lob @Column
+    @Lob
+    @Column
     private String storeImage;
 
     @Column
@@ -69,18 +71,18 @@ public class Store extends BaseTimeEntity {
     /**
      * 메뉴와 OneToMany 연결
      */
-    @OneToMany(mappedBy = "store",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
     /**
      * 주문과 OneToMany 연결
      */
-    @OneToMany(mappedBy = "store",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY)
     private List<Order> orders = new ArrayList<>();
 
     /**
      * 리뷰와 OneToMany 연결
      */
-    @OneToMany(mappedBy = "store",fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "store",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -88,6 +90,7 @@ public class Store extends BaseTimeEntity {
 
     /**
      * Store 생성자
+     *
      * @param storeName
      * @param storeDescription
      * @param storeAddress
@@ -109,13 +112,14 @@ public class Store extends BaseTimeEntity {
 
     /**
      * Store 수정 메소드
+     *
      * @param storeName
      * @param storeDescription
      * @param storeAddress
      * @param storePhone
      * @param leastAmount
      */
-    public void update(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount ) {
+    public void update(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount) {
         this.storeName = storeName;
         this.storeDescription = storeDescription;
         this.storeAddress = storeAddress;

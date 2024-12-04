@@ -7,6 +7,8 @@ import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
+import com.example.elevendash.global.exception.BaseException;
+import com.example.elevendash.global.exception.code.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -72,10 +74,18 @@ public class Member extends BaseTimeEntity {
         this.role = signUpRequest.role() != null ? role : MemberRole.CUSTOMER;
     }
 
-
     public void deleteAccount() {
         this.deletedAt = LocalDateTime.now();
         this.profileImage = null;
+    }
+
+    public void validateProvider() {
+        if (this.provider != Provider.EMAIL && this.password != null && this.providerId == null) {
+            throw new BaseException(ErrorCode.BAD_PROVIDER);
+        }
+        if (this.provider == Provider.EMAIL && this.password == null) {
+            throw new BaseException(ErrorCode.BAD_EMAIL);
+        }
     }
 
     @Override

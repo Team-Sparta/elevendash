@@ -26,7 +26,7 @@ public class SecurityConfig {
     private final JwtExceptionFilter jwtExceptionFilter;
 
     private static final String[] PERMIT_PATHS = {
-            "/users/sign-up/**", "/users/login/**", "*/*"
+            "/members/sign-up/**", "/members/login/**", "*/*"
     };
 
     private static final String[] ALLOW_ORIGINS = {
