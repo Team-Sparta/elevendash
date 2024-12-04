@@ -1,8 +1,12 @@
 package com.example.elevendash.domain.member.service;
 
+import com.example.elevendash.domain.member.dto.OAuthLoginInfo;
+import com.example.elevendash.domain.member.dto.oauth.OAuthUser;
+import com.example.elevendash.domain.member.dto.request.OAuthLoginRequest;
+import com.example.elevendash.domain.member.dto.response.OAuthLoginResponse;
 import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.dto.AuthUserInfo;
-import com.example.elevendash.domain.member.dto.MemberProfileResponse;
+import com.example.elevendash.domain.member.dto.response.MemberProfileResponse;
 import com.example.elevendash.domain.member.dto.Token;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
@@ -10,8 +14,11 @@ import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
 import com.example.elevendash.domain.member.dto.response.SignUpResponse;
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.member.enums.Provider;
+import com.example.elevendash.domain.member.factory.OAuthProviderFactory;
 import com.example.elevendash.domain.member.repository.MemberRepository;
 import com.example.elevendash.global.annotation.LoginMember;
+import com.example.elevendash.global.constants.AuthConstants;
 import com.example.elevendash.global.exception.AuthenticationException;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.InvalidParamException;
@@ -23,11 +30,10 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
+
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +42,9 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordService passwordService;
+
+    private final OAuthProviderFactory providerFactory;
+
     private final S3Service s3Service;
 
     public SignUpResponse signUp(SignUpRequest request) {
@@ -88,8 +97,8 @@ public class MemberService {
                 new Token(token, jwtTokenProvider.getExpirationByToken(token)),
                 new AuthUserInfo(
                         member.getEmail(),
-                        member.getProvider(),
-                        member.getProviderId()
+                        member.getProviderId(),
+                        member.getProvider()
                 )
         );
     }
@@ -126,4 +135,45 @@ public class MemberService {
         return new UpdateProfileResponse(member.getId());
     }
 
+    public OAuthLoginResponse oAuthLogin(@Valid OAuthLoginRequest request) {
+        OAuthLoginInfo authLoginInfo = request.toDto();
+        Provider provider = authLoginInfo.provider();
+
+        // 인가 코드를 이용해 토큰 발급 요청
+        String accessToken = providerFactory.getAccessToken(
+                provider,
+                authLoginInfo.propertyMap().get(AuthConstants.REDIRECT_URI),
+                authLoginInfo.propertyMap().get(AuthConstants.CODE)
+        );
+
+        // 토큰을 이용해 사용자 정보 가져오기
+        OAuthUser oAuthUser = providerFactory.getOAuthUser(provider, accessToken);
+
+        // 회원가입 or 로그인
+        String email = oAuthUser.email();
+
+        boolean isNewMember = !memberRepository.existsByEmailAndDeletedAtIsNull(email);
+
+        Token token = createTokenForMember(isNewMember, email);
+
+        return new OAuthLoginResponse(
+                token,
+                isNewMember,
+                new AuthUserInfo(email, oAuthUser.id(), provider)
+        );
+    }
+
+    private Token createTokenForMember(boolean isNewMember, String email) {
+        if (isNewMember) {
+            return new Token(null, null);
+        } else {
+            Member member = memberRepository.findByEmailAndDeletedAtIsNull(email);
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put("id", member.getId());
+            hashMap.put("name", member.getName());
+            hashMap.put("email", member.getEmail());
+            String generatedToken = jwtTokenProvider.createAccessToken(hashMap);
+            return new Token(generatedToken, jwtTokenProvider.getExpirationByToken(generatedToken));
+        }
+    }
 }
