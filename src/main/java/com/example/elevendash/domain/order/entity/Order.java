@@ -45,5 +45,4 @@ public class Order extends BaseTimeEntity {
     public void updateStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
-
 }
