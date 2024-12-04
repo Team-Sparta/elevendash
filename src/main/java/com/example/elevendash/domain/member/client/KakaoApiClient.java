@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.member.client;
 
-import com.example.elevendash.domain.member.dto.oauth.KakaoUser;
+import com.example.elevendash.domain.member.dto.oauth.kakao.KakaoUser;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;

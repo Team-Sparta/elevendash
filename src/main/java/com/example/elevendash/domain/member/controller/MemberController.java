@@ -42,6 +42,10 @@ public class MemberController {
         return CommonResponse.success(SuccessCode.SUCCESS, memberService.oAuthLogin(request));
     }
 
+    @PostMapping("/login/naver")
+    public ResponseEntity<CommonResponse<OAuthLoginResponse>> naverLogin(@Valid @RequestBody OAuthLoginRequest request) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.oAuthLogin(request));
+    }
 
     @GetMapping("/{memberId}/profile")
     public ResponseEntity<CommonResponse<MemberProfileResponse>> getMemberProfile(
