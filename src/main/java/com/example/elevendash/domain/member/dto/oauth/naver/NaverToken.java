@@ -13,6 +13,6 @@ public record NaverToken(
 ) implements OAuthToken {
     @Override
     public String scope() {
-        return "email";
+        return "account_email";
     }
 }

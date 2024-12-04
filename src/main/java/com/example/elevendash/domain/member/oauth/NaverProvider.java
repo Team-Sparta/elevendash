@@ -5,6 +5,8 @@ import com.example.elevendash.domain.member.client.NaverAuthClient;
 import com.example.elevendash.domain.member.dto.oauth.OAuthToken;
 import com.example.elevendash.domain.member.dto.oauth.OAuthUser;
 import com.example.elevendash.global.constants.AuthConstants;
+import com.example.elevendash.global.exception.BaseException;
+import com.example.elevendash.global.exception.code.ErrorCode;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +51,14 @@ public class NaverProvider implements OAuthProvider {
         return AuthConstants.TOKEN_PREFIX + accessToken;
     }
 
-    public void getOAuthTokenFallback(String redirectUri, String code, Throwable ex) {
+    public OAuthToken getOAuthTokenFallback(String redirectUri, String code, Throwable ex) {
         log.error("Failed to fetch OAuth token from Naver API", ex);
+        throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
-    public void getOAuthUserFallback(String redirectUri, String code, Throwable ex) {
+    public OAuthUser getOAuthUserFallback(String accessToken, Throwable ex) {
         log.error("Failed to fetch User from Naver API", ex);
+        throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
 }
