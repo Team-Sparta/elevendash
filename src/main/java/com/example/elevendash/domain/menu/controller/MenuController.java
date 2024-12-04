@@ -13,6 +13,7 @@ import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class MenuController {
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
             @RequestPart("request") @Valid RegisterMenuRequestDto requestDto,
             @PathVariable("storeId") Long storeId,
-            @RequestPart("image") MultipartFile menuImage,
+            @RequestPart("image") @NotNull MultipartFile menuImage,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
     }
@@ -70,7 +71,7 @@ public class MenuController {
             @PathVariable("storeId") Long storeId,
             @PathVariable("menuId") Long menuId,
             @LoginMember Member member,
-            @RequestPart("image") MultipartFile menuImage,
+            @RequestPart("image") @NotNull MultipartFile menuImage,
             @RequestPart("request") @Valid UpdateMenuRequestDto requestDto) {
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,menuImage,storeId,menuId,requestDto));
     }

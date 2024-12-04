@@ -99,7 +99,7 @@ public class StoreService {
      */
     public Boolean isValidStoreNumber(Member member,Long LimitNumber) {
         Long storeNumber = storeRepository.countByMemberAndIsDeleted(member, Boolean.FALSE);
-        return !storeNumber.equals(LimitNumber);
+        return storeNumber <(LimitNumber);
     }
     /**
      * 오픈 마감시간 검증 메소드

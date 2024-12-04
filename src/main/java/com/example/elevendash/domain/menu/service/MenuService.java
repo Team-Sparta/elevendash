@@ -126,7 +126,16 @@ public class MenuService {
         return new AddMenuOptionResponseDto(addOption.getId());
     }
 
-    @Transactional
+    /**
+     * 메뉴 옵션 수정 서비스 메소드
+     * @param member 요청한 회원
+     * @param storeId 상점 ID
+     * @param menuId 메뉴 ID
+     * @param menuOptionId 메뉴 옵션 ID
+     * @param requestDto 수정 요청 데이터
+     * @return 수정된 메뉴 옵션의 응답 DTO
+     */
+    @Transactional(readOnly = true)
     public UpdateMenuOptionResponseDto updateOption (Member member, Long storeId, Long menuId,Long menuOptionId ,UpdateMenuOptionRequestDto requestDto) {
         Store updateOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
@@ -136,11 +145,18 @@ public class MenuService {
         isValidMenuAndStore(updateOptionMenu, updateOptionStore);
         MenuOption updateOption = menuOptionRepository.findById(menuOptionId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU_OPTION));
+
+        return updateOptionTransactional(requestDto,updateOption);
+    }
+
+    /**
+     * 옵션 수정 메소드
+     */
+    @Transactional
+    protected UpdateMenuOptionResponseDto updateOptionTransactional(UpdateMenuOptionRequestDto requestDto, MenuOption updateOption) {
         updateOption.update(requestDto.getContent());
         return new UpdateMenuOptionResponseDto(updateOption.getId());
     }
-
-
     /**
      * 유저 및 음식점 유효성 검증
      * @param member
