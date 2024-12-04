@@ -11,5 +11,4 @@ public interface OAuthToken {
 
     String scope();
 
-    int refreshTokenExpiresIn();
 }

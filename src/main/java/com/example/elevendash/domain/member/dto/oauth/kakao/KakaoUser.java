@@ -1,5 +1,6 @@
-package com.example.elevendash.domain.member.dto.oauth;
+package com.example.elevendash.domain.member.dto.oauth.kakao;
 
+import com.example.elevendash.domain.member.dto.oauth.OAuthUser;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record KakaoUser(

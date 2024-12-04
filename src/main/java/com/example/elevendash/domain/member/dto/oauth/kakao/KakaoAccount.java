@@ -1,4 +1,4 @@
-package com.example.elevendash.domain.member.dto.oauth;
+package com.example.elevendash.domain.member.dto.oauth.kakao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
