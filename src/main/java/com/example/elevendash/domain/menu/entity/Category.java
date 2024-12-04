@@ -35,7 +35,7 @@ public class Category extends BaseTimeEntity {
     /**
      * 메뉴와 OneToMany 연결
      */
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Menu> menus;
 
     /**

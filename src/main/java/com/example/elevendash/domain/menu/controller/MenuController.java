@@ -2,6 +2,7 @@ package com.example.elevendash.domain.menu.controller;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
 import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
 import com.example.elevendash.domain.menu.service.MenuService;
 import com.example.elevendash.global.annotation.LoginMember;
@@ -36,5 +37,20 @@ public class MenuController {
             @RequestParam("menuImage") MultipartFile menuImage,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
+    }
+
+    /**
+     * 메뉴 삭제 API
+     * @param storeId
+     * @param menuId
+     * @param member
+     * @return
+     */
+    @DeleteMapping("/{storeId}/menus/{menuId}")
+    public ResponseEntity<CommonResponse<DeleteMenuResponseDto>> deleteMenu(
+            @PathVariable Long storeId,
+            @PathVariable Long menuId,
+            @LoginMember Member member) {
+        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,menuService.deleteMenu(member,storeId,menuId));
     }
 }

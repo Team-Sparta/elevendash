@@ -3,6 +3,7 @@ package com.example.elevendash.domain.menu.service;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
 import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
 import com.example.elevendash.domain.menu.entity.Category;
 import com.example.elevendash.domain.menu.entity.Menu;
@@ -37,7 +38,7 @@ public class MenuService {
     @Transactional
     public RegisterMenuResponseDto registerMenu (Member member, MultipartFile menuImage, Long storeId, RegisterMenuRequestDto requestDto) {
         // 가게 조회
-        Store addMenuStore = storeRepository.findById(storeId)
+        Store addMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
         // 유저 및 음식점 유효성 검증
         isValidMemberAndStore(member, addMenuStore);
@@ -54,6 +55,20 @@ public class MenuService {
                 .build();
         menuRepository.save(saveMenu);
         return new RegisterMenuResponseDto(saveMenu.getId());
+    }
+
+    @Transactional
+    public DeleteMenuResponseDto deleteMenu (Member member, Long storeId, Long menuId) {
+        Store deleteMenuStore = storeRepository.findByIdAndIsDeleted(storeId, Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        isValidMemberAndStore(member, deleteMenuStore);
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        if(!menu.getStore().getId().equals(deleteMenuStore.getId())) {
+            throw new BaseException(ErrorCode.NOT_SAME_STORE);
+        }
+        menuRepository.delete(menu);
+        return new DeleteMenuResponseDto(menu.getId());
     }
 
     /**
