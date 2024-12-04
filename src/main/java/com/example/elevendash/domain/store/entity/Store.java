@@ -7,6 +7,9 @@ import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.sql.Time;
@@ -17,7 +20,6 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "stores")
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store extends BaseTimeEntity {
     /**
@@ -32,29 +34,31 @@ public class Store extends BaseTimeEntity {
      * 필드 변수 설정
      */
     @Column(nullable = false)
+    @NotBlank
     private String storeName;
 
     @Lob
-    @Column
+    @Column @NotBlank
     private String storeDescription;
 
-    @Column
+    @Column @NotNull
     private LocalTime openTime;
 
-    @Column
+    @Column @NotNull
     private LocalTime closeTime;
 
-    @Column(nullable = false)
+    @Column(nullable = false) @NotBlank
     private String storeAddress;
 
-    @Column(nullable = false)
+    @Column(nullable = false) @NotBlank
     private String storePhone;
 
-    @Column(nullable = false)
+    @Column(nullable = false) @NotNull
+    @Min(value = 0)
     private Integer leastAmount;
 
     @Lob
-    @Column
+    @Column @NotBlank
     private String storeImage;
 
     @Column
@@ -66,7 +70,7 @@ public class Store extends BaseTimeEntity {
      * 멤버와 manyToOne 연결
      */
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id") @NotNull
     private Member member;
 
     /**
@@ -123,12 +127,15 @@ public class Store extends BaseTimeEntity {
      * @param storePhone
      * @param leastAmount
      */
-    public void update(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount) {
+    public void update(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImage, LocalTime openTime, LocalTime closeTime) {
         this.storeName = storeName;
         this.storeDescription = storeDescription;
         this.storeAddress = storeAddress;
         this.storePhone = storePhone;
         this.leastAmount = leastAmount;
+        this.storeImage = storeImage;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
     }
 
     /**

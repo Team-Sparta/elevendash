@@ -64,11 +64,22 @@ public enum ErrorCode {
      * Image
      */
     S3_UPLOADER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 중 오류가 발생하였습니다."),
-    BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다.")
+    BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다."),
 
 
+
+    /**
+     * Store
+     */
+    NOT_FOUND_STORE(HttpStatus.NOT_FOUND, "상점 정보를 찾을 수 없습니다."),
+    NOT_SAME_MEMBER(HttpStatus.NOT_ACCEPTABLE, "상점과 멤버정보가 일치하지 않습니다."),
+
+    /**
+     * Menu
+     */
+    NOT_FOUND_MENU(HttpStatus.NOT_FOUND, "메뉴 정보를 찾을 수 없습니다."),
+    NOT_SAME_STORE(HttpStatus.NOT_ACCEPTABLE, "상점과 메뉴정보가 일치하지 않습니다."),
     ;
-
 
     private final HttpStatus httpStatus;
     private final String message;
