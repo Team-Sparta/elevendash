@@ -75,7 +75,7 @@ public class StoreService {
     @Transactional
     public DeleteStoreResponseDto deleteStore(Member member, Long storeId) {
         // 상점을 찾지 못한경우 예외
-        Store deleteStore = storeRepository.findById(storeId)
+        Store deleteStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
 
         // 상점의 멤버와 현재 멤버가 일치하지 않은경우 예외
