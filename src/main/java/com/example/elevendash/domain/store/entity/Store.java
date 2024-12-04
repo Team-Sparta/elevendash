@@ -7,14 +7,17 @@ import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Table(name = "stores")
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store extends BaseTimeEntity {
     /**
      * 식별자 생성
@@ -32,6 +35,12 @@ public class Store extends BaseTimeEntity {
 
     @Lob @Column
     private String storeDescription;
+
+    @Column
+    private LocalTime openTime;
+
+    @Column
+    private LocalTime closeTime;
 
     @Column(nullable = false)
     private String storeAddress;
@@ -87,6 +96,7 @@ public class Store extends BaseTimeEntity {
      * @param storeImagem
      * @param member
      */
+    @Builder
     public Store(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImagem, Member member) {
         this.storeName = storeName;
         this.storeDescription = storeDescription;
@@ -123,7 +133,7 @@ public class Store extends BaseTimeEntity {
     /**
      * 기본 생성자
      */
-    protected Store() {}
+
 
 
 
