@@ -17,19 +17,26 @@ import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.InvalidParamException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import com.example.elevendash.global.provider.JwtTokenProvider;
+import com.example.elevendash.global.s3.S3Service;
+import com.example.elevendash.global.s3.UploadImageInfo;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordService passwordService;
+    private final S3Service s3Service;
 
     public SignUpResponse signUp(SignUpRequest request) {
         validateEmail(request.email());
@@ -100,10 +107,23 @@ public class MemberService {
 
     public void deleteMember(Member loginMember) {
         loginMember.deleteAccount();
-
     }
 
-    public UpdateProfileResponse updateProfile(Member loginMember, @Valid UpdateProfileRequest request, MultipartFile image) {
-        return null;
+    @Transactional
+    public UpdateProfileResponse updateProfile(Member loginMember, UpdateProfileRequest request, MultipartFile image) {
+
+        Member member = memberRepository.findByEmailAndDeletedAtIsNull(loginMember.getEmail());
+
+        String imageUrl = null;
+
+        if (image != null) {
+            UploadImageInfo uploadImageInfo = s3Service.uploadMemberProfileImage(image);
+            imageUrl = uploadImageInfo.ImageUrl();
+        }
+
+        member.updateProfile(request, imageUrl);
+
+        return new UpdateProfileResponse(member.getId());
     }
+
 }

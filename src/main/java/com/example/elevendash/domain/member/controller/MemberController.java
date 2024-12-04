@@ -14,6 +14,7 @@ import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +43,7 @@ public class MemberController {
         return CommonResponse.success(SuccessCode.SUCCESS, memberService.getMemberProfile(memberId, loginMember));
     }
 
-    @PutMapping
+    @PutMapping(value = "/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<CommonResponse<UpdateProfileResponse>> updateProfile(
             @LoginMember Member loginMember,
             @Valid @RequestPart(value = "request") UpdateProfileRequest request,
