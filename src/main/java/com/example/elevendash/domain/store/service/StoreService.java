@@ -93,7 +93,7 @@ public class StoreService {
      * @param LimitNumber
      * @return
      */
-    private Boolean isValidStoreNumber(Member member,Long LimitNumber) {
+    public Boolean isValidStoreNumber(Member member,Long LimitNumber) {
         Long storeNumber = storeRepository.countByMemberAndIsDeleted(member, Boolean.FALSE);
         return !storeNumber.equals(LimitNumber);
     }
@@ -103,7 +103,7 @@ public class StoreService {
      * @param closeTime
      * @return
      */
-    private Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
+    public Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
         return openTime.isBefore(closeTime);
     }
     /**
@@ -111,7 +111,7 @@ public class StoreService {
      * @param multipartFile
      * @return
      */
-    private String convert (MultipartFile multipartFile) {
+    public static String convert (MultipartFile multipartFile) {
         return "storePictureExample.jpg";
     }
 }

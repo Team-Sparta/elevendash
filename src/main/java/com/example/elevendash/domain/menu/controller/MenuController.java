@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("stores/")
@@ -19,17 +20,21 @@ public class MenuController {
     private final MenuService menuService;
 
     /**
-     * 메뉴 등록 엔드포인트
-     * @param requestDto
-     * @param storeId
-     * @param member
-     * @return
+     * 메뉴 등록 API
+     *
+     * @param requestDto 메뉴 등록 정보 (이름, 가격, 이미지, 카테고리)
+     * @param storeId 가게 식별자
+     * @param member 로그인한 사용자 정보
+     * @return 등록된 메뉴 정보
+     * @throws  가게를 찾을 수 없는 경우
+     * @throws  권한이 없는 경우
      */
     @PostMapping("/{storeId}/menus/register")
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
             @RequestBody @Valid RegisterMenuRequestDto requestDto,
             @PathVariable Long storeId,
+            @RequestParam("menuImage") MultipartFile menuImage,
             @LoginMember Member member) {
-        return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, storeId, requestDto));
+        return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
     }
 }

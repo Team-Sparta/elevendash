@@ -27,6 +27,6 @@ public class RegisterMenuRequestDto {
     @NotBlank
     private final String menuImage;
 
-    @NotBlank
+    @NotNull
     private final Categories menuCategory;
 }

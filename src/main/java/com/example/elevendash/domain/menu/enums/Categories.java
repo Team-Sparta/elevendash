@@ -1,6 +1,9 @@
 package com.example.elevendash.domain.menu.enums;
 
-public enum Categories {
+
+import lombok.Getter;
+
+@Getter
 public enum Categories {
     CHICKEN("치킨"),
     PIZZA("피자"),
@@ -24,8 +27,5 @@ public enum Categories {
         this.koreanName = koreanName;
     }
 
-    public String getKoreanName() {
-        return koreanName;
-    }
 }
-}
+
