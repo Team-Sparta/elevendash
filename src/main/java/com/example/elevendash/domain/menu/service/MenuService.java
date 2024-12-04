@@ -4,11 +4,9 @@ import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.request.UpdateMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.UpdateMenuRequestDto;
-import com.example.elevendash.domain.menu.dto.response.AddMenuOptionResponseDto;
-import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
-import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
-import com.example.elevendash.domain.menu.dto.response.UpdateMenuResponseDto;
+import com.example.elevendash.domain.menu.dto.response.*;
 import com.example.elevendash.domain.menu.entity.Category;
 import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.menu.entity.MenuOption;
@@ -116,15 +114,29 @@ public class MenuService {
      */
     @Transactional
     public AddMenuOptionResponseDto addOption (Member member, Long storeId, Long menuId, AddMenuOptionRequestDto requestDto) {
-        Store addOptionMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+        Store addOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        isValidMemberAndStore(member, addOptionMenuStore);
+        isValidMemberAndStore(member, addOptionStore);
         Menu addOptionMenu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
-        isValidMenuAndStore(addOptionMenu, addOptionMenuStore);
-        MenuOption addMenuOption = new MenuOption(requestDto.getContent(),addOptionMenu);
-        menuOptionRepository.save(addMenuOption);
-        return new AddMenuOptionResponseDto(addMenuOption.getId());
+        isValidMenuAndStore(addOptionMenu, addOptionStore);
+        MenuOption addOption = new MenuOption(requestDto.getContent(),addOptionMenu);
+        menuOptionRepository.save(addOption);
+        return new AddMenuOptionResponseDto(addOption.getId());
+    }
+
+    @Transactional
+    public UpdateMenuOptionResponseDto updateOption (Member member, Long storeId, Long menuId,Long menuOptionId ,UpdateMenuOptionRequestDto requestDto) {
+        Store updateOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        isValidMemberAndStore(member, updateOptionStore);
+        Menu updateOptionMenu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        isValidMenuAndStore(updateOptionMenu, updateOptionStore);
+        MenuOption updateOption = menuOptionRepository.findById(menuOptionId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU_OPTION));
+        updateOption.update(requestDto.getContent());
+        return new UpdateMenuOptionResponseDto(updateOption.getId());
     }
 
 
@@ -149,7 +161,6 @@ public class MenuService {
         if(!store.equals(menu.getStore())){
             throw new BaseException(ErrorCode.NOT_SAME_STORE);
         }
-
     }
 
 }

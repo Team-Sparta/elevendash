@@ -31,8 +31,7 @@ public class MenuController {
      * @param storeId 가게 식별자
      * @param member 로그인한 사용자 정보
      * @return 등록된 메뉴 정보
-     * @throws  가게를 찾을 수 없는 경우
-     * @throws  권한이 없는 경우
+
      */
     @PostMapping("/{storeId}/menus/register")
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
@@ -75,6 +74,14 @@ public class MenuController {
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,storeId,menuId,requestDto));
     }
 
+    /**
+     * 메뉴 옵션 추가 API
+     * @param storeId
+     * @param menuId
+     * @param member
+     * @param requestDto
+     * @return
+     */
     @PostMapping("/{storeId}/menus/{menuId}/menu-options/add")
     public ResponseEntity<CommonResponse<AddMenuOptionResponseDto>> addMenuOption(
             @PathVariable("storeId") Long storeId,
@@ -83,5 +90,7 @@ public class MenuController {
             @RequestBody @Valid AddMenuOptionRequestDto requestDto) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.addOption(member,storeId,menuId,requestDto));
     }
+
+//    @PutMapping("/{storeId}/menus/{menuId}/menu-options/{menuOptionId}")
 
 }
