@@ -66,7 +66,7 @@ public class StoreService {
      */
     private Boolean isValidStoreNumber(Member member,Long LimitNumber) {
         Long storeNumber = storeRepository.countByMemberAndIsDeleted(member, Boolean.FALSE);
-        return !storeNumber.equals(LimitNumber);
+        return storeNumber.equals(LimitNumber);
     }
     /**
      * 오픈 마감시간 검증 메소드
@@ -75,7 +75,7 @@ public class StoreService {
      * @return
      */
     private Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
-        return !openTime.isBefore(closeTime);
+        return openTime.isBefore(closeTime);
     }
     /**
      * 임시 파일 변환 메소드
