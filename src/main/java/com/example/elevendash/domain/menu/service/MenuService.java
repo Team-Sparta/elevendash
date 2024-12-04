@@ -10,6 +10,7 @@ import com.example.elevendash.domain.menu.dto.response.*;
 import com.example.elevendash.domain.menu.entity.Category;
 import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.menu.entity.MenuOption;
+import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.menu.repository.CategoryRepository;
 import com.example.elevendash.domain.menu.repository.MenuOptionRepository;
 import com.example.elevendash.domain.menu.repository.MenuRepository;
@@ -50,7 +51,6 @@ public class MenuService {
         Category category = categoryRepository.findByCategoryName(requestDto.getMenuCategory())
                 .orElseThrow(() -> new BaseException(("카테고리를 찾을 수 없습니다: " + requestDto.getMenuCategory()),ErrorCode.NOT_FOUND_ENUM_CONSTANT));
         Menu saveMenu = Menu.builder()
-                .menuImage(requestDto.getMenuImage())
                 .menuName(requestDto.getMenuName())
                 .menuPrice(requestDto.getMenuPrice())
                 .store(addMenuStore)
@@ -91,7 +91,7 @@ public class MenuService {
      * @return
      */
     @Transactional
-    public UpdateMenuResponseDto updateMenu (Member member, Long storeId, Long menuId, UpdateMenuRequestDto requestDto) {
+    public UpdateMenuResponseDto updateMenu (Member member, MultipartFile menuImage,Long storeId, Long menuId, UpdateMenuRequestDto requestDto) {
         Store updateMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
         isValidMemberAndStore(member, updateMenuStore);
@@ -101,7 +101,7 @@ public class MenuService {
         Category updateMenuCategory = categoryRepository.findByCategoryName(requestDto.getMenuCategory())
                 .orElseThrow(() -> new BaseException(("카테고리를 찾을 수 없습니다: " + requestDto.getMenuCategory()),ErrorCode.NOT_FOUND_ENUM_CONSTANT));
         updateMenu.update(requestDto.getMenuName(), requestDto.getMenuPrice()
-                ,updateMenuCategory,requestDto.getMenuImage());
+                ,updateMenuCategory, storeService.convert(menuImage));
         return new UpdateMenuResponseDto(updateMenu.getId());
     }
 

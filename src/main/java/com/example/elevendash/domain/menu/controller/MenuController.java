@@ -35,9 +35,9 @@ public class MenuController {
      */
     @PostMapping("/{storeId}/menus/register")
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
-            @RequestBody @Valid RegisterMenuRequestDto requestDto,
+            @RequestPart("request") @Valid RegisterMenuRequestDto requestDto,
             @PathVariable("storeId") Long storeId,
-            @RequestParam("menuImage") MultipartFile menuImage,
+            @RequestPart("image") MultipartFile menuImage,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
     }
@@ -70,8 +70,9 @@ public class MenuController {
             @PathVariable("storeId") Long storeId,
             @PathVariable("menuId") Long menuId,
             @LoginMember Member member,
-            @RequestBody @Valid UpdateMenuRequestDto requestDto) {
-        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,storeId,menuId,requestDto));
+            @RequestPart("image") MultipartFile menuImage,
+            @RequestPart("request") @Valid UpdateMenuRequestDto requestDto) {
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,menuImage,storeId,menuId,requestDto));
     }
 
     /**
