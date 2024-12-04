@@ -4,10 +4,7 @@ import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
 import com.example.elevendash.domain.menu.dto.request.UpdateMenuRequestDto;
-import com.example.elevendash.domain.menu.dto.response.AddMenuOptionResponseDto;
-import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
-import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
-import com.example.elevendash.domain.menu.dto.response.UpdateMenuResponseDto;
+import com.example.elevendash.domain.menu.dto.response.*;
 import com.example.elevendash.domain.menu.service.MenuService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
@@ -92,6 +89,24 @@ public class MenuController {
             @RequestBody @Valid AddMenuOptionRequestDto requestDto) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.addOption(member,storeId,menuId,requestDto));
     }
+
+    /**
+     * 메누 삭제 API
+     * @param storeId
+     * @param menuId
+     * @param member
+     * @param menuOptionId
+     * @return
+     */
+    @DeleteMapping("/{storeId}/menus/{menuId}/menu-options/{menuOptionId}")
+    public ResponseEntity<CommonResponse<DeleteMenuOptionResponseDto>> deleteMenuOption(
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId,
+            @LoginMember Member member,
+            @PathVariable Long menuOptionId) {
+        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,menuService.deleteOption(member,storeId,menuId,menuOptionId));
+    }
+
 
 //    @PutMapping("/{storeId}/menus/{menuId}/menu-options/{menuOptionId}")
 

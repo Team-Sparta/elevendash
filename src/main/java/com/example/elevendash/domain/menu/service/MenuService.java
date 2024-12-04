@@ -10,7 +10,6 @@ import com.example.elevendash.domain.menu.dto.response.*;
 import com.example.elevendash.domain.menu.entity.Category;
 import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.menu.entity.MenuOption;
-import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.menu.repository.CategoryRepository;
 import com.example.elevendash.domain.menu.repository.MenuOptionRepository;
 import com.example.elevendash.domain.menu.repository.MenuRepository;
@@ -147,6 +146,28 @@ public class MenuService {
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU_OPTION));
 
         return updateOptionTransactional(requestDto,updateOption);
+    }
+
+    /**
+     * 메뉴 옵션 삭제 서비스 메소드
+     * @param member
+     * @param storeId
+     * @param menuId
+     * @param menuOptionId
+     * @return
+     */
+    @Transactional
+    public DeleteMenuOptionResponseDto deleteOption (Member member, Long storeId, Long menuId, Long menuOptionId) {
+        Store updateOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        isValidMemberAndStore(member, updateOptionStore);
+        Menu updateOptionMenu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        isValidMenuAndStore(updateOptionMenu, updateOptionStore);
+        MenuOption deleteOption = menuOptionRepository.findById(menuOptionId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU_OPTION));
+        menuOptionRepository.delete(deleteOption);
+        return new DeleteMenuOptionResponseDto(deleteOption.getId());
     }
 
     /**
