@@ -85,6 +85,10 @@ public class MemberService {
     public EmailLoginResponse emailLogin(EmailLoginRequest request) {
         Member member = memberRepository.findByEmailAndDeletedAtIsNull(request.email());
 
+        if (member == null) {
+            throw new AuthenticationException(ErrorCode.NOT_FOUND_MEMBER);
+        }
+
         if (!passwordService.matches(request.password(), member.getPassword())) {
             throw new AuthenticationException(ErrorCode.INVALID_AUTHENTICATION);
         }

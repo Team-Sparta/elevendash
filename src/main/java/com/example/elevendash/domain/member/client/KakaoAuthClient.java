@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.member.client;
 
-import com.example.elevendash.domain.member.dto.oauth.KakaoToken;
+import com.example.elevendash.domain.member.dto.oauth.kakao.KakaoToken;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
