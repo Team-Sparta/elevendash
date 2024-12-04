@@ -73,6 +73,9 @@ public enum ErrorCode {
      */
     NOT_FOUND_STORE(HttpStatus.NOT_FOUND, "상점 정보를 찾을 수 없습니다."),
     NOT_SAME_MEMBER(HttpStatus.NOT_ACCEPTABLE, "상점과 멤버정보가 일치하지 않습니다."),
+    NOT_VALID_OPEN_TIME(HttpStatus.BAD_REQUEST, "오픈시간이 마감시간보다 빠릅니다"),
+    ENOUGH_STORE(HttpStatus.BAD_REQUEST, "상점의 수가 3개입니다 더이상 추가할 수 없습니다"),
+    NOT_OWNER(HttpStatus.NOT_ACCEPTABLE, "OWNER 권한만 할 수 있습니다."),
 
     /**
      * Menu

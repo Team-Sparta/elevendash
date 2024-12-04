@@ -42,16 +42,16 @@ public class StoreService {
     @Transactional
     public RegisterStoreResponseDto registerStore(Member member, MultipartFile multipartFile, RegisterStoreRequestDto dto) {
         // 오픈 마감시간 검증
-        if(isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
-            throw new BaseException("오픈시간이 마감시간보다 빠릅니다",ErrorCode.VALIDATION_ERROR);
+        if(!isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
+            throw new BaseException(ErrorCode.NOT_VALID_OPEN_TIME);
         }
         // 스토어 수 검증
-        if(isValidStoreNumber(member, 3L)) {
-            throw new BaseException("스토어 수가 이미 3개 입니다",ErrorCode.VALIDATION_ERROR);
+        if(!isValidStoreNumber(member, 3L)) {
+            throw new BaseException(ErrorCode.ENOUGH_STORE);
         }
         // OWNER 권한 검증
         if(!member.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException("OWNER만이 상점을 개설할 수 있습니다",ErrorCode.DISABLE_ACCOUNT);
+            throw new BaseException(ErrorCode.NOT_OWNER);
         }
         String storeImage = convert(multipartFile);
         Store savedStore = Store.builder()
@@ -113,7 +113,6 @@ public class StoreService {
 
     public String convert (MultipartFile image) {
         String imageUrl = null;
-
         if (image != null) {
             UploadImageInfo uploadImageInfo = s3Service.uploadMemberProfileImage(image);
             imageUrl = uploadImageInfo.ImageUrl();
