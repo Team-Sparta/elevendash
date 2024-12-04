@@ -72,7 +72,7 @@ public class Member extends BaseTimeEntity {
         this.password = signUpRequest.password();
         this.provider = signUpRequest.provider();
         this.providerId = signUpRequest.providerId();
-        this.role = signUpRequest.role() != null ? role : MemberRole.CUSTOMER;
+        this.role = signUpRequest.role() != null ? signUpRequest.role() : MemberRole.CUSTOMER;
     }
 
     public void updateProfile(UpdateProfileRequest request, String profileImageUrl) {
