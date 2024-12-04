@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 
@@ -33,6 +34,8 @@ public class RegisterStoreRequestDto {
 
     @NotBlank
     private final Integer leastAmount;
+
+    private final MultipartFile multipartFile;
 
 
 }

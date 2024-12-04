@@ -9,6 +9,7 @@ import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,25 +90,28 @@ public class Store extends BaseTimeEntity {
     private List<BookMark> bookmarks = new ArrayList<>();
 
     /**
-     * Store 생성자
      *
      * @param storeName
      * @param storeDescription
      * @param storeAddress
      * @param storePhone
      * @param leastAmount
-     * @param storeImagem
+     * @param storeImage
+     * @param openTime
+     * @param closeTime
      * @param member
      */
     @Builder
-    public Store(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImagem, Member member) {
+    public Store(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImage, LocalTime openTime, LocalTime closeTime, Member member) {
         this.storeName = storeName;
         this.storeDescription = storeDescription;
         this.storeAddress = storeAddress;
         this.storePhone = storePhone;
         this.leastAmount = leastAmount;
-        this.storeImage = storeImagem;
+        this.storeImage = storeImage;
         this.member = member;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
     }
 
     /**
