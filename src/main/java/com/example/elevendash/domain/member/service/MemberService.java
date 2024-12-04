@@ -1,10 +1,12 @@
 package com.example.elevendash.domain.member.service;
 
+import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.dto.AuthUserInfo;
 import com.example.elevendash.domain.member.dto.MemberProfileResponse;
 import com.example.elevendash.domain.member.dto.Token;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
+import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
 import com.example.elevendash.domain.member.dto.response.SignUpResponse;
 import com.example.elevendash.domain.member.entity.Member;
@@ -15,8 +17,10 @@ import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.InvalidParamException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import com.example.elevendash.global.provider.JwtTokenProvider;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 
@@ -92,5 +96,14 @@ public class MemberService {
                         member.getName(),
                         member.getProfileImage()))
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MEMBER));
+    }
+
+    public void deleteMember(Member loginMember) {
+        loginMember.deleteAccount();
+
+    }
+
+    public UpdateProfileResponse updateProfile(Member loginMember, @Valid UpdateProfileRequest request, MultipartFile image) {
+        return null;
     }
 }
