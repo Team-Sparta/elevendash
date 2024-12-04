@@ -1,9 +1,13 @@
 package com.example.elevendash.domain.menu.controller;
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.request.UpdateMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.response.AddMenuOptionResponseDto;
 import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
 import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
+import com.example.elevendash.domain.menu.dto.response.UpdateMenuResponseDto;
 import com.example.elevendash.domain.menu.service.MenuService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
@@ -33,7 +37,7 @@ public class MenuController {
     @PostMapping("/{storeId}/menus/register")
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
             @RequestBody @Valid RegisterMenuRequestDto requestDto,
-            @PathVariable Long storeId,
+            @PathVariable("storeId") Long storeId,
             @RequestParam("menuImage") MultipartFile menuImage,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
@@ -48,9 +52,36 @@ public class MenuController {
      */
     @DeleteMapping("/{storeId}/menus/{menuId}")
     public ResponseEntity<CommonResponse<DeleteMenuResponseDto>> deleteMenu(
-            @PathVariable Long storeId,
-            @PathVariable Long menuId,
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE,menuService.deleteMenu(member,storeId,menuId));
     }
+
+    /**
+     * 메뉴 수정 API
+     * @param storeId
+     * @param menuId
+     * @param member
+     * @param requestDto
+     * @return
+     */
+    @PutMapping("/{storeId}/menus/{menuId}")
+    public ResponseEntity<CommonResponse<UpdateMenuResponseDto>> updateMenu(
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId,
+            @LoginMember Member member,
+            @RequestBody @Valid UpdateMenuRequestDto requestDto) {
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,storeId,menuId,requestDto));
+    }
+
+    @PostMapping("/{storeId}/menus/{menuId}/menu-options/add")
+    public ResponseEntity<CommonResponse<AddMenuOptionResponseDto>> addMenuOption(
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId,
+            @LoginMember Member member,
+            @RequestBody @Valid AddMenuOptionRequestDto requestDto) {
+        return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.addOption(member,storeId,menuId,requestDto));
+    }
+
 }

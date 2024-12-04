@@ -2,11 +2,16 @@ package com.example.elevendash.domain.menu.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
+import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.request.UpdateMenuRequestDto;
+import com.example.elevendash.domain.menu.dto.response.AddMenuOptionResponseDto;
 import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
 import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
+import com.example.elevendash.domain.menu.dto.response.UpdateMenuResponseDto;
 import com.example.elevendash.domain.menu.entity.Category;
 import com.example.elevendash.domain.menu.entity.Menu;
+import com.example.elevendash.domain.menu.entity.MenuOption;
 import com.example.elevendash.domain.menu.repository.CategoryRepository;
 import com.example.elevendash.domain.menu.repository.MenuOptionRepository;
 import com.example.elevendash.domain.menu.repository.MenuRepository;
@@ -57,6 +62,13 @@ public class MenuService {
         return new RegisterMenuResponseDto(saveMenu.getId());
     }
 
+    /**
+     * 메뉴 삭제 서비스 메소드
+     * @param member
+     * @param storeId
+     * @param menuId
+     * @return
+     */
     @Transactional
     public DeleteMenuResponseDto deleteMenu (Member member, Long storeId, Long menuId) {
         Store deleteMenuStore = storeRepository.findByIdAndIsDeleted(storeId, Boolean.FALSE)
@@ -72,11 +84,56 @@ public class MenuService {
     }
 
     /**
+     * 메뉴 수정 서비스 메소드
+     * @param member
+     * @param storeId
+     * @param menuId
+     * @param requestDto
+     * @return
+     */
+    @Transactional
+    public UpdateMenuResponseDto updateMenu (Member member, Long storeId, Long menuId, UpdateMenuRequestDto requestDto) {
+        Store updateMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        isValidMemberAndStore(member, updateMenuStore);
+        Menu updateMenu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        isValidMenuAndStore(updateMenu, updateMenuStore);
+        Category updateMenuCategory = categoryRepository.findByCategoryName(requestDto.getMenuCategory())
+                .orElseThrow(() -> new BaseException(("카테고리를 찾을 수 없습니다: " + requestDto.getMenuCategory()),ErrorCode.NOT_FOUND_ENUM_CONSTANT));
+        updateMenu.update(requestDto.getMenuName(), requestDto.getMenuPrice()
+                ,updateMenuCategory,requestDto.getMenuImage());
+        return new UpdateMenuResponseDto(updateMenu.getId());
+    }
+
+    /**
+     * 메뉴 옵션 추가 서비스 메소드
+     * @param member
+     * @param storeId
+     * @param menuId
+     * @param requestDto
+     * @return
+     */
+    @Transactional
+    public AddMenuOptionResponseDto addOption (Member member, Long storeId, Long menuId, AddMenuOptionRequestDto requestDto) {
+        Store addOptionMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        isValidMemberAndStore(member, addOptionMenuStore);
+        Menu addOptionMenu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        isValidMenuAndStore(addOptionMenu, addOptionMenuStore);
+        MenuOption addMenuOption = new MenuOption(requestDto.getContent(),addOptionMenu);
+        menuOptionRepository.save(addMenuOption);
+        return new AddMenuOptionResponseDto(addMenuOption.getId());
+    }
+
+
+    /**
      * 유저 및 음식점 유효성 검증
      * @param member
      * @param store
      */
-    private final void isValidMemberAndStore (Member member, Store store) {
+    private void isValidMemberAndStore (Member member, Store store) {
         // 가게 소유자 검증
         if(!store.getMember().equals(member)){
             throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
@@ -86,4 +143,13 @@ public class MenuService {
             throw new BaseException("OWNER만이 상점을 개설할 수 있습니다",ErrorCode.DISABLE_ACCOUNT);
         }
     }
+
+    private void isValidMenuAndStore (Menu menu, Store store) {
+        // 가게 메뉴 검증
+        if(!store.equals(menu.getStore())){
+            throw new BaseException(ErrorCode.NOT_SAME_STORE);
+        }
+
+    }
+
 }
