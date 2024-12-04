@@ -2,8 +2,10 @@ package com.example.elevendash.domain.store.controller;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
+import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
@@ -42,7 +44,7 @@ public class StoreController {
     ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(
             @LoginMember Member loginMember,
             @Valid @RequestPart(value = "request") RegisterStoreRequestDto requestDto,
-            @RequestPart(value = "image") MultipartFile storeImage) {
+            @RequestPart(name = "image", required = false) MultipartFile storeImage) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT, storeService.registerStore(loginMember, storeImage, requestDto));
     }
 
@@ -57,6 +59,20 @@ public class StoreController {
     ResponseEntity<CommonResponse<DeleteStoreResponseDto>> deleteStore(@PathVariable(name = "storeId") Long storeId,
                                                                        @LoginMember Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE, storeService.deleteStore(loginMember, storeId));
+    }
+
+    /**
+     * 상점 수정 엔드포인트
+     * @param storeId
+     * @param loginMember
+     * @return
+     */
+    @PutMapping("/{storeId}")
+    ResponseEntity<CommonResponse<UpdateStoreResponseDto>> updateStore(@PathVariable(name = "storeId") Long storeId,
+                                                                       @LoginMember Member loginMember,
+                                                                       @RequestPart("request") @Valid UpdateStoreRequestDto requestDto,
+                                                                       @RequestPart(name = "image", required = false) MultipartFile storeImage){
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE, storeService.updateStore(loginMember,storeId,storeImage,requestDto));
     }
 
 }

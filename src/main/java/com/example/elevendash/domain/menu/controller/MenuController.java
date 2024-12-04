@@ -35,7 +35,7 @@ public class MenuController {
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
             @RequestPart("request") @Valid RegisterMenuRequestDto requestDto,
             @PathVariable("storeId") Long storeId,
-            @RequestPart("image") @NotNull MultipartFile menuImage,
+            @RequestPart(name = "image", required = false) @NotNull MultipartFile menuImage,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
     }
@@ -68,7 +68,7 @@ public class MenuController {
             @PathVariable("storeId") Long storeId,
             @PathVariable("menuId") Long menuId,
             @LoginMember Member member,
-            @RequestPart("image") @NotNull MultipartFile menuImage,
+            @RequestPart(name = "image", required = false) @NotNull MultipartFile menuImage,
             @RequestPart("request") @Valid UpdateMenuRequestDto requestDto) {
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,menuImage,storeId,menuId,requestDto));
     }
