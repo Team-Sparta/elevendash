@@ -55,7 +55,10 @@ public class StoreService {
         if(!member.getRole().equals(MemberRole.OWNER)){
             throw new BaseException(ErrorCode.NOT_OWNER);
         }
-        String storeImage = convert(multipartFile);
+        String storeImage = null;
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            storeImage = convert(multipartFile);
+        }
         Store savedStore = Store.builder()
                 .storeName(dto.getStoreName())
                 .storeDescription(dto.getStoreDescription())
@@ -83,10 +86,12 @@ public class StoreService {
         // 상점을 찾지 못한경우 예외
         Store deleteStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-
         // 상점의 멤버와 현재 멤버가 일치하지 않은경우 예외
         if(!deleteStore.getMember().equals(member)){
             throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
         }
         // soft delete
         deleteStore.delete();
@@ -103,9 +108,17 @@ public class StoreService {
         if(!member.getRole().equals(MemberRole.OWNER)){
             throw new BaseException(ErrorCode.NOT_OWNER);
         }
-        String storeImage = convert(multipartFile);
-        Store updateStore = storeRepository.findById(storeId)
+        String storeImage = null;
+        // 삭제된 상점 제외 조회
+        Store updateStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        // 상점 소유자 검증
+        if (!updateStore.getMember().equals(member)){
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            storeImage = convert(multipartFile);
+        }
         updateStore.update(dto.getStoreName(),dto.getStoreDescription(),dto.getStoreAddress()
                 ,dto.getStorePhone(),dto.getLeastAmount(),storeImage,dto.getOpenTime(),dto.getCloseTime());
         return new UpdateStoreResponseDto(updateStore.getId());

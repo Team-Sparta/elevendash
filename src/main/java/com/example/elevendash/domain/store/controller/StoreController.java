@@ -44,7 +44,7 @@ public class StoreController {
     ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(
             @LoginMember Member loginMember,
             @Valid @RequestPart(value = "request") RegisterStoreRequestDto requestDto,
-            @RequestPart(value = "image") MultipartFile storeImage) {
+            @RequestPart(name = "image", required = false) MultipartFile storeImage) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT, storeService.registerStore(loginMember, storeImage, requestDto));
     }
 
@@ -71,7 +71,7 @@ public class StoreController {
     ResponseEntity<CommonResponse<UpdateStoreResponseDto>> updateStore(@PathVariable(name = "storeId") Long storeId,
                                                                        @LoginMember Member loginMember,
                                                                        @RequestPart("request") @Valid UpdateStoreRequestDto requestDto,
-                                                                       @RequestPart("image") MultipartFile storeImage){
+                                                                       @RequestPart(name = "image", required = false) MultipartFile storeImage){
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE, storeService.updateStore(loginMember,storeId,storeImage,requestDto));
     }
 
