@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.member.service;
 
-import com.example.elevendash.domain.member.controller.UpdateProfileResponse;
+import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.dto.AuthUserInfo;
 import com.example.elevendash.domain.member.dto.MemberProfileResponse;
 import com.example.elevendash.domain.member.dto.Token;

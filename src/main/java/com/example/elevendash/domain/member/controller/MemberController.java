@@ -6,6 +6,7 @@ import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
 import com.example.elevendash.domain.member.dto.response.SignUpResponse;
+import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.service.MemberService;
 import com.example.elevendash.global.annotation.LoginMember;
@@ -58,6 +59,4 @@ public class MemberController {
         memberService.deleteMember(loginMember);
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE);
     }
-
-
 }
