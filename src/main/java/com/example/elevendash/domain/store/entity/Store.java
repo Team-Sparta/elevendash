@@ -7,15 +7,18 @@ import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
+import lombok.*;
 
-import java.awt.*;
+import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Table(name = "stores")
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Store extends BaseTimeEntity {
     /**
      * 식별자 생성
@@ -34,6 +37,12 @@ public class Store extends BaseTimeEntity {
     @Lob
     @Column
     private String storeDescription;
+
+    @Column
+    private LocalTime openTime;
+
+    @Column
+    private LocalTime closeTime;
 
     @Column(nullable = false)
     private String storeAddress;
@@ -81,24 +90,28 @@ public class Store extends BaseTimeEntity {
     private List<BookMark> bookmarks = new ArrayList<>();
 
     /**
-     * Store 생성자
      *
      * @param storeName
      * @param storeDescription
      * @param storeAddress
      * @param storePhone
      * @param leastAmount
-     * @param storeImagem
+     * @param storeImage
+     * @param openTime
+     * @param closeTime
      * @param member
      */
-    public Store(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImagem, Member member) {
+    @Builder
+    public Store(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImage, LocalTime openTime, LocalTime closeTime, Member member) {
         this.storeName = storeName;
         this.storeDescription = storeDescription;
         this.storeAddress = storeAddress;
         this.storePhone = storePhone;
         this.leastAmount = leastAmount;
-        this.storeImage = storeImagem;
+        this.storeImage = storeImage;
         this.member = member;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
     }
 
     /**
@@ -128,8 +141,11 @@ public class Store extends BaseTimeEntity {
     /**
      * 기본 생성자
      */
-    protected Store() {
-    }
+
+
+
+
+
 
 
 }
