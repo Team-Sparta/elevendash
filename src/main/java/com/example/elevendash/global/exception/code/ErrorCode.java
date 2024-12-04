@@ -67,8 +67,14 @@ public enum ErrorCode {
     BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다.")
 
 
-    ;
 
+
+    /**
+     * Store
+     */
+    NOT_FOUND_STORE(HttpStatus.NOT_FOUND, "상점 정보를 찾을 수 없습니다."),
+    NOT_SAME_MEMBER(HttpStatus.NOT_ACCEPTABLE, "상점과 멤버정보가 일치하지 않습니다.")
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;
