@@ -2,6 +2,7 @@ package com.example.elevendash.domain.store.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
+import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
@@ -28,6 +29,7 @@ public class StoreService {
 
     /**
      * 음식점 등록 메소드
+     * 예외사항: 오픈 마감시간 검증 스토어 수 검증
      * @param member 등록하려는 유저
      * @param multipartFile 음식점 이미지 파일
      * @param dto 음식점에 필요한 정보
@@ -59,6 +61,28 @@ public class StoreService {
     }
 
     /**
+     * 상점 삭제 메소드
+     * 예외사항: 상점이 존재하지 않는경우, 상점의 멤버와 삭제하려는 멤버가 일치하지 않는경우
+     * @param member
+     * @param storeId
+     * @return
+     */
+    @Transactional
+    public DeleteStoreResponseDto deleteStore(Member member, Long storeId) {
+        // 상점을 찾지 못한경우 예외
+        Store deleteStore = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+
+        // 상점의 멤버와 현재 멤버가 일치하지 않은경우 예외
+        if(!deleteStore.getMember().equals(member)){
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        // soft delete
+        deleteStore.delete();
+        return new DeleteStoreResponseDto(deleteStore.getId());
+    }
+
+    /**
      * 음식점 수 검증 메소드 (3개인 경우에 추가할경우 위반)
      * @param member
      * @param LimitNumber
@@ -75,7 +99,7 @@ public class StoreService {
      * @return
      */
     private Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
-        return !openTime.isBefore(closeTime);
+        return openTime.isBefore(closeTime);
     }
     /**
      * 임시 파일 변환 메소드

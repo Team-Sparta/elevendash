@@ -7,6 +7,7 @@ import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -52,7 +53,8 @@ public class Store extends BaseTimeEntity {
     @Column(nullable = false) @NotBlank
     private String storePhone;
 
-    @Column(nullable = false) @NotBlank
+    @Column(nullable = false) @NotNull
+    @Min(value = 0)
     private Integer leastAmount;
 
     @Lob
