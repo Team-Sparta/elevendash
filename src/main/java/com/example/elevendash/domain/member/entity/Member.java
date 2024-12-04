@@ -1,6 +1,7 @@
 package com.example.elevendash.domain.member.entity;
 
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
+import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.member.enums.Provider;
 import com.example.elevendash.domain.order.entity.Order;
@@ -72,6 +73,11 @@ public class Member extends BaseTimeEntity {
         this.provider = signUpRequest.provider();
         this.providerId = signUpRequest.providerId();
         this.role = signUpRequest.role() != null ? role : MemberRole.CUSTOMER;
+    }
+
+    public void updateProfile(UpdateProfileRequest request, String profileImageUrl) {
+        this.name = request.name();
+        this.profileImage = profileImageUrl;
     }
 
     public void deleteAccount() {
