@@ -3,7 +3,12 @@ package com.example.elevendash.domain.menu.entity;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.validator.constraints.Length;
 
 import java.util.List;
 
@@ -23,12 +28,17 @@ public class Menu extends BaseTimeEntity {
     /**
      * 필드 변수
      */
-    @Column
+    @Column @NotBlank
+    @Length(max = 50)
     private String menuName;
 
-    @Column
+    @Column @NotNull
+    @Min(0)
     private Integer menuPrice;
 
+    @Lob @NotBlank
+    @Column
+    private String menuImage;
     //연관 관계
 
     /**
@@ -53,31 +63,35 @@ public class Menu extends BaseTimeEntity {
     // order와 관계 정리할 필요 있음
 
     /**
-     * Menu 생성자
+     * 메뉴 생성자
      * @param menuName
      * @param menuPrice
      * @param store
      * @param category
+     * @param menuImage
      */
-    public Menu(String menuName, Integer menuPrice, Store store, Category category) {
+    @Builder
+    public Menu(String menuName, Integer menuPrice, Store store, Category category, String menuImage) {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
         this.store = store;
         this.category = category;
+        this.menuImage = menuImage;
     }
 
     /**
      * 메뉴 변경 메소드
      * @param menuName
      * @param menuPrice
-     * @param store
      * @param category
+     * @param menuImage
      */
-    public void update(String menuName, Integer menuPrice, Store store, Category category ) {
+
+    public void update(String menuName, Integer menuPrice, Category category, String menuImage ) {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
-        this.store = store;
         this.category = category;
+        this.menuImage = menuImage;
     }
 
     protected Menu() {}

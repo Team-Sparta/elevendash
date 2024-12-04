@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.menu.enums;
 
-public enum Category {
+public enum Categories {
     CHICKEN,
     PIZZA,
     KOREAN_FOOD,
@@ -16,5 +16,4 @@ public enum Category {
     STEAMED_FOOD,
     LUNCH_BOX,
     PORRIDGE
-
 }

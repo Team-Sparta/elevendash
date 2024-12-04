@@ -1,6 +1,7 @@
 package com.example.elevendash.domain.store.service;
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
 import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
@@ -39,11 +40,15 @@ public class StoreService {
     public RegisterStoreResponseDto registerStore(Member member, MultipartFile multipartFile, RegisterStoreRequestDto dto) {
         // 오픈 마감시간 검증
         if(isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
-            throw new BaseException(ErrorCode.VALIDATION_ERROR);
+            throw new BaseException("오픈시간이 마감시간보다 빠릅니다",ErrorCode.VALIDATION_ERROR);
         }
         // 스토어 수 검증
         if(isValidStoreNumber(member, 3L)) {
-            throw new BaseException(ErrorCode.VALIDATION_ERROR);
+            throw new BaseException("스토어 수가 이미 3개 입니다",ErrorCode.VALIDATION_ERROR);
+        }
+        // OWNER 권한 검증
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException("OWNER만이 상점을 개설할 수 있습니다",ErrorCode.DISABLE_ACCOUNT);
         }
         String storeImage = convert(multipartFile);
         Store savedStore = Store.builder()
