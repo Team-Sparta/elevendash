@@ -58,7 +58,7 @@ public class Store extends BaseTimeEntity {
     private Integer leastAmount;
 
     @Lob
-    @Column
+    @Column @NotBlank
     private String storeImage;
 
     @Column
@@ -127,12 +127,15 @@ public class Store extends BaseTimeEntity {
      * @param storePhone
      * @param leastAmount
      */
-    public void update(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount) {
+    public void update(String storeName, String storeDescription, String storeAddress, String storePhone, Integer leastAmount, String storeImage, LocalTime openTime, LocalTime closeTime) {
         this.storeName = storeName;
         this.storeDescription = storeDescription;
         this.storeAddress = storeAddress;
         this.storePhone = storePhone;
         this.leastAmount = leastAmount;
+        this.storeImage = storeImage;
+        this.openTime = openTime;
+        this.closeTime = closeTime;
     }
 
     /**
