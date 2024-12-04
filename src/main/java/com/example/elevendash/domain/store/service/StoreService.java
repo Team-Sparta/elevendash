@@ -29,6 +29,7 @@ public class StoreService {
 
     /**
      * 음식점 등록 메소드
+     * 예외사항: 오픈 마감시간 검증 스토어 수 검증
      * @param member 등록하려는 유저
      * @param multipartFile 음식점 이미지 파일
      * @param dto 음식점에 필요한 정보
@@ -59,20 +60,26 @@ public class StoreService {
         return new RegisterStoreResponseDto(savedStore.getId());
     }
 
+    /**
+     * 상점 삭제 메소드
+     * 예외사항: 상점이 존재하지 않는경우, 상점의 멤버와 삭제하려는 멤버가 일치하지 않는경우
+     * @param member
+     * @param storeId
+     * @return
+     */
     @Transactional
     public DeleteStoreResponseDto deleteStore(Member member, Long storeId) {
-        Optional<Store> deleteStore = storeRepository.findById(storeId);
         // 상점을 찾지 못한경우 예외
-        if(deleteStore.isEmpty()){
-            throw new BaseException(ErrorCode.NOT_FOUND_STORE);
-        }
+        Store deleteStore = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+
         // 상점의 멤버와 현재 멤버가 일치하지 않은경우 예외
-        if(!deleteStore.get().getMember().equals(member)){
+        if(!deleteStore.getMember().equals(member)){
             throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
         }
         // soft delete
-        deleteStore.get().delete();
-        return new DeleteStoreResponseDto(deleteStore.get().getId());
+        deleteStore.delete();
+        return new DeleteStoreResponseDto(deleteStore.getId());
     }
 
     /**
@@ -83,7 +90,7 @@ public class StoreService {
      */
     private Boolean isValidStoreNumber(Member member,Long LimitNumber) {
         Long storeNumber = storeRepository.countByMemberAndIsDeleted(member, Boolean.FALSE);
-        return storeNumber.equals(LimitNumber);
+        return !storeNumber.equals(LimitNumber);
     }
     /**
      * 오픈 마감시간 검증 메소드
