@@ -38,13 +38,25 @@ public class AdvertisementService {
         return new AddAdvertisementResponseDto(advertisement.getId());
     }
 
-//    @Transactional
-//    public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember, Long StoreId ,Long advertisementId) {
-//        if(!advertisementRepository.existsByStore(storeRepository.findById(StoreId).get())) {
-//            throw new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT);
-//        }
-//
-//    }
+    @Transactional
+    public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember, Long StoreId ,Long advertisementId) {
+        // 쿠폰과 상점 일치 확인
+        Store store = storeRepository.findById(StoreId).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        if(!advertisementRepository.existsByStore(store)) {
+            throw new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT);
+        }
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
+        // 쿠폰과 멤버 일치 확인
+        if(!advertisement.getStore().getId().equals(loginMember.getId())) {
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        advertisement.stop();
+
+        return new DeleteAdvertisementResponseDto(advertisement.getId());
+    }
+
+
 
 
 }
