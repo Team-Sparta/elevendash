@@ -23,10 +23,10 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     // 그냥 조회
     Page<Store> findAllByIsDeleted(Boolean isDeleted, Pageable pageable);
     // 북마크순 조회
-    @Query("select s from Store s left join s.bookmarks b where s.isDeleted = :isDeleted group by s.id order by count(b) desc ")
+    @Query("select distinct s from Store s left join s.bookmarks b where s.isDeleted = :isDeleted group by s.id order by count(b) desc ")
     Page<Store> findAllByIsDeletedBookmarkSort(Boolean isDeleted, Pageable pageable);
     // 내가 북마크한 상점 조회
-    @Query("select s from Store s left join s.bookmarks b left join b.member where s.isDeleted = :isDeleted and b.member = :loginMember group by s.id")
+    @Query("select distinct s from Store s left join s.bookmarks b left join b.member where s.isDeleted = :isDeleted and b.member = :loginMember group by s.id")
     Page<Store> findAllByIsDeletedAndMyBookmark(Boolean isDeleted, Member loginMember, Pageable pageable);
 
     @Query("select s from Store s left join s.menus m left join m.category c where s.isDeleted = :isDeleted and c.categoryName = :category group by s.id")
