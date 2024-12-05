@@ -77,5 +77,12 @@ public class Advertisement extends BaseTimeEntity {
         }
         this.status = AdvertisementState.STOPPED;
     }
+    // 관리자 광고 수락
+    public void accept(){
+        if (this.status != AdvertisementState.WAITING) {
+            throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
+        }
+        this.status = AdvertisementState.ACCEPTED;
+    }
 
 }

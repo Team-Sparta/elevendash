@@ -2,6 +2,7 @@ package com.example.elevendash.domain.advertisement.service;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.request.RejectAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.response.AcceptAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.dto.response.RejectAdvertisementResponseDto;
@@ -76,23 +77,32 @@ public class AdvertisementService {
      * @return
      */
     @Transactional
-    public RejectAdvertisementResponseDto rejectAdvertisement(Member loginMember, Long StoreId, Long advertisementId, RejectAdvertisementRequestDto requestDto) {
+    public RejectAdvertisementResponseDto rejectAdvertisement(Member loginMember, Long advertisementId, RejectAdvertisementRequestDto requestDto) {
         if(!loginMember.getRole().equals(MemberRole.ADMIN)){
             throw new BaseException(ErrorCode.NOT_ADMIN);
         }
-        Store store = storeRepository.findByIdAndIsDeleted(StoreId,Boolean.FALSE)
-                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_STORE));
-
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
         if(!advertisement.getStatus().equals(AdvertisementState.WAITING)) {
             throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
         }
-        if(!advertisement.getStore().getId().equals(store.getId())) {
-            throw new BaseException(ErrorCode.NOT_SAME_STORE);
-        }
         advertisement.rejectBid(requestDto.getRejectReason());
         return new RejectAdvertisementResponseDto(advertisement.getId());
+    }
+
+    @Transactional
+    public AcceptAdvertisementResponseDto acceptAdvertisement(Member loginMember, Long advertisementId) {
+        if(!loginMember.getRole().equals(MemberRole.ADMIN)){
+            throw new BaseException(ErrorCode.NOT_ADMIN);
+        }
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
+        if(!advertisement.getStatus().equals(AdvertisementState.WAITING)) {
+            throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
+        }
+        advertisement.accept();
+
+        return new AcceptAdvertisementResponseDto(advertisement.getId());
     }
 
 
