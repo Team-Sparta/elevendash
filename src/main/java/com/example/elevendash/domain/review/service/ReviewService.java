@@ -3,7 +3,10 @@ package com.example.elevendash.domain.review.service;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
+import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
 import com.example.elevendash.domain.review.dto.response.ReviewResponseDto;
+import com.example.elevendash.domain.review.dto.response.PageReviewResponseDto;
+import com.example.elevendash.domain.review.entity.Review;
 
 import com.example.elevendash.domain.review.repository.ReviewRepository;
 import com.example.elevendash.global.exception.BaseException;
@@ -25,7 +28,7 @@ public class ReviewService {
 //        if(!findOrder.getOrderStatus().equals("배달완료")){
 //            throw new BaseException(ErrorCode.NOT_DELIVERED);
 //        }
-//        Review review = new Review(dto);
+//        Review review = new Review(dto); //dto: orderId, content, starRating
 //        Review savedReview = reviewRepository.save(review);
 //
 //        return new ReviewResponseDto(savedReview);
@@ -38,23 +41,37 @@ public class ReviewService {
         return PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public Page<ReviewResponseDto> find(Long storeId, Member member, int page){
+    public Page<PageReviewResponseDto> find(Long storeId, Member member, int page){
 
         Pageable pageable = pageable(page);
-        Page<ReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, member.getId(), pageable).map(review -> new ReviewResponseDto(review, review.getComment()));
+        Page<PageReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, member.getId(), pageable).map(review -> new PageReviewResponseDto(review, review.getComment()));
 
         return reviews;
     }
 
-    public Page<ReviewResponseDto> findBystarRating(Long storeId, int minStar, int maxStar, int page){
+    public Page<PageReviewResponseDto> findBystarRating(Long storeId, int minStar, int maxStar, int page){
 
         if(minStar > maxStar) {
             throw new BaseException(ErrorCode.BAD_STARRATING);
         }
         Pageable pageable = pageable(page);
-        Page<ReviewResponseDto> reviews = reviewRepository.findByStarRating(storeId, minStar, maxStar, pageable).map(review -> new ReviewResponseDto(review, review.getComment()));
+        Page<PageReviewResponseDto> reviews = reviewRepository.findByStarRating(storeId, minStar, maxStar, pageable).map(review -> new PageReviewResponseDto(review, review.getComment()));
 
         return reviews;
+    }
+
+    public ReviewResponseDto updateReview(Long reviewId, Long loginMemberId, UpdateReviewDto dto){
+        Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
+
+        if (!findReview.getMember().getId().equals(loginMemberId)) {
+            throw new BaseException(ErrorCode.UNAUTHORIZED_REVIEW_UPDATE);
+        }
+
+        findReview.updateReview(dto);
+        Review savedReview = reviewRepository.save(findReview);
+
+        return new ReviewResponseDto(savedReview);
+
     }
 
 }
