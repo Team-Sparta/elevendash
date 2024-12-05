@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CartService {
@@ -25,14 +26,14 @@ public class CartService {
     }
 
     public CartResponseDto createCookie(Long storesId, Long orderId, HttpServletResponse response, CartRequestDto requestDto) {
-        Order order = orderRepository.findByOrderId(orderId);
+        Optional<Order> order = orderRepository.findById(orderId);
         Store store = storeRepository.findById(storesId);
+        List<Menu> orderMenuName = requestDto.getMenuName();
 
-        if (!order.getStore().getId().equals(storesId)) {
+        if (!order.get().getStore().getId().equals(storesId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 못한 요청입니다");
         }
 
-        List<Menu> orderMenuName = requestDto.getMenuName();
         List<Menu> orderSuccess = new ArrayList<>();
 
             for (Menu orderMenu : orderMenuName) {
