@@ -125,11 +125,10 @@ public class AdvertisementService {
         List<Advertisement> advertisements = advertisementRepository.findAll();
         List<FindAllAdvertisementResponseDto.AdvertisementInfo> advertisementInfos =
                 advertisements.stream().map(advertisement -> new FindAllAdvertisementResponseDto.AdvertisementInfo(
-                        advertisement.getId(),
-                        advertisement.getMember().getId(),
-                        advertisement.getStore().getId(),
-                        advertisement.getBidPrice()
-                )).toList();
+                    advertisement.getId(),
+                    advertisement.getStore().getId(),
+                    advertisement.getMember().getId(), advertisement.getBidPrice()))
+                        .toList();
         return new FindAllAdvertisementResponseDto(advertisementInfos);
     }
 
