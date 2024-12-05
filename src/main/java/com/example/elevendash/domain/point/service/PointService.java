@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.point.service;
 
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.point.dto.response.TotalPointsResponse;
 import com.example.elevendash.domain.point.entity.PointHistory;
 import com.example.elevendash.domain.point.enums.PointType;
@@ -16,15 +17,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PointService {
-    final PointRepository pointRepository;
+    private final PointRepository pointRepository;
     private final PointHistoryRepository pointHistoryRepository;
 
     @Transactional
-    public void addPoints(Long memberId, Long orderId, Integer foodPrice, String description, LocalDateTime expirationAt) {
+    public void addPoints(Member member, Long orderId, Integer foodPrice, String description) {
         Integer calculatedPoint = calculatePoint(foodPrice);
         LocalDateTime now = LocalDateTime.now();
         Point point = Point.builder()
-                .memberId(memberId)
+                .member(member)
                 .orderId(orderId)
                 .amount(calculatedPoint)
                 .expirationDate(now.plusYears(1))
@@ -33,7 +34,7 @@ public class PointService {
         Point savedPoint = pointRepository.save(point);
 
         PointHistory pointHistory = PointHistory.builder()
-                .memberId(memberId)
+                .member(member)
                 .amount(calculatedPoint)
                 .point(savedPoint)
                 .description(description)
@@ -44,11 +45,11 @@ public class PointService {
     }
 
     @Transactional
-    public void usePoints(Long memberId, Long orderId, Integer amount, String description, LocalDateTime expirationAt) {
+    public void usePoints(Member member, Long orderId, Integer amount, String description, LocalDateTime expirationAt) {
 
         LocalDateTime now = LocalDateTime.now();
 
-        List<Point> activePoints = pointRepository.findActivePoints(memberId, now);
+        List<Point> activePoints = pointRepository.findActivePoints(member.getId(), now);
 
         int remainingPointsToDeduct = amount;
 
@@ -62,7 +63,7 @@ public class PointService {
             pointRepository.save(point);
 
             PointHistory.builder()
-                    .memberId(memberId)
+                    .member(member)
                     .orderId(orderId)
                     .amount(pointsToDeduct)
                     .point(point)
@@ -100,7 +101,7 @@ public class PointService {
 
             // Log restoration in history
             PointHistory history = PointHistory.builder()
-                    .memberId(point.getMemberId())
+                    .member(point.getMember())
                     .orderId(orderId)
                     .amount(restoredPoints)
                     .point(point)
@@ -112,7 +113,7 @@ public class PointService {
     }
 
     public TotalPointsResponse getTotalPoints(Long memberId) {
-        return pointRepository.getTotalActivePoints(memberId, LocalDateTime.now());
+        return new TotalPointsResponse(pointRepository.getTotalActivePoints(memberId, LocalDateTime.now()));
     }
 
     public Integer calculatePoint(Integer foodPrice) {

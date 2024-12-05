@@ -11,13 +11,13 @@ import java.util.List;
 
 public interface PointRepository extends JpaRepository<Point, Long> {
 
-    @Query("SELECT p FROM Point p WHERE p.memberId = :memberId AND p.expirationDate > :now AND p.amount > 0")
+    @Query("SELECT p FROM Point p WHERE p.member.id = :memberId AND p.expirationDate > :now AND p.amount > 0")
     List<Point> findActivePoints(@Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
-    @Query("SELECT new com.example.elevendash.domain.point.dto.response.TotalPointsResponse(SUM(p.amount)) " +
+    @Query("SELECT SUM(p.amount) " +
             "FROM Point p " +
-            "WHERE p.memberId = :memberId AND p.expirationDate > :now AND p.amount > 0")
-    TotalPointsResponse getTotalActivePoints(@Param("memberId") Long memberId, @Param("now") LocalDateTime now);
+            "WHERE p.member.id = :memberId AND p.expirationDate > :now AND p.amount > 0")
+    Long getTotalActivePoints(@Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
     List<Point> findByExpirationDateBefore(LocalDateTime now);
 }

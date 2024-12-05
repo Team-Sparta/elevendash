@@ -1,5 +1,6 @@
 package com.example.elevendash.global.config;
 
+import com.example.elevendash.global.filter.AdminRoleFilter;
 import com.example.elevendash.global.filter.JwtAuthenticationFilter;
 import com.example.elevendash.global.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
+    private final AdminRoleFilter adminRoleFilter;
 
     private static final String[] PERMIT_PATHS = {
             "/members/sign-up/**", "/members/login/**"
@@ -53,6 +55,7 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
+                .addFilterBefore(adminRoleFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.point.entity;
 
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.point.enums.PointType;
 import com.example.elevendash.global.entity.BaseCreatedTimeEntity;
 import jakarta.persistence.*;
@@ -19,8 +20,9 @@ public class PointHistory extends BaseCreatedTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "member_id", nullable = false)
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false, columnDefinition = "BIGINT UNSIGNED comment '회원 고유 번호'")
+    private Member member;
 
     @Column(name = "order_id", nullable = false)
     private Long orderId;
@@ -40,8 +42,8 @@ public class PointHistory extends BaseCreatedTimeEntity {
     private String description;
 
     @Builder
-    public PointHistory(@NotBlank Long memberId, @NotBlank Long orderId, @NotNull Integer amount, @NotNull Point point, @NotNull PointType type, @NotBlank String description) {
-        this.memberId = memberId;
+    public PointHistory(@NotNull Member member, @NotBlank Long orderId, @NotNull Integer amount, @NotNull Point point, @NotNull PointType type, @NotBlank String description) {
+        this.member = member;
         this.orderId = orderId;
         this.amount = amount;
         this.point = point;

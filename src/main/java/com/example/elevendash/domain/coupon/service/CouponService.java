@@ -7,6 +7,7 @@ import com.example.elevendash.domain.coupon.entity.CouponUsage;
 import com.example.elevendash.domain.coupon.enums.CouponType;
 import com.example.elevendash.domain.coupon.repository.CouponRepository;
 import com.example.elevendash.domain.coupon.repository.CouponUsageRepository;
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,13 @@ public class CouponService {
     private final CouponUsageRepository couponUsageRepository;
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
-    public CouponIdResponse issueCoupon(Long memberId, Long couponId) {
+    public CouponIdResponse issueCoupon(Member member, Long couponId) {
         LocalDateTime now = LocalDateTime.now();
 
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_COUPON));
 
-        boolean isAlreadyIssued = couponUsageRepository.existsByMemberIdAndCouponId(memberId, couponId);
+        boolean isAlreadyIssued = couponUsageRepository.existsByMemberIdAndCouponId(member.getId(), couponId);
 
         // 오늘 발급된 쿠폰 수가 하루 발급 개수 제한을 초과했는지 확인
         long todayIssuedCount = couponUsageRepository.countByCouponIdAndCreatedAtBetween(
@@ -44,7 +45,7 @@ public class CouponService {
         coupon.validateCoupon(now, isAlreadyIssued, todayIssuedCount);
 
         // 쿠폰 발급
-        CouponUsage couponUsage = new CouponUsage(coupon, memberId, false);
+        CouponUsage couponUsage = new CouponUsage(coupon, member, false);
         couponUsageRepository.save(couponUsage);
 
         // 쿠폰 발급 개수 업데이트
