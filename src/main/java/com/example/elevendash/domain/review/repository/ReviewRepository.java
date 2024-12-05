@@ -5,6 +5,7 @@ import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,8 +14,8 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-
-    @Query("select r from Review r left join fetch r.comment where r.store.id=:storeId and r.member.id!=:memberId")
+    @EntityGraph(attributePaths = {"comment"})
+    @Query("select r from Review r where r.store.id=:storeId and r.member.id!=:memberId")
     Page<Review> findByStoreIdPage(Long storeId, Long memberId, Pageable pageable);
 
     @Query("select r from Review r where r.store.id=:storeId and r.starRating between :minStar and :maxStar")
