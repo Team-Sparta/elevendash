@@ -28,22 +28,22 @@ public class CartService {
 
 
     public CartResponseDto createCookie(HttpServletResponse response, HttpServletRequest request, CartRequestDto requestDto) {
-        List<Long> menus = new ArrayList<>(requestDto.getMenuId());
-        Long storeId = requestDto.getStoreId();
-        Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
+        List<Long> requestDtoMenuId = new ArrayList<>(requestDto.getMenuId());
+        Long requestDtoStoreId = requestDto.getStoreId();
+        Store store = storeRepository.findById(requestDtoStoreId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
         List<String> orderSuccess = new ArrayList<>();
         List<Menu> storeMenu = store.getMenus();
-        Integer price;
+        Integer totalPrice = 0;
 
         // 클라이언트가 보내준 menu가 store에 있는 menu인지 확인
-        for (Menu menu : storeMenu) {
-            for (String food : menus) {
-                if (storeMenu.stream().map(Objects::toString).toList().contains(food)) {
-                    orderSuccess.add(food);
-                    price = menu.getMenuPrice();
-
-                } else {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않은 매뉴입니다");
+        for(Long menuId : requestDtoMenuId) {
+            for (Menu storeMenuDetails : storeMenu) {
+                if (storeMenuDetails.getId().equals(menuId)) {
+                    orderSuccess.add(storeMenuDetails.getMenuName());
+                    Integer price = storeMenuDetails.getMenuPrice();
+                    totalPrice += price;
+                }else {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "찾을 수 없는 메뉴입니다");
                 }
             }
         }
@@ -53,14 +53,7 @@ public class CartService {
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60 * 24);
         response.addCookie(cookie);
-        return new CartResponseDto(orderSuccess);
+        return new CartResponseDto(orderSuccess, totalPrice);
     }
 
-
-
-    public Store findstoreByOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new IllegalArgumentException("잘못된 Id 값입니다"));
-        Store storeId = order.getStore();
-        return storeId;
-    }
 }

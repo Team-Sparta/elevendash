@@ -13,15 +13,15 @@ public class OrderCheckResponseDto {
 
     private final Long price;
 
-    private final List<String> menus;
+    private final List<Menu> menu;
 
     private final String status;
 
 
-    public OrderCheckResponseDto(Long ordersid, Long price, List<String> menus, String status) {
+    public OrderCheckResponseDto(Long ordersid, Long price, List<Menu> menu, String status) {
         this.ordersid = ordersid;
         this.price = price;
-        this.menus = menus;
+        this.menu = menu;
         this.status = status;
     }
 
@@ -29,7 +29,7 @@ public class OrderCheckResponseDto {
         return new OrderCheckResponseDto(
                 order.getId(),
                 order.getPrice(),
-                order.getManus(),
+                order.getMenu(),
                 order.getOrderStatus()
         );
     }
