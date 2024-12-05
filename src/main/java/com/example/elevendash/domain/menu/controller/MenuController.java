@@ -107,7 +107,18 @@ public class MenuController {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE,menuService.deleteOption(member,storeId,menuId,menuOptionId));
     }
 
+    /**
+     * 메뉴 단건 조회 API
+     * @param storeId
+     * @param menuId
+     * @return
+     */
+    @GetMapping("/{storeId}/menus/{menuId}")
+    public ResponseEntity<CommonResponse<FindMenuResponseDto>> findMenu(
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId){
+        return CommonResponse.success(SuccessCode.SUCCESS,menuService.findMenu(storeId,menuId));
+    }
 
-//    @PutMapping("/{storeId}/menus/{menuId}/menu-options/{menuOptionId}")
 
 }

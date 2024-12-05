@@ -40,6 +40,10 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
+
     public Review(CreateReviewDto dto){
         this.content = dto.getContent();
         this.starRating = dto.getStarRating();
