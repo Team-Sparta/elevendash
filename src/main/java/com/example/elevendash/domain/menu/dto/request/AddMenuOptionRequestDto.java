@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.menu.dto.request;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,5 +14,6 @@ public class AddMenuOptionRequestDto {
     @NotBlank
     @Length(min = 1, max = 50)
     private final String content;
-    // 옵션 적용 여부
+    @Min(0)
+    private final Integer optionPrice;
 }

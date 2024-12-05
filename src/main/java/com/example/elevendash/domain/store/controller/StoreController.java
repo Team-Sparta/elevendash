@@ -4,6 +4,7 @@ import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
 import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.FindStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.elevendash.domain.store.service.StoreService;
@@ -73,6 +74,16 @@ public class StoreController {
                                                                        @RequestPart("request") @Valid UpdateStoreRequestDto requestDto,
                                                                        @RequestPart(name = "image", required = false) MultipartFile storeImage){
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE, storeService.updateStore(loginMember,storeId,storeImage,requestDto));
+    }
+
+    /**
+     * 상점 단건 조회 엔드포인트
+     * @param storeId
+     * @return
+     */
+    @GetMapping("/{storeId}")
+    ResponseEntity<CommonResponse<FindStoreResponseDto>> findStore(@PathVariable(name = "storeId") Long storeId){
+        return CommonResponse.success(SuccessCode.SUCCESS, storeService.findStore(storeId));
     }
 
 }

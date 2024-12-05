@@ -23,4 +23,7 @@ public class UpdateMenuRequestDto {
 
     @NotNull
     private Categories menuCategory;
+
+    @Length(max = 250)
+    private String menuDescription;
 }

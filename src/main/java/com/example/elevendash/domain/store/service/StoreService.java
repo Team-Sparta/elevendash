@@ -2,9 +2,14 @@ package com.example.elevendash.domain.store.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
+import com.example.elevendash.domain.menu.dto.CategoryInfo;
+import com.example.elevendash.domain.menu.enums.Categories;
+import com.example.elevendash.domain.menu.repository.CategoryRepository;
+import com.example.elevendash.domain.menu.repository.MenuRepository;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
 import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.FindStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.elevendash.domain.store.entity.Store;
@@ -24,14 +29,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
     private final S3Service s3Service;
+    private final CategoryRepository categoryRepository;
+    private final MenuRepository menuRepository;
 
     /**
      * 음식점 등록 메소드
@@ -98,6 +104,14 @@ public class StoreService {
         return new DeleteStoreResponseDto(deleteStore.getId());
     }
 
+    /**
+     * 가게 수정 서비스 메소드
+     * @param member
+     * @param storeId
+     * @param multipartFile
+     * @param dto
+     * @return
+     */
     @Transactional
     public UpdateStoreResponseDto updateStore(Member member, Long storeId,MultipartFile multipartFile, UpdateStoreRequestDto dto) {
         // 오픈 마감시간 검증
@@ -125,7 +139,41 @@ public class StoreService {
     }
 
     /**
-     * 음식점 수 검증 메소드 (3개인 경우에 추가할경우 위반)
+     * 상점 단건 조회 서비스 메소드
+     * @param storeId
+     * @return
+     */
+    @Transactional
+    public FindStoreResponseDto findStore(Long storeId) {
+        // 삭제된건 제외하고 조회
+        Store findStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        List<Object[]> categories = categoryRepository.findAllCategoryInfo(findStore);
+        Map<String,List<CategoryInfo.MenuInfoForCategory>> menuMap = new HashMap<>();
+
+        for(Object[] category : categories){
+            String categoryName = ((Categories)category[0]).getKoreanName();
+            String menuName = (String) category[1];
+            String menuDescription = (String) category[2];
+            Integer menuPrice = (Integer) category[3];
+            String menuImage = (String) category[4];
+
+            CategoryInfo.MenuInfoForCategory menuInfo = new CategoryInfo.MenuInfoForCategory(menuName,menuDescription,menuPrice,menuImage);
+            menuMap.put(menuName,menuMap.getOrDefault(menuName,new ArrayList<>()));
+            menuMap.getOrDefault(menuName,new ArrayList<>()).add(menuInfo);
+        }
+        List<CategoryInfo> categoryList = new ArrayList<>();
+        for(Map.Entry<String,List<CategoryInfo.MenuInfoForCategory>> entry : menuMap.entrySet()){
+            categoryList.add(new CategoryInfo(entry.getKey(),entry.getValue()));
+        }
+
+        return new FindStoreResponseDto(findStore.getStoreName()
+                ,findStore.getStoreDescription(),findStore.getOpenTime(),findStore.getCloseTime()
+                ,findStore.getStoreAddress(),findStore.getStorePhone(),findStore.getLeastAmount(),findStore.getStoreImage(),categoryList);
+    }
+
+    /**
+     * 음식점 수 검증 메소드 (3개 미만 경우에 가능)
      * @param member
      * @param LimitNumber
      * @return
@@ -144,10 +192,10 @@ public class StoreService {
         return openTime.isBefore(closeTime);
     }
 
-    public String convert (MultipartFile image) {
+    private String convert (MultipartFile image) {
         String imageUrl = null;
         if (image != null) {
-            UploadImageInfo uploadImageInfo = s3Service.uploadMemberProfileImage(image);
+            UploadImageInfo uploadImageInfo = s3Service.uploadStoreImage(image);
             imageUrl = uploadImageInfo.ImageUrl();
         }
         return imageUrl;
