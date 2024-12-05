@@ -6,6 +6,7 @@ import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisement
 import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.dto.response.RejectAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.entity.Advertisement;
+import com.example.elevendash.domain.advertisement.enums.AdvertisementState;
 import com.example.elevendash.domain.advertisement.repository.AdvertisementRepository;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
@@ -84,6 +85,9 @@ public class AdvertisementService {
 
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
+        if(!advertisement.getStatus().equals(AdvertisementState.WAITING)) {
+            throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
+        }
         if(!advertisement.getStore().getId().equals(store.getId())) {
             throw new BaseException(ErrorCode.NOT_SAME_STORE);
         }

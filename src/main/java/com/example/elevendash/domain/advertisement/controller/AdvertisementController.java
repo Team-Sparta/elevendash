@@ -45,12 +45,25 @@ public class AdvertisementController {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.deleteAdvertisement(loginMember,storeId,advertisementId));
     }
 
+    /**
+     * 광고를 거절하는 API
+     * @param advertisementId 거절할 광고 ID
+     * @param loginMember 로그인한 관리자 회원
+     * @param storeId 스토어 ID
+     * @param requestDto 거절 사유 정보
+     * @return 거절된 광고 정보
+     */
     @PutMapping("/{advertisementId}/reject")
     public ResponseEntity<CommonResponse<RejectAdvertisementResponseDto>> rejectAdvertisement(
             @PathVariable Long advertisementId,
             @LoginMember Member loginMember,
             @RequestParam Long storeId,
             @RequestBody @Valid RejectAdvertisementRequestDto requestDto){
-        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.rejectAdvertisement(loginMember,storeId,advertisementId,requestDto));
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,advertisementService.rejectAdvertisement(
+                loginMember,
+                storeId,
+                advertisementId,
+                requestDto)
+        );
     }
 }
