@@ -25,7 +25,6 @@ public class PointHistory extends BaseCreatedTimeEntity {
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
-    @Setter
     @Column(name = "amount", nullable = false)
     private Integer amount;
 
