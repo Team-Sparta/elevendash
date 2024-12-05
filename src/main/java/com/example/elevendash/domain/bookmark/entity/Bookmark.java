@@ -8,8 +8,10 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "bookmarks")
-public class BookMark extends BaseTimeEntity {
+@Table(name = "bookmarks",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"member_id","store_id"})
+})
+public class Bookmark extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -22,4 +24,12 @@ public class BookMark extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     Store store;
+
+    public Bookmark(Member member, Store store) {
+        this.member = member;
+        this.store = store;
+    }
+    public Bookmark(){
+
+    }
 }

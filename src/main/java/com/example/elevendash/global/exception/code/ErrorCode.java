@@ -66,7 +66,12 @@ public enum ErrorCode {
     S3_UPLOADER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 중 오류가 발생하였습니다."),
     BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다."),
 
-
+    /**
+     * Bookmark
+     */
+    ALREADY_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크하셨습니다"),
+    NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "북마크가 존재하지 않습니다"),
+    NOT_CORRECT_INFORMATION(HttpStatus.BAD_REQUEST, "상점과 멤버의 정보가 북마크와 일치하지 않습니다"),
 
     /**
      * Store
