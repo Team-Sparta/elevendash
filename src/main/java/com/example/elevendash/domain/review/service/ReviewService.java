@@ -14,6 +14,7 @@ import com.example.elevendash.global.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -74,8 +75,14 @@ public class ReviewService {
 
     }
 
-    public void delete(Long reviewId) {
+    @Transactional
+    public void delete(Long reviewId, Long loginMemberId) {
         Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
+
+        if (!findReview.getMember().getId().equals(loginMemberId)) {
+            throw new BaseException(ErrorCode.UNAUTHORIZED_REVIEW_DELETE);
+        }
+
         reviewRepository.delete(findReview);
     }
 
