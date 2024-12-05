@@ -1,7 +1,11 @@
 package com.example.elevendash.domain.cart.dto.response;
 
 import com.example.elevendash.domain.menu.entity.Menu;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +13,14 @@ import java.util.List;
 @Getter
 public class CartResponseDto {
 
-    private final Long id;
+    private final List<Long> menuId;
 
-    private final List<Menu> manuName;
+    @Min(0)
+    private final Long price;
 
-    public CartResponseDto (Long id, List<Menu> manuName) {
-        this.id = id;
-        this.manuName = new ArrayList<>(manuName);
+    public CartResponseDto (List<Long> menuId, Long price) {
+        this.menuId = new ArrayList<>(menuId);
+        this.price = price;
     }
 
 
