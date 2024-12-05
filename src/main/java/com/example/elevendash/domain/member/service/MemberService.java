@@ -3,20 +3,19 @@ package com.example.elevendash.domain.member.service;
 import com.example.elevendash.domain.member.dto.OAuthLoginInfo;
 import com.example.elevendash.domain.member.dto.oauth.OAuthUser;
 import com.example.elevendash.domain.member.dto.request.OAuthLoginRequest;
-import com.example.elevendash.domain.member.dto.response.OAuthLoginResponse;
-import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
+import com.example.elevendash.domain.member.dto.response.*;
 import com.example.elevendash.domain.member.dto.AuthUserInfo;
-import com.example.elevendash.domain.member.dto.response.MemberProfileResponse;
 import com.example.elevendash.domain.member.dto.Token;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
-import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
-import com.example.elevendash.domain.member.dto.response.SignUpResponse;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.Provider;
 import com.example.elevendash.domain.member.factory.OAuthProviderFactory;
 import com.example.elevendash.domain.member.repository.MemberRepository;
+import com.example.elevendash.domain.store.dto.StoreInfo;
+import com.example.elevendash.domain.store.repository.StoreRepository;
+import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.constants.AuthConstants;
 import com.example.elevendash.global.exception.AuthenticationException;
@@ -33,6 +32,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -46,6 +47,7 @@ public class MemberService {
     private final OAuthProviderFactory providerFactory;
 
     private final S3Service s3Service;
+    private final StoreRepository storeRepository;
 
     public SignUpResponse signUp(SignUpRequest request) {
         validateEmail(request.email());
@@ -108,8 +110,7 @@ public class MemberService {
     }
 
     public MemberProfileResponse getMemberProfile(
-            Long memberId,
-            @LoginMember Member loginMember) {
+            Long memberId) {
         return memberRepository.findById(memberId)
                 .map(member -> new MemberProfileResponse(
                         member.getId(),
@@ -137,6 +138,16 @@ public class MemberService {
         member.updateProfile(request, imageUrl);
 
         return new UpdateProfileResponse(member.getId());
+    }
+
+    public FindMyStoreResponseDto findMyStores(Member loginMember) {
+
+        List<StoreInfo> storeInfoList = storeRepository.findAllByMemberAndIsDeleted(loginMember, Boolean.FALSE).stream().map(
+                store-> new StoreInfo(
+                        store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
+                        ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+                )).collect(Collectors.toList());
+        return new FindMyStoreResponseDto(storeInfoList);
     }
 
     public OAuthLoginResponse oAuthLogin(@Valid OAuthLoginRequest request) {

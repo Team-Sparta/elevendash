@@ -2,6 +2,7 @@ package com.example.elevendash.domain.menu.entity;
 
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,6 +29,11 @@ public class MenuOption extends BaseTimeEntity {
 
     @Column
     @NotNull
+    @Min(0)
+    private Integer optionPrice;
+
+    @Column
+    @NotNull
     private Boolean selected = Boolean.FALSE;
 
     // 연관 관계 설정
@@ -44,8 +50,9 @@ public class MenuOption extends BaseTimeEntity {
      * @param content
      * @param menu
      */
-    public MenuOption(String content, Menu menu) {
+    public MenuOption(String content, Integer optionPrice ,Menu menu) {
         this.content = content;
+        this.optionPrice = optionPrice;
         this.menu = menu;
     }
 
@@ -53,8 +60,9 @@ public class MenuOption extends BaseTimeEntity {
      * MenuOption 수정 메소드
      * @param content
      */
-    public void update(String content) {
+    public void update(String content, Integer optionPrice) {
         this.content = content;
+        this.optionPrice = optionPrice;
     }
 
     public void select(Boolean selected) {

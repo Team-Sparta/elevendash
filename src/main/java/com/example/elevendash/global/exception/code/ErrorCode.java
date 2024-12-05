@@ -67,6 +67,22 @@ public enum ErrorCode {
     BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다."),
 
 
+    /**
+     * Coupon
+     */
+    NOT_FOUND_COUPON(HttpStatus.NOT_FOUND, "쿠폰을 찾을수 없습니다."),
+    ALREADY_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "이미 발급한 쿠폰입니다."),
+    EXPIRED_COUPON(HttpStatus.BAD_REQUEST, "만료기간이 지난 쿠폰입니다."),
+    TOTAL_OVER_ISSUED_COUPON(HttpStatus.CONFLICT, "쿠폰 발급 한도를 초과했습니다."),
+    DAILY_OVER_ISSUED_COUPON(HttpStatus.CONFLICT, "오늘의 쿠폰 발급 한도를 초과했습니다."),
+    ALREADY_USED_COUPON(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
+
+    /**
+     * Bookmark
+     */
+    ALREADY_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크하셨습니다"),
+    NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "북마크가 존재하지 않습니다"),
+    NOT_CORRECT_INFORMATION(HttpStatus.BAD_REQUEST, "상점과 멤버의 정보가 북마크와 일치하지 않습니다"),
 
     /**
      * Store
@@ -80,10 +96,24 @@ public enum ErrorCode {
     /**
      * Menu
      */
+
+    NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, "메뉴 정보를 찾을 수 없습니다."),
     NOT_SAME_STORE(HttpStatus.NOT_ACCEPTABLE, "상점과 메뉴정보가 일치하지 않습니다."),
-    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다.")
-    ;
+    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다."),
+
+    /**
+     * Review
+     */
+    NOT_DELIVERED(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다."),
+    BAD_STARRATING(HttpStatus.BAD_REQUEST, "최소 별점이 최대 별점보다 클 수 없습니다."),
+    /**
+     * Advertisement
+     */
+    DUPLICATE_ADVERTISEMENT(HttpStatus.BAD_REQUEST, "이미 광고가 존재합니다."),
+    NOT_STATUS_WAITING(HttpStatus.BAD_REQUEST,"대기 중인 광고만 거절할 수 있습니다." ),
+    NOT_STATUS_ACCEPTED(HttpStatus.BAD_REQUEST,"진행중인 광고만 중단할 수 있습니다" );
+
 
     private final HttpStatus httpStatus;
     private final String message;

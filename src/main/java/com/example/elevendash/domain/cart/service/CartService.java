@@ -6,8 +6,10 @@ import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.store.entity.Store;
+import com.example.elevendash.domain.store.repository.StoreRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,17 +20,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class CartService {
-    private final StoreRepoistory storeRepoistory;
+    private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
 
-    public CartService(OrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
-    }
 
     public CartResponseDto createCookie(Long storesId, Long orderId, HttpServletResponse response, CartRequestDto requestDto) throws ChangeSetPersister.NotFoundException {
         Order order = orderRepository.findById(orderId).orElseThrow(ChangeSetPersister.NotFoundException::new);
-        Store store = storeRepository.findById(storesId);
+        Store store = storeRepository.findById(storesId).orElseThrow(ChangeSetPersister.NotFoundException::new);
         List<Menu> orderMenuName = requestDto.getMenuName();
 
         if (!order.getStore().getId().equals(storesId)) {

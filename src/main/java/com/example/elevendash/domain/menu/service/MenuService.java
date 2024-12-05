@@ -2,6 +2,7 @@ package com.example.elevendash.domain.menu.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
+import com.example.elevendash.domain.menu.dto.MenuOptionInfo;
 import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
 import com.example.elevendash.domain.menu.dto.request.UpdateMenuOptionRequestDto;
@@ -18,10 +19,15 @@ import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
+import com.example.elevendash.global.s3.S3Service;
+import com.example.elevendash.global.s3.UploadImageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +37,7 @@ public class MenuService {
     private final MenuOptionRepository menuOptionRepository;
     private final StoreRepository storeRepository;
     private final StoreService storeService;
+    private final S3Service s3Service;
 
     /**
      * 메뉴 등록 서비스 메소드
@@ -45,16 +52,17 @@ public class MenuService {
         Store addMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
         // 유저 및 음식점 유효성 검증
-        isValidMemberAndStore(member, addMenuStore);
+        checkValidMemberAndStore(member, addMenuStore);
         // 연결할 카테고리 조회
         Category category = categoryRepository.findByCategoryName(requestDto.getMenuCategory())
-                .orElseThrow(() -> new BaseException(("카테고리를 찾을 수 없습니다: " + requestDto.getMenuCategory()),ErrorCode.NOT_FOUND_ENUM_CONSTANT));
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_CATEGORY));
         Menu saveMenu = Menu.builder()
                 .menuName(requestDto.getMenuName())
                 .menuPrice(requestDto.getMenuPrice())
                 .store(addMenuStore)
                 .category(category)
-                .menuImage(storeService.convert(menuImage))
+                .menuImage(convert(menuImage))
+                .menuDescription(requestDto.getMenuDescription())
                 .build();
         menuRepository.save(saveMenu);
         return new RegisterMenuResponseDto(saveMenu.getId());
@@ -71,7 +79,7 @@ public class MenuService {
     public DeleteMenuResponseDto deleteMenu (Member member, Long storeId, Long menuId) {
         Store deleteMenuStore = storeRepository.findByIdAndIsDeleted(storeId, Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        isValidMemberAndStore(member, deleteMenuStore);
+        checkValidMemberAndStore(member, deleteMenuStore);
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
         if(!menu.getStore().getId().equals(deleteMenuStore.getId())) {
@@ -93,14 +101,14 @@ public class MenuService {
     public UpdateMenuResponseDto updateMenu (Member member, MultipartFile menuImage,Long storeId, Long menuId, UpdateMenuRequestDto requestDto) {
         Store updateMenuStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        isValidMemberAndStore(member, updateMenuStore);
+        checkValidMemberAndStore(member, updateMenuStore);
         Menu updateMenu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
-        isValidMenuAndStore(updateMenu, updateMenuStore);
+        checkValidMenuAndStore(updateMenu, updateMenuStore);
         Category updateMenuCategory = categoryRepository.findByCategoryName(requestDto.getMenuCategory())
                 .orElseThrow(() -> new BaseException(("카테고리를 찾을 수 없습니다: " + requestDto.getMenuCategory()),ErrorCode.NOT_FOUND_ENUM_CONSTANT));
         updateMenu.update(requestDto.getMenuName(), requestDto.getMenuPrice()
-                ,updateMenuCategory, storeService.convert(menuImage));
+                ,updateMenuCategory,convert(menuImage),requestDto.getMenuDescription());
         return new UpdateMenuResponseDto(updateMenu.getId());
     }
 
@@ -116,11 +124,11 @@ public class MenuService {
     public AddMenuOptionResponseDto addOption (Member member, Long storeId, Long menuId, AddMenuOptionRequestDto requestDto) {
         Store addOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        isValidMemberAndStore(member, addOptionStore);
+        checkValidMemberAndStore(member, addOptionStore);
         Menu addOptionMenu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
-        isValidMenuAndStore(addOptionMenu, addOptionStore);
-        MenuOption addOption = new MenuOption(requestDto.getContent(),addOptionMenu);
+        checkValidMenuAndStore(addOptionMenu, addOptionStore);
+        MenuOption addOption = new MenuOption(requestDto.getContent(),requestDto.getOptionPrice(),addOptionMenu);
         menuOptionRepository.save(addOption);
         return new AddMenuOptionResponseDto(addOption.getId());
     }
@@ -138,10 +146,10 @@ public class MenuService {
     public UpdateMenuOptionResponseDto updateOption (Member member, Long storeId, Long menuId,Long menuOptionId ,UpdateMenuOptionRequestDto requestDto) {
         Store updateOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        isValidMemberAndStore(member, updateOptionStore);
+        checkValidMemberAndStore(member, updateOptionStore);
         Menu updateOptionMenu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
-        isValidMenuAndStore(updateOptionMenu, updateOptionStore);
+        checkValidMenuAndStore(updateOptionMenu, updateOptionStore);
         MenuOption updateOption = menuOptionRepository.findById(menuOptionId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU_OPTION));
 
@@ -160,10 +168,10 @@ public class MenuService {
     public DeleteMenuOptionResponseDto deleteOption (Member member, Long storeId, Long menuId, Long menuOptionId) {
         Store updateOptionStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        isValidMemberAndStore(member, updateOptionStore);
+        checkValidMemberAndStore(member, updateOptionStore);
         Menu updateOptionMenu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
-        isValidMenuAndStore(updateOptionMenu, updateOptionStore);
+        checkValidMenuAndStore(updateOptionMenu, updateOptionStore);
         MenuOption deleteOption = menuOptionRepository.findById(menuOptionId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU_OPTION));
         menuOptionRepository.delete(deleteOption);
@@ -175,30 +183,58 @@ public class MenuService {
      */
     @Transactional
     protected UpdateMenuOptionResponseDto updateOptionTransactional(UpdateMenuOptionRequestDto requestDto, MenuOption updateOption) {
-        updateOption.update(requestDto.getContent());
+        updateOption.update(requestDto.getContent(),requestDto.getOptionPrice());
         return new UpdateMenuOptionResponseDto(updateOption.getId());
     }
+
+    public FindMenuResponseDto findMenu(Long storeId, Long menuId) {
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        Store store = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        checkValidMenuAndStore(findMenu,store);
+        List<MenuOptionInfo> menuOptionInfoList = menuOptionRepository.findByMenu(findMenu).stream().map(
+                menuOption -> new MenuOptionInfo(menuOption.getId(),menuOption.getContent(), menuOption.getOptionPrice())
+        ).toList();
+        return new FindMenuResponseDto(
+                findMenu.getId(),
+                findMenu.getMenuName(),
+                findMenu.getCategory().getCategoryName(),
+                findMenu.getMenuImage(),
+                findMenu.getMenuDescription(),
+                findMenu.getMenuPrice(),
+                menuOptionInfoList
+        );
+    }
+
     /**
      * 유저 및 음식점 유효성 검증
      * @param member
      * @param store
      */
-    private void isValidMemberAndStore (Member member, Store store) {
+    private void checkValidMemberAndStore (Member member, Store store) {
         // 가게 소유자 검증
         if(!store.getMember().equals(member)){
             throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
         }
         // 유저 권한 검증
         if(!member.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException("OWNER만이 상점을 개설할 수 있습니다",ErrorCode.DISABLE_ACCOUNT);
+            throw new BaseException(ErrorCode.NOT_OWNER);
         }
     }
 
-    private void isValidMenuAndStore (Menu menu, Store store) {
+    private void checkValidMenuAndStore (Menu menu, Store store) {
         // 가게 메뉴 검증
         if(!store.equals(menu.getStore())){
             throw new BaseException(ErrorCode.NOT_SAME_STORE);
         }
+    }
+
+    private String convert (MultipartFile image) {
+        String imageUrl = null;
+        if (image != null) {
+            UploadImageInfo uploadImageInfo = s3Service.uploadMenuImage(image);
+            imageUrl = uploadImageInfo.ImageUrl();
+        }
+        return imageUrl;
     }
 
 }
