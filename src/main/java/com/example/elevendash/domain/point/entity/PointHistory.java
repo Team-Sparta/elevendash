@@ -3,6 +3,8 @@ package com.example.elevendash.domain.point.entity;
 import com.example.elevendash.domain.point.enums.PointType;
 import com.example.elevendash.global.entity.BaseCreatedTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +22,9 @@ public class PointHistory extends BaseCreatedTimeEntity {
     @Column(name = "member_id", nullable = false)
     private Long memberId;
 
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
+
     @Setter
     private Integer amount;
 
@@ -34,8 +39,9 @@ public class PointHistory extends BaseCreatedTimeEntity {
     private String description;
 
     @Builder
-    public PointHistory(Long memberId, Integer amount, Point point, PointType type, String description) {
+    public PointHistory(@NotBlank Long memberId, @NotBlank Long orderId, @NotNull Integer amount, @NotNull Point point, @NotNull PointType type, @NotBlank String description) {
         this.memberId = memberId;
+        this.orderId = orderId;
         this.amount = amount;
         this.point = point;
         this.type = type;

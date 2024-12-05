@@ -24,6 +24,6 @@ public class PointController {
     public ResponseEntity<CommonResponse<TotalPointsResponse>> getMyPoints(
 
             @LoginMember Member loginMember) {
-        return CommonResponse.success(SuccessCode.SUCCESS_INSERT, pointService.getTotalPoints(loginMember.getId()));
+        return CommonResponse.success(SuccessCode.SUCCESS, pointService.getTotalPoints(loginMember.getId()));
     }
 }

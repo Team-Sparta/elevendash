@@ -17,7 +17,7 @@ public interface PointRepository extends JpaRepository<Point, Long> {
     @Query("SELECT new com.example.elevendash.domain.point.dto.response.TotalPointsResponse(SUM(p.amount)) " +
             "FROM Point p " +
             "WHERE p.memberId = :memberId AND p.expirationDate > :now AND p.amount > 0")
-    TotalPointsResponse getTotalActivePoints(@Param("memberId") Long userId, @Param("now") LocalDateTime now);
+    TotalPointsResponse getTotalActivePoints(@Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
     List<Point> findByExpirationDateBefore(LocalDateTime now);
 }

@@ -44,7 +44,7 @@ public class PointService {
     }
 
     @Transactional
-    public void usePoints(Long memberId, Integer amount, String description, LocalDateTime expirationAt) {
+    public void usePoints(Long memberId, Long orderId, Integer amount, String description, LocalDateTime expirationAt) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -63,6 +63,7 @@ public class PointService {
 
             PointHistory.builder()
                     .memberId(memberId)
+                    .orderId(orderId)
                     .amount(pointsToDeduct)
                     .point(point)
                     .description(description)
@@ -86,11 +87,8 @@ public class PointService {
     @Transactional
     public void rollbackPoints(Long orderId) {
         // Fetch point history for the order where points were used
-        List<PointHistory> consumedHistories = pointHistoryRepository.findAll()
-                .stream()
-                .filter(history -> history.getType() == PointType.REDEEMED)
-                .filter(history -> history.getPoint().getOrderId().equals(orderId))
-                .toList();
+        List<PointHistory> consumedHistories = pointHistoryRepository.findByTypeAndOrderId(PointType.REDEEMED, orderId);
+
 
         for (PointHistory consumedHistory : consumedHistories) {
             Point point = consumedHistory.getPoint();
@@ -103,6 +101,7 @@ public class PointService {
             // Log restoration in history
             PointHistory history = PointHistory.builder()
                     .memberId(point.getMemberId())
+                    .orderId(orderId)
                     .amount(restoredPoints)
                     .point(point)
                     .type(PointType.CANCELLED)

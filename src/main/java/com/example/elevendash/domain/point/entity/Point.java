@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class Point extends BaseCreatedTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED comment '회원 고유 번호'")
+    @Column(name = "id", columnDefinition = "BIGINT UNSIGNED comment '포인트 고유 번호'")
     private Long id;
 
     @Column(name = "member_id", nullable = false, columnDefinition = "BIGINT UNSIGNED comment '회원 고유 번호'")

@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface PointHistoryRepository extends JpaRepository<PointHistory, Long> {
 
-    PointHistory findFirstByMemberIdAndAmountAndDescriptionAndTypeOrderByCreatedAtDesc(Long id, Double amount, String description, PointType pointType);
+    List<PointHistory> findByTypeAndOrderId(PointType pointType, Long orderId);
 }
