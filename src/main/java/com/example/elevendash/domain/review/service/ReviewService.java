@@ -5,6 +5,7 @@ import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
 import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
 import com.example.elevendash.domain.review.dto.response.ReviewResponseDto;
+import com.example.elevendash.domain.review.dto.response.PageReviewResponseDto;
 import com.example.elevendash.domain.review.entity.Review;
 
 import com.example.elevendash.domain.review.repository.ReviewRepository;
@@ -40,23 +41,32 @@ public class ReviewService {
         return PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public Page<ReviewResponseDto> find(Long storeId, Member member, int page){
+    public Page<PageReviewResponseDto> find(Long storeId, Member member, int page){
 
         Pageable pageable = pageable(page);
-        Page<ReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, member.getId(), pageable).map(review -> new ReviewResponseDto(review, review.getComment()));
+        Page<PageReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, member.getId(), pageable).map(review -> new PageReviewResponseDto(review, review.getComment()));
 
         return reviews;
     }
 
-    public Page<ReviewResponseDto> findBystarRating(Long storeId, int minStar, int maxStar, int page){
+    public Page<PageReviewResponseDto> findBystarRating(Long storeId, int minStar, int maxStar, int page){
 
         if(minStar > maxStar) {
             throw new BaseException(ErrorCode.BAD_STARRATING);
         }
         Pageable pageable = pageable(page);
-        Page<ReviewResponseDto> reviews = reviewRepository.findByStarRating(storeId, minStar, maxStar, pageable).map(review -> new ReviewResponseDto(review, review.getComment()));
+        Page<PageReviewResponseDto> reviews = reviewRepository.findByStarRating(storeId, minStar, maxStar, pageable).map(review -> new PageReviewResponseDto(review, review.getComment()));
 
         return reviews;
+    }
+
+    public ReviewResponseDto updateReview(Long reviewId, UpdateReviewDto dto){
+        Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
+        findReview.updateReview(dto);
+        Review savedReview = reviewRepository.save(findReview);
+
+        return new ReviewResponseDto(savedReview);
+
     }
 
 }

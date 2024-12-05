@@ -95,6 +95,7 @@ public enum ErrorCode {
     /**
      * Review
      */
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "리뷰 정보를 찾을 수 없습니다."),
     NOT_DELIVERED(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다."),
     BAD_STARRATING(HttpStatus.BAD_REQUEST, "최소 별점이 최대 별점보다 클 수 없습니다.")
 

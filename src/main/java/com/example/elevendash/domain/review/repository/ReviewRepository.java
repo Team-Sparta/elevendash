@@ -23,7 +23,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findByStoreId(Long storeId);
 
-    default Review findByStoreIdOrElseThrow(Long storeId) {
-        return findByStoreId(storeId).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_STORE));
+    default Review findByIdOrElseThrow(Long reviewId) {
+        return findById(reviewId).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_REVIEW));
     }
 }

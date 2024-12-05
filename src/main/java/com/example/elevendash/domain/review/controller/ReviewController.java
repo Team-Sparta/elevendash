@@ -3,6 +3,7 @@ package com.example.elevendash.domain.review.controller;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
 import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
+import com.example.elevendash.domain.review.dto.response.PageReviewResponseDto;
 import com.example.elevendash.domain.review.dto.response.ReviewResponseDto;
 import com.example.elevendash.domain.review.service.ReviewService;
 import com.example.elevendash.global.annotation.LoginMember;
@@ -32,17 +33,17 @@ public class ReviewController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ReviewResponseDto>> find(
+    public ResponseEntity<Page<PageReviewResponseDto>> find(
             @PathVariable Long storeId,
             @LoginMember Member loginMember,
             int page
     ){
-        Page<ReviewResponseDto> reviews = reviewService.find(storeId, loginMember, page);
+        Page<PageReviewResponseDto> reviews = reviewService.find(storeId, loginMember, page);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
     @GetMapping("/star")
-    public ResponseEntity<Page<ReviewResponseDto>> findByStar(
+    public ResponseEntity<Page<PageReviewResponseDto>> findByStar(
             @PathVariable Long storeId,
             @RequestParam
             @Min(value = 1, message = "별점의 최하점은 1점입니다.")
@@ -55,9 +56,19 @@ public class ReviewController {
             int page
     ){
 
-        Page<ReviewResponseDto> reviews = reviewService.findBystarRating(storeId, minStar, maxStar, page);
+        Page<PageReviewResponseDto> reviews = reviewService.findBystarRating(storeId, minStar, maxStar, page);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
 
+    }
+
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<ReviewResponseDto> updateReview(
+            @PathVariable Long storeId,
+            @PathVariable Long reviewId,
+            @Valid @RequestBody UpdateReviewDto dto
+    ){
+        ReviewResponseDto responseDto = reviewService.updateReview(reviewId, dto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
 }
