@@ -32,6 +32,10 @@ public class Menu extends BaseTimeEntity {
     @Length(max = 50)
     private String menuName;
 
+    @Column @NotBlank
+    @Length(max = 255)
+    private String menuDescription;
+
     @Column @NotNull
     @Min(0)
     private Integer menuPrice;
@@ -71,12 +75,13 @@ public class Menu extends BaseTimeEntity {
      * @param menuImage
      */
     @Builder
-    public Menu(String menuName, Integer menuPrice, Store store, Category category, String menuImage) {
+    public Menu(String menuName, Integer menuPrice, Store store, Category category, String menuImage,String menuDescription) {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
         this.store = store;
         this.category = category;
         this.menuImage = menuImage;
+        this.menuDescription = menuDescription;
     }
 
     /**
@@ -87,11 +92,12 @@ public class Menu extends BaseTimeEntity {
      * @param menuImage
      */
 
-    public void update(String menuName, Integer menuPrice, Category category, String menuImage ) {
+    public void update(String menuName, Integer menuPrice, Category category, String menuImage ,String menuDescription ) {
         this.menuName = menuName;
         this.menuPrice = menuPrice;
         this.category = category;
         this.menuImage = menuImage;
+        this.menuDescription = menuDescription;
     }
 
     protected Menu() {}
