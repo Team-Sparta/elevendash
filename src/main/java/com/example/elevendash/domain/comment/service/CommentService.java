@@ -34,6 +34,19 @@ public class CommentService {
         return new CommentResponseDto(savedComment, findReview.getStore());
     }
 
+    public CommentResponseDto updateComment(Member loginMember, Long commentId, CommentRequestDto dto){
+
+        validateOwner(loginMember);
+
+        Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
+
+        findComment.updateComment(dto);
+        Comment savedComment = commentRepository.save(findComment);
+
+        return new CommentResponseDto(savedComment);
+
+    }
+
     private void validateOwner(Member loginMember){
         if(!loginMember.getRole().equals(MemberRole.OWNER)){
             throw new BaseException(ErrorCode.NOT_OWNER);
