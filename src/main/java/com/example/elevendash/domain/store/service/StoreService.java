@@ -206,7 +206,6 @@ public class StoreService {
             ));
         }
 
-
         if(storeInfoList == null){
             throw new BaseException(ErrorCode.NOT_FOUND_STORE);
         }
@@ -215,7 +214,9 @@ public class StoreService {
                 new FindAllStoreResponseDto.PageInfo(storeInfoList.getNumber()+1,
                         storeInfoList.getSize(),
                         storeInfoList.getTotalElements(),
-                        storeInfoList.getTotalPages()));
+                        storeInfoList.getTotalPages()
+                )
+        );
     }
 
 

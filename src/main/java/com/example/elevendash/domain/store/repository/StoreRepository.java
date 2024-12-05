@@ -34,4 +34,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Page<Store> findAllByIsDeletedAndCategory(Boolean isDeleted, Categories category, Pageable pageable);
 
     List<Store> findAllByMemberAndIsDeleted(@NotNull Member member, Boolean isDeleted);
+
+    Optional<Store> findByIdAndIsDeletedAndMember(Long id, Boolean isDeleted, @NotNull Member member);
 }

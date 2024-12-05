@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.store.entity;
 
+import com.example.elevendash.domain.advertisement.entity.Advertisement;
 import com.example.elevendash.domain.bookmark.entity.Bookmark;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.menu.entity.Menu;
@@ -92,6 +93,8 @@ public class Store extends BaseTimeEntity {
     @OneToMany(mappedBy = "store",fetch = FetchType.LAZY,cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+    @OneToOne(mappedBy = "store", fetch = FetchType.LAZY,cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Advertisement advertisement;
     /**
      *
      * @param storeName
