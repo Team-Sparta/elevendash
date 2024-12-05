@@ -19,8 +19,8 @@ public class CartController {
     private final OrderService orderService;
     private final CartService cartService;
 
-    @PostMapping("/stores/{storesId}/Orders/{orderId}/carts")
-    public ResponseEntity<CartResponseDto> addCart(@PathVariable Long storesId, @PathVariable Long orderId, HttpServletResponse response,@Validated CartRequestDto requestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.createCookie(storesId,orderId,response,requestDto));
+    @PostMapping("/Orders/{orderId}/carts")
+    public ResponseEntity<CartResponseDto> addCart( @PathVariable Long orderId, HttpServletResponse response,@Validated CartRequestDto requestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.createCookie(orderId,response,requestDto));
     }
 }
