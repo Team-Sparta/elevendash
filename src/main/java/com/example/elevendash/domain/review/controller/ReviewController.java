@@ -2,7 +2,6 @@ package com.example.elevendash.domain.review.controller;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
-import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
 import com.example.elevendash.domain.review.dto.response.ReviewResponseDto;
 import com.example.elevendash.domain.review.service.ReviewService;
 import com.example.elevendash.global.annotation.LoginMember;
@@ -26,7 +25,7 @@ public class ReviewController {
     public ResponseEntity<ReviewResponseDto> create(
             @PathVariable Long storeId,
             @Valid @RequestBody CreateReviewDto dto
-    ){
+    ) {
         ReviewResponseDto responseDto = reviewService.create(storeId, dto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
@@ -36,7 +35,7 @@ public class ReviewController {
             @PathVariable Long storeId,
             @LoginMember Member loginMember,
             int page
-    ){
+    ) {
         Page<ReviewResponseDto> reviews = reviewService.find(storeId, loginMember, page);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
@@ -53,7 +52,7 @@ public class ReviewController {
             @Max(value = 5, message = "별점의 최고점은 5점입니다.")
             int maxStar,
             int page
-    ){
+    ) {
 
         Page<ReviewResponseDto> reviews = reviewService.findBystarRating(storeId, minStar, maxStar, page);
         return new ResponseEntity<>(reviews, HttpStatus.OK);

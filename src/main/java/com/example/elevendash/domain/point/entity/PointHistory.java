@@ -25,7 +25,7 @@ public class PointHistory extends BaseCreatedTimeEntity {
     @Column(name = "order_id", nullable = false)
     private Long orderId;
 
-    @Setter
+    @Column(name = "amount", nullable = false)
     private Integer amount;
 
     @ManyToOne
@@ -33,9 +33,10 @@ public class PointHistory extends BaseCreatedTimeEntity {
     private Point point;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private PointType type;
 
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Builder

@@ -22,7 +22,6 @@ public class PointController {
 
     @GetMapping
     public ResponseEntity<CommonResponse<TotalPointsResponse>> getMyPoints(
-
             @LoginMember Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS, pointService.getTotalPoints(loginMember.getId()));
     }

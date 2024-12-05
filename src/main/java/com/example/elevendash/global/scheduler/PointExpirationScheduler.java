@@ -11,7 +11,7 @@ public class PointExpirationScheduler {
 
     private final PointService pointService;
 
-    @Scheduled(cron = "0 0 0 * * ?") // Every day at midnight
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에
     public void expirePoints() {
         pointService.expirePoints();
     }
