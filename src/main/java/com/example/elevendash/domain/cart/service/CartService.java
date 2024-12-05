@@ -6,6 +6,7 @@ import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.store.entity.Store;
+import com.example.elevendash.domain.store.repository.StoreRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -19,16 +20,17 @@ import java.util.Optional;
 
 @Service
 public class CartService {
-    private final StoreRepoistory storeRepoistory;
+    private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
 
-    public CartService(OrderRepository orderRepository) {
+    public CartService(StoreRepository storeRepository, OrderRepository orderRepository) {
+        this.storeRepository = storeRepository;
         this.orderRepository = orderRepository;
     }
 
     public CartResponseDto createCookie(Long storesId, Long orderId, HttpServletResponse response, CartRequestDto requestDto) throws ChangeSetPersister.NotFoundException {
         Order order = orderRepository.findById(orderId).orElseThrow(ChangeSetPersister.NotFoundException::new);
-        Store store = storeRepository.findById(storesId);
+        Store store = storeRepository.findById(storesId).orElseThrow(ChangeSetPersister.NotFoundException::new);
         List<Menu> orderMenuName = requestDto.getMenuName();
 
         if (!order.getStore().getId().equals(storesId)) {
