@@ -16,5 +16,5 @@ public abstract class BaseCreatedTimeEntity {
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, columnDefinition = "datetime comment '생성일'")
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 }

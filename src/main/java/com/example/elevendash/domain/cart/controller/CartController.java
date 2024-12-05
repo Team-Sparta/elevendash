@@ -26,4 +26,5 @@ public class CartController {
     public ResponseEntity<CartResponseDto> addCart(HttpServletResponse response, HttpServletRequest request, @Validated CartRequestDto requestDto) {
         return ResponseEntity.ok().body(cartService.createCookie(response, request, requestDto));
     }
+
 }

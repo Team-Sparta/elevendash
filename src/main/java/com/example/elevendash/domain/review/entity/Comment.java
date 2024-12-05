@@ -20,7 +20,4 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @OneToOne
-    @JoinColumn(name = "review_id")
-    private Review review;
 }

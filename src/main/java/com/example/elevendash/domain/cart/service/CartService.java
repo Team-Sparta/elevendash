@@ -10,7 +10,9 @@ import com.example.elevendash.domain.store.repository.StoreRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,9 +24,11 @@ import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
+@AllArgsConstructor
 public class CartService {
     private final StoreRepository storeRepository;
     private final OrderRepository orderRepository;
+
 
 
     public CartResponseDto createCookie(HttpServletResponse response, HttpServletRequest request, CartRequestDto requestDto) {
