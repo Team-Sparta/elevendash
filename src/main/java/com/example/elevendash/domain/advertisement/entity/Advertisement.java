@@ -71,7 +71,7 @@ public class Advertisement extends BaseTimeEntity {
         this.state = AdvertisementState.REJECTED;
     }
     // 상점 주인의 광고 종료
-    public void stop(Integer bidPrice){
+    public void stop(){
         if (this.state != AdvertisementState.ACCEPTED) {
             throw new BaseException(ErrorCode.NOT_STATUS_ACCEPTED);
         }
