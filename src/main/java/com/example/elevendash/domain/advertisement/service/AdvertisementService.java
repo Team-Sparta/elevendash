@@ -2,6 +2,7 @@ package com.example.elevendash.domain.advertisement.service;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.entity.Advertisement;
 import com.example.elevendash.domain.advertisement.repository.AdvertisementRepository;
 import com.example.elevendash.domain.member.entity.Member;
@@ -36,6 +37,14 @@ public class AdvertisementService {
         advertisementRepository.save(advertisement);
         return new AddAdvertisementResponseDto(advertisement.getId());
     }
+
+//    @Transactional
+//    public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember, Long StoreId ,Long advertisementId) {
+//        if(!advertisementRepository.existsByStore(storeRepository.findById(StoreId).get())) {
+//            throw new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT);
+//        }
+//
+//    }
 
 
 }
