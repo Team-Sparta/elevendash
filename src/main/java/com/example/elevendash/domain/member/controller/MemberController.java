@@ -52,7 +52,7 @@ public class MemberController {
             @PathVariable Long memberId,
             @LoginMember Member loginMember
     ) {
-        return CommonResponse.success(SuccessCode.SUCCESS, memberService.getMemberProfile(memberId, loginMember));
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.getMemberProfile(memberId));
     }
 
     @PutMapping(value = "/profile", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
