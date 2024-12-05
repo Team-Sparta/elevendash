@@ -35,7 +35,7 @@ public class AdvertisementController {
         );
     }
 
-    @DeleteMapping("/advertisements/{advertisementId}")
+    @DeleteMapping("/{advertisementId}")
     public ResponseEntity<CommonResponse<DeleteAdvertisementResponseDto>> deleteAdvertisement(
             @PathVariable Long advertisementId,
             @LoginMember Member loginMember,
