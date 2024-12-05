@@ -12,14 +12,16 @@ import java.util.List;
 
 @Getter
 public class CartResponseDto {
+    private final Long storeId;
 
-    private final List<String> menuName;
+    private final List<Long> menuId;
 
     @Min(0)
     private final Integer price;
 
-    public CartResponseDto (List<String> menuName, Integer price) {
-        this.menuName = new ArrayList<>(menuName);
+    public CartResponseDto (Long storeId, List<Long> menuId, Integer price) {
+        this.storeId = storeId;
+        this.menuId = new ArrayList<>(menuId);
         this.price = price;
     }
 
