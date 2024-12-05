@@ -5,6 +5,7 @@ import com.example.elevendash.domain.menu.dto.CategoryInfo;
 import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.store.dto.StoreInfo;
 import com.example.elevendash.domain.store.entity.Store;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,4 +32,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     @Query("select s from Store s left join s.menus m left join m.category c where s.isDeleted = :isDeleted and c.categoryName = :category group by s.id")
     Page<Store> findAllByIsDeletedAndCategory(Boolean isDeleted, Categories category, Pageable pageable);
+
+    List<Store> findAllByMemberAndIsDeleted(@NotNull Member member, Boolean isDeleted);
 }

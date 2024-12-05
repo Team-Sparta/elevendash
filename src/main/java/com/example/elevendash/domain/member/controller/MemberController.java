@@ -1,16 +1,13 @@
 package com.example.elevendash.domain.member.controller;
 
-import com.example.elevendash.domain.member.dto.response.MemberProfileResponse;
+import com.example.elevendash.domain.member.dto.response.*;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
 import com.example.elevendash.domain.member.dto.request.OAuthLoginRequest;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
-import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
-import com.example.elevendash.domain.member.dto.response.OAuthLoginResponse;
-import com.example.elevendash.domain.member.dto.response.SignUpResponse;
-import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.service.MemberService;
+import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
@@ -64,6 +61,12 @@ public class MemberController {
         return CommonResponse.success(SuccessCode.SUCCESS, memberService.updateProfile(loginMember, request, image));
     }
 
+    @GetMapping("/{memberId}/my-stores")
+    public ResponseEntity<CommonResponse<FindMyStoreResponseDto>> findMyStores(
+            @LoginMember Member loginMember
+    ) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.findMyStores(loginMember));
+    }
 
     @DeleteMapping
     public ResponseEntity<CommonResponse<Void>> deleteMember(
