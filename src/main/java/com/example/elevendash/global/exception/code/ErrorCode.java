@@ -105,8 +105,19 @@ public enum ErrorCode {
     /**
      * Review
      */
+    NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "리뷰 정보를 찾을 수 없습니다."),
     NOT_DELIVERED(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다."),
     BAD_STARRATING(HttpStatus.BAD_REQUEST, "최소 별점이 최대 별점보다 클 수 없습니다."),
+    UNAUTHORIZED_REVIEW_UPDATE(HttpStatus.UNAUTHORIZED, "리뷰를 수정할 수 있는 권한이 없습니다."),
+    UNAUTHORIZED_REVIEW_DELETE(HttpStatus.UNAUTHORIZED, "리뷰를 삭제할 수 있는 권한이 없습니다."),
+
+    /**
+     * Comment
+     */
+    NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "댓글 정보를 찾을 수 없습니다."),
+
+
+
     /**
      * Advertisement
      */

@@ -75,4 +75,15 @@ public class ReviewController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long storeId,
+            @PathVariable Long reviewId,
+            @LoginMember Member loginmember
+    ){
+        reviewService.delete(reviewId, loginmember.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
