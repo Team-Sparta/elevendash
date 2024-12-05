@@ -27,7 +27,7 @@ public class CommentController {
             @Valid @RequestBody CommentRequestDto dto
     ){
         CommentResponseDto responseDto = commentService.create(loginMember, reviewId, dto);
-        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
 }

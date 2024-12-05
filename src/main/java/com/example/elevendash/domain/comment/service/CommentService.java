@@ -34,7 +34,7 @@ public class CommentService {
         return new CommentResponseDto(savedComment, findReview.getStore());
     }
 
-    public void validateOwner(Member loginMember){
+    private void validateOwner(Member loginMember){
         if(!loginMember.getRole().equals(MemberRole.OWNER)){
             throw new BaseException(ErrorCode.NOT_OWNER);
         }
