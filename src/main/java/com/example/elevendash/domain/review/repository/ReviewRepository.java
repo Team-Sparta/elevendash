@@ -14,9 +14,12 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    @EntityGraph(attributePaths = {"comment"})
-    @Query("select r from Review r where r.store.id=:storeId and r.member.id!=:memberId")
-    Page<Review> findByStoreIdPage(Long storeId, Long memberId, Pageable pageable);
+//    @EntityGraph(attributePaths = {"comment"})
+//    @Query("select r from Review r where r.store.id=:storeId and r.member.id!=:memberId")
+    @Query("select r from Review r left join fetch r.comment where r.store.id = :storeId and r.member.id != :memberId")
+    Page<Review> findByStore_IdAndMemberNotPage(Long storeId, Long memberId, Pageable pageable);
+
+//    Page<Review> findByStore_Id(Long storeId, Pageable pageable);
 
     @Query("select r from Review r where r.store.id=:storeId and r.starRating between :minStar and :maxStar")
     Page<Review> findByStarRating(Long storeId, int minStar, int maxStar, Pageable pageable);

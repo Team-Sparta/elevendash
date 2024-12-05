@@ -42,10 +42,9 @@ public class ReviewService {
         return PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public Page<PageReviewResponseDto> find(Long storeId, Member member, int page){
+    public Page<PageReviewResponseDto> find(Long storeId, Long memberId, Pageable pageable){
 
-        Pageable pageable = pageable(page);
-        Page<PageReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, member.getId(), pageable).map(review -> new PageReviewResponseDto(review, review.getComment()));
+        Page<PageReviewResponseDto> reviews = reviewRepository.findByStore_IdAndMemberNotPage(storeId, memberId, pageable).map(review -> new PageReviewResponseDto(review, review.getComment()));
 
         return reviews;
     }

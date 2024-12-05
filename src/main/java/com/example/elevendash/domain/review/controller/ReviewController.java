@@ -38,10 +38,12 @@ public class ReviewController {
     @GetMapping
     public ResponseEntity<Page<PageReviewResponseDto>> find(
             @PathVariable Long storeId,
-            @LoginMember Member loginMember,
-            int page
+            @LoginMember Member loginmember,
+//          @RequestParam Long memberId, //테스트용
+            @PageableDefault(size = 2, page = 0, sort = "creatdAt", direction = Sort.Direction.DESC) Pageable pageable
     ){
-        Page<PageReviewResponseDto> reviews = reviewService.find(storeId, loginMember, page);
+        Page<PageReviewResponseDto> reviews = reviewService.find(storeId, loginmember.getId(), pageable);
+//      Page<PageReviewResponseDto> reviews = reviewService.find(storeId, memberId, pageable); //테스트용
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
