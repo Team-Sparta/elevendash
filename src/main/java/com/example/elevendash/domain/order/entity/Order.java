@@ -29,9 +29,9 @@ public class Order extends BaseTimeEntity {
     private String orderStatus;
 
     @Column(nullable = false)
-    @ElementCollection
-    @CollectionTable(name = "order_menu_list", joinColumns = {@JoinColumn(name = "id", referencedColumnName = "id")})
-    private List<String> manus = new ArrayList<>();
+    @OneToMany()
+    @JoinColumn(name = "id")
+    private List<Menu> menu = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
@@ -41,11 +41,11 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long id,Long price, String orderStatus, List<String> manus) {
+    public Order(Long id,Long price, String orderStatus, List<Menu> manus) {
         this.id = id;
         this.price = price;
         this.orderStatus = orderStatus;
-        this.manus = manus;
+        this.menu = manus;
     }
 
     public void updateStatus(String orderStatus) {

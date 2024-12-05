@@ -17,6 +17,6 @@ public class AddOrderResponseDto {
     public AddOrderResponseDto(Long orderId, Long price, List<String> menus) {
         this.orderId = orderId;
         this.price = price;
-        this.menus = menus;
+        this.menus = List.copyOf(menus);
     }
 }

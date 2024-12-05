@@ -59,7 +59,7 @@ public enum ErrorCode {
     NONE_NAME(HttpStatus.BAD_REQUEST, "이름은 필수값입니다."),
     BAD_PROVIDER(HttpStatus.BAD_REQUEST, "소셜로그인은 비밀번호가 없어야하며 providerId가 필수입니다."),
     BAD_EMAIL(HttpStatus.BAD_REQUEST, "이메일을 통한 회원가입은 비밀번호가 필수입니다."),
-
+    NOT_ADMIN(HttpStatus.FORBIDDEN, "관리자가 아닌 사람은 접근할 수 없습니다"),
     /**
      * Image
      */
@@ -112,7 +112,8 @@ public enum ErrorCode {
      */
     DUPLICATE_ADVERTISEMENT(HttpStatus.BAD_REQUEST, "이미 광고가 존재합니다."),
     NOT_STATUS_WAITING(HttpStatus.BAD_REQUEST,"대기 중인 광고만 거절할 수 있습니다." ),
-    NOT_STATUS_ACCEPTED(HttpStatus.BAD_REQUEST,"진행중인 광고만 중단할 수 있습니다" );
+    NOT_STATUS_ACCEPTED(HttpStatus.BAD_REQUEST,"진행중인 광고만 중단할 수 있습니다" ),
+    NOT_FOUND_ADVERTISEMENT(HttpStatus.BAD_REQUEST,"광고가 존재하지 않습니다" );
 
 
     private final HttpStatus httpStatus;

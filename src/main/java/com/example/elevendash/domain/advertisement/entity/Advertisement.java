@@ -30,7 +30,7 @@ public class Advertisement extends BaseTimeEntity {
     @Column
     @NotNull
     @Enumerated(EnumType.STRING)
-    private AdvertisementState state = AdvertisementState.WAITING;
+    private AdvertisementState status = AdvertisementState.WAITING;
 
     @Column
     private String rejectReason;
@@ -60,22 +60,29 @@ public class Advertisement extends BaseTimeEntity {
     // 광고 금액 수정
     public void retryBid(Integer bidPrice) {
         this.bidPrice = bidPrice;
-        this.state = AdvertisementState.WAITING;
+        this.status = AdvertisementState.WAITING;
     }
     // 광고  거절
     public void rejectBid(String rejectReason) {
-        if (this.state != AdvertisementState.WAITING) {
+        if (this.status != AdvertisementState.WAITING) {
             throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
         }
         this.rejectReason = rejectReason;
-        this.state = AdvertisementState.REJECTED;
+        this.status = AdvertisementState.REJECTED;
     }
     // 상점 주인의 광고 종료
-    public void stop(Integer bidPrice){
-        if (this.state != AdvertisementState.ACCEPTED) {
+    public void stop(){
+        if (this.status != AdvertisementState.ACCEPTED) {
             throw new BaseException(ErrorCode.NOT_STATUS_ACCEPTED);
         }
-        this.state = AdvertisementState.STOPPED;
+        this.status = AdvertisementState.STOPPED;
+    }
+    // 관리자 광고 수락
+    public void accept(){
+        if (this.status != AdvertisementState.WAITING) {
+            throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
+        }
+        this.status = AdvertisementState.ACCEPTED;
     }
 
 }
