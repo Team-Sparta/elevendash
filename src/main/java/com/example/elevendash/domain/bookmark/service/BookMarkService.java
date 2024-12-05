@@ -5,18 +5,14 @@ import com.example.elevendash.domain.bookmark.dto.response.DeleteBookmarkRespons
 import com.example.elevendash.domain.bookmark.entity.Bookmark;
 import com.example.elevendash.domain.bookmark.repository.BookMarkRepository;
 import com.example.elevendash.domain.member.entity.Member;
-import com.example.elevendash.domain.member.repository.MemberRepository;
-import com.example.elevendash.domain.member.service.MemberService;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
-import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,10 +37,10 @@ public class BookMarkService {
     }
 
     @Transactional
-    public DeleteBookmarkResponseDto deleteBookmark(Member member, Long storeId, Long BookmarkId){
-        Bookmark deleteBookmark = bookMarkRepository.findById(BookmarkId)
+    public DeleteBookmarkResponseDto deleteBookmark(Member member, Long storeId, Long bookmarkId){
+        Bookmark deleteBookmark = bookMarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_BOOKMARK));
-        if(deleteBookmark.getStore().getId().equals(storeId) && deleteBookmark.getMember().equals(member)){
+        if(storeId.equals(deleteBookmark.getStore().getId()) && deleteBookmark.getMember().equals(member)){
             bookMarkRepository.delete(deleteBookmark);
         }
         else{

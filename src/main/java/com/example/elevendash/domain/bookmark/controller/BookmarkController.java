@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class BookmarkController {
     private final BookMarkService bookMarkService;
 
+    /**
+     * 북마크 생성 API
+     * @param storeId
+     * @param loginMember
+     * @return
+     */
     @PostMapping("/stores/{storeId}/bookmarks")
     public ResponseEntity<CommonResponse<AddBookmarkResponseDto>> addBookmark(
             @PathVariable("storeId") Long storeId,
@@ -25,6 +31,13 @@ public class BookmarkController {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,bookMarkService.addBookmark(loginMember,storeId));
     }
 
+    /**
+     * 북마크 삭제 API
+     * @param bookmarkId
+     * @param storeId
+     * @param loginMember
+     * @return
+     */
     @DeleteMapping("/stores/{storeId}/bookmarks/{bookmarkId}")
     public ResponseEntity<CommonResponse<DeleteBookmarkResponseDto>> deleteBookmark(
             @PathVariable("bookmarkId") Long bookmarkId,
