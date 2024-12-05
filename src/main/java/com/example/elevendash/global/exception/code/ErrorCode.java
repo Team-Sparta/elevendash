@@ -60,6 +60,12 @@ public enum ErrorCode {
     BAD_PROVIDER(HttpStatus.BAD_REQUEST, "소셜로그인은 비밀번호가 없어야하며 providerId가 필수입니다."),
     BAD_EMAIL(HttpStatus.BAD_REQUEST, "이메일을 통한 회원가입은 비밀번호가 필수입니다."),
 
+    /**
+     * Image
+     */
+    S3_UPLOADER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 중 오류가 발생하였습니다."),
+    BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다."),
+
 
     /**
      * Coupon
@@ -71,13 +77,12 @@ public enum ErrorCode {
     TODAY_OVER_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "오늘의 쿠폰 발급 한도를 초과했습니다."),
     ALREADY_USED_COUPON(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
 
-
     /**
-     * Image
+     * Bookmark
      */
-    S3_UPLOADER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3 업로드 중 오류가 발생하였습니다."),
-    BAD_FORMAT_IMG(HttpStatus.BAD_REQUEST, "이미지 파일의 형식이 맞지 않습니다."),
-
+    ALREADY_BOOKMARK(HttpStatus.BAD_REQUEST, "이미 북마크하셨습니다"),
+    NOT_FOUND_BOOKMARK(HttpStatus.NOT_FOUND, "북마크가 존재하지 않습니다"),
+    NOT_CORRECT_INFORMATION(HttpStatus.BAD_REQUEST, "상점과 멤버의 정보가 북마크와 일치하지 않습니다"),
 
     /**
      * Store
@@ -95,8 +100,16 @@ public enum ErrorCode {
     NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, "메뉴 정보를 찾을 수 없습니다."),
     NOT_SAME_STORE(HttpStatus.NOT_ACCEPTABLE, "상점과 메뉴정보가 일치하지 않습니다."),
-    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다.")
+    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다."),
+
+    /**
+     * Review
+     */
+    NOT_DELIVERED(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다."),
+    BAD_STARRATING(HttpStatus.BAD_REQUEST, "최소 별점이 최대 별점보다 클 수 없습니다.")
+
     ;
+
 
     private final HttpStatus httpStatus;
     private final String message;

@@ -13,6 +13,7 @@ public class CategoryInfo {
     private final List<MenuInfoForCategory> menus;
     @Getter
     public static class MenuInfoForCategory {
+        private final Long menuId;
         private final String menuName;
         private final String menuDescription;
         private final Integer menuPrice;
@@ -20,7 +21,8 @@ public class CategoryInfo {
 
         public MenuInfoForCategory(String menuName, String menuDescription
                 , Integer menuPrice
-                , String menuImage){
+                , String menuImage, Long menuId) {
+            this.menuId = menuId;
             this.menuName = menuName;
             this.menuDescription = menuDescription;
             this.menuPrice = menuPrice;

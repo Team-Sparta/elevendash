@@ -2,15 +2,11 @@ package com.example.elevendash.domain.member.controller;
 
 import com.example.elevendash.domain.coupon.dto.response.CouponListResponse;
 import com.example.elevendash.domain.coupon.service.CouponService;
-import com.example.elevendash.domain.member.dto.response.MemberProfileResponse;
+import com.example.elevendash.domain.member.dto.response.*;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
 import com.example.elevendash.domain.member.dto.request.OAuthLoginRequest;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
-import com.example.elevendash.domain.member.dto.response.EmailLoginResponse;
-import com.example.elevendash.domain.member.dto.response.OAuthLoginResponse;
-import com.example.elevendash.domain.member.dto.response.SignUpResponse;
-import com.example.elevendash.domain.member.dto.response.UpdateProfileResponse;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.service.MemberService;
 import com.example.elevendash.domain.point.dto.response.TotalPointsResponse;
@@ -78,6 +74,13 @@ public class MemberController {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE);
     }
 
+    @GetMapping("/my/my-stores")
+    public ResponseEntity<CommonResponse<FindMyStoreResponseDto>> findMyStores(
+            @LoginMember Member loginMember
+    ) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.findMyStores(loginMember));
+    }
+
     @GetMapping("/my/points")
     public ResponseEntity<CommonResponse<TotalPointsResponse>> getPoints(
             @LoginMember Member loginMember
@@ -91,5 +94,3 @@ public class MemberController {
     ) {
         return CommonResponse.success(SuccessCode.SUCCESS, couponService.getMyCoupons(loginMember.getId()));
     }
-
-}

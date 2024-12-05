@@ -6,23 +6,24 @@ import com.example.elevendash.domain.menu.dto.CategoryInfo;
 import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.menu.repository.CategoryRepository;
 import com.example.elevendash.domain.menu.repository.MenuRepository;
+import com.example.elevendash.domain.store.dto.StoreInfo;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
 import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
-import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
-import com.example.elevendash.domain.store.dto.response.FindStoreResponseDto;
-import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
-import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.*;
 import com.example.elevendash.domain.store.entity.Store;
+import com.example.elevendash.domain.store.enums.SortMode;
 import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import com.example.elevendash.global.s3.S3Service;
 import com.example.elevendash.global.s3.UploadImageInfo;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -149,28 +150,76 @@ public class StoreService {
         Store findStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
         List<Object[]> categories = categoryRepository.findAllCategoryInfo(findStore);
+        // 카테고리별로 메뉴 연결을 위한 map
         Map<String,List<CategoryInfo.MenuInfoForCategory>> menuMap = new HashMap<>();
-
+        //연결 로직
         for(Object[] category : categories){
             String categoryName = ((Categories)category[0]).getKoreanName();
             String menuName = (String) category[1];
             String menuDescription = (String) category[2];
             Integer menuPrice = (Integer) category[3];
             String menuImage = (String) category[4];
+            Long menuId = (Long) category[5];
 
-            CategoryInfo.MenuInfoForCategory menuInfo = new CategoryInfo.MenuInfoForCategory(menuName,menuDescription,menuPrice,menuImage);
+            CategoryInfo.MenuInfoForCategory menuInfo = new CategoryInfo.MenuInfoForCategory(menuName,menuDescription,menuPrice,menuImage,menuId);
             menuMap.putIfAbsent(categoryName, new ArrayList<>());
             menuMap.get(categoryName).add(menuInfo);
         }
+        // map을 객체로 변환
         List<CategoryInfo> categoryList = new ArrayList<>();
         for(Map.Entry<String,List<CategoryInfo.MenuInfoForCategory>> entry : menuMap.entrySet()){
             categoryList.add(new CategoryInfo(entry.getKey(),entry.getValue()));
         }
 
-        return new FindStoreResponseDto(findStore.getStoreName()
+        return new FindStoreResponseDto(findStore.getId(),findStore.getStoreName()
                 ,findStore.getStoreDescription(),findStore.getOpenTime(),findStore.getCloseTime()
                 ,findStore.getStoreAddress(),findStore.getStorePhone(),findStore.getLeastAmount(),findStore.getStoreImage(),categoryList);
     }
+
+    // 시간이 되면 동적 쿼리로 작성
+    @Transactional
+    public FindAllStoreResponseDto findAllStore(Member loginMember,Categories category,Integer pageSize, Integer pageNumber, SortMode sortMode) {
+        Page<StoreInfo> storeInfoList = null;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        if(sortMode.equals(SortMode.NORMAL)){
+            storeInfoList = storeRepository.findAllByIsDeleted(Boolean.FALSE,pageable).map(store -> new StoreInfo(
+                    store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
+                    ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+            ));
+        }
+        if(sortMode.equals(SortMode.BOOKMARK_RANKING)){
+            storeInfoList = storeRepository.findAllByIsDeletedBookmarkSort(Boolean.FALSE,pageable).map(store -> new StoreInfo(
+                    store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
+                    ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+            ));
+        }
+        if(sortMode.equals(SortMode.MY_BOOKMARK)){
+            storeInfoList = storeRepository.findAllByIsDeletedAndMyBookmark(Boolean.FALSE,loginMember,pageable).map(store -> new StoreInfo(
+                    store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
+                    ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+            ));
+        }
+        if(sortMode.equals(SortMode.CATEGORY)){
+            storeInfoList = storeRepository.findAllByIsDeletedAndCategory(Boolean.FALSE,category,pageable).map(store -> new StoreInfo(
+                    store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
+                    ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+            ));
+        }
+
+
+        if(storeInfoList == null){
+            throw new BaseException(ErrorCode.NOT_FOUND_STORE);
+        }
+
+        return new FindAllStoreResponseDto(storeInfoList.getContent(),
+                new FindAllStoreResponseDto.PageInfo(storeInfoList.getNumber()+1,
+                        storeInfoList.getSize(),
+                        storeInfoList.getTotalElements(),
+                        storeInfoList.getTotalPages()));
+    }
+
+
+
 
     /**
      * 음식점 수 검증 메소드 (3개 미만 경우에 가능)
