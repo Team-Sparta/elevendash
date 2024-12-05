@@ -1,7 +1,9 @@
 package com.example.elevendash.domain.review.service;
 
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
+import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
 import com.example.elevendash.domain.review.dto.response.ReviewResponseDto;
 import com.example.elevendash.domain.review.entity.Review;
 
@@ -38,10 +40,10 @@ public class ReviewService {
         return PageRequest.of(page, DEFAULT_PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public Page<ReviewResponseDto> find(Long storeId, Long memberId, int page){
+    public Page<ReviewResponseDto> find(Long storeId, Member member, int page){
 
         Pageable pageable = pageable(page);
-        Page<ReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, memberId, pageable).map(review -> new ReviewResponseDto(review, review.getComment()));
+        Page<ReviewResponseDto> reviews = reviewRepository.findByStoreIdPage(storeId, member.getId(), pageable).map(review -> new ReviewResponseDto(review, review.getComment()));
 
         return reviews;
     }
