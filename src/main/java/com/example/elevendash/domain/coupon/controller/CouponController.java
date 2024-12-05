@@ -24,6 +24,6 @@ public class CouponController {
     public ResponseEntity<CommonResponse<CouponIdResponse>> issueCoupon(
             @RequestParam Long couponId,
             @LoginMember Member loginMember) {
-        return CommonResponse.success(SuccessCode.SUCCESS, couponService.issueCoupon(loginMember.getId(), couponId));
+        return CommonResponse.success(SuccessCode.SUCCESS, couponService.issueCoupon(loginMember, couponId));
     }
 }

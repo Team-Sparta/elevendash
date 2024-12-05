@@ -15,8 +15,6 @@ import com.example.elevendash.domain.member.factory.OAuthProviderFactory;
 import com.example.elevendash.domain.member.repository.MemberRepository;
 import com.example.elevendash.domain.store.dto.StoreInfo;
 import com.example.elevendash.domain.store.repository.StoreRepository;
-import com.example.elevendash.domain.store.service.StoreService;
-import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.constants.AuthConstants;
 import com.example.elevendash.global.exception.AuthenticationException;
 import com.example.elevendash.global.exception.BaseException;
@@ -81,6 +79,7 @@ public class MemberService {
         hashMap.put("id", member.getId());
         hashMap.put("name", member.getName());
         hashMap.put("email", member.getEmail());
+        hashMap.put("role", member.getRole());
         return hashMap;
     }
 
@@ -143,9 +142,9 @@ public class MemberService {
     public FindMyStoreResponseDto findMyStores(Member loginMember) {
 
         List<StoreInfo> storeInfoList = storeRepository.findAllByMemberAndIsDeleted(loginMember, Boolean.FALSE).stream().map(
-                store-> new StoreInfo(
-                        store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
-                        ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+                store -> new StoreInfo(
+                        store.getId(), store.getBookmarks().size(), store.getStoreName(), store.getOpenTime()
+                        , store.getCloseTime(), store.getStoreAddress(), store.getLeastAmount()
                 )).collect(Collectors.toList());
         return new FindMyStoreResponseDto(storeInfoList);
     }
@@ -183,12 +182,9 @@ public class MemberService {
             return new Token(null, null);
         } else {
             Member member = memberRepository.findByEmailAndDeletedAtIsNull(email);
-            HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("id", member.getId());
-            hashMap.put("name", member.getName());
-            hashMap.put("email", member.getEmail());
-            String generatedToken = jwtTokenProvider.createAccessToken(hashMap);
+            String generatedToken = jwtTokenProvider.createAccessToken(createClaims(member));
             return new Token(generatedToken, jwtTokenProvider.getExpirationByToken(generatedToken));
         }
     }
+
 }

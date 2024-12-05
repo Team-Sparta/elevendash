@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.coupon.entity;
 
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.entity.BaseCreatedTimeEntity;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
@@ -25,8 +26,9 @@ public class CouponUsage extends BaseCreatedTimeEntity {
     @Column(name = "id", columnDefinition = "BIGINT UNSIGNED comment '쿠폰 사영 고유 번호'")
     private Long id;
 
-    @Column(name = "member_id", nullable = false, columnDefinition = "BIGINT UNSIGNED comment '회원 고유 번호'")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false, columnDefinition = "BIGINT UNSIGNED comment '회원 고유 번호'")
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "coupon_id", nullable = false, columnDefinition = "BIGINT UNSIGNED comment '쿠폰 고유 번호'")
@@ -34,9 +36,9 @@ public class CouponUsage extends BaseCreatedTimeEntity {
 
     private boolean used; // 쿠폰 사용 여부
 
-    public CouponUsage(Coupon coupon, Long memberId, boolean used) {
+    public CouponUsage(Coupon coupon, Member member, boolean used) {
         this.coupon = coupon;
-        this.memberId = memberId;
+        this.member = member;
         this.used = used;
     }
 

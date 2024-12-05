@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.store.repository;
 
+import com.example.elevendash.domain.advertisement.enums.AdvertisementStatus;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.menu.dto.CategoryInfo;
 import com.example.elevendash.domain.menu.enums.Categories;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,4 +38,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findAllByMemberAndIsDeleted(@NotNull Member member, Boolean isDeleted);
 
     Optional<Store> findByIdAndIsDeletedAndMember(Long id, Boolean isDeleted, @NotNull Member member);
+
+    @Query("select s from Store s inner join s.advertisement a where a.status = :status order by a.bidPrice desc")
+    Page<Store> findAllForAd (@Param("status") AdvertisementStatus status, Pageable pageable);
+
 }

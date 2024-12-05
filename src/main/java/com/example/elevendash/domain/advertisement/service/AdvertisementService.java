@@ -2,12 +2,10 @@ package com.example.elevendash.domain.advertisement.service;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.request.RejectAdvertisementRequestDto;
-import com.example.elevendash.domain.advertisement.dto.response.AcceptAdvertisementResponseDto;
-import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisementResponseDto;
-import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
-import com.example.elevendash.domain.advertisement.dto.response.RejectAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.request.UpdateAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.response.*;
 import com.example.elevendash.domain.advertisement.entity.Advertisement;
-import com.example.elevendash.domain.advertisement.enums.AdvertisementState;
+import com.example.elevendash.domain.advertisement.enums.AdvertisementStatus;
 import com.example.elevendash.domain.advertisement.repository.AdvertisementRepository;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
@@ -18,6 +16,8 @@ import com.example.elevendash.global.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,7 +71,6 @@ public class AdvertisementService {
     /**
      * 관리자의 광고 거절 메소드
      * @param loginMember
-     * @param StoreId
      * @param advertisementId
      * @param requestDto
      * @return
@@ -83,13 +82,19 @@ public class AdvertisementService {
         }
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
-        if(!advertisement.getStatus().equals(AdvertisementState.WAITING)) {
+        if(!advertisement.getStatus().equals(AdvertisementStatus.WAITING)) {
             throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
         }
         advertisement.rejectBid(requestDto.getRejectReason());
         return new RejectAdvertisementResponseDto(advertisement.getId());
     }
 
+    /**
+     * 관리자 광고 수락 기능
+     * @param loginMember
+     * @param advertisementId
+     * @return
+     */
     @Transactional
     public AcceptAdvertisementResponseDto acceptAdvertisement(Member loginMember, Long advertisementId) {
         if(!loginMember.getRole().equals(MemberRole.ADMIN)){
@@ -97,7 +102,7 @@ public class AdvertisementService {
         }
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
-        if(!advertisement.getStatus().equals(AdvertisementState.WAITING)) {
+        if(!advertisement.getStatus().equals(AdvertisementStatus.WAITING)) {
             throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
         }
         advertisement.accept();
@@ -105,6 +110,56 @@ public class AdvertisementService {
         return new AcceptAdvertisementResponseDto(advertisement.getId());
     }
 
+    /**
+     * 관리자 광고 조회 기능
+     * @param loginMember
+     * @return
+     */
+    @Transactional
+    public FindAllAdvertisementResponseDto findAllAdvertisement(Member loginMember) {
+        if(!loginMember.getRole().equals(MemberRole.ADMIN)){
+            throw new BaseException(ErrorCode.NOT_ADMIN);
+        }
+        List<Advertisement> advertisements = advertisementRepository.findAllByStatusOrderByBidPriceDesc(AdvertisementStatus.WAITING);
+        List<FindAllAdvertisementResponseDto.AdvertisementInfo> advertisementInfos =
+                advertisements.stream().map(advertisement -> new FindAllAdvertisementResponseDto.AdvertisementInfo(
+                    advertisement.getId(),
+                    advertisement.getStore().getId(),
+                    advertisement.getMember().getId(), advertisement.getBidPrice()))
+                        .toList();
+        return new FindAllAdvertisementResponseDto(advertisementInfos);
+    }
+
+    @Transactional
+    public FindAllMyAdvertisementResponseDto findAllMyAdvertisement(Member loginMember) {
+        if(!loginMember.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
+        }
+        List<Advertisement> advertisements = advertisementRepository.findAllByMember(loginMember);
+        List<FindAllMyAdvertisementResponseDto.AdvertisementInfoForOwner> advertisementInfoForOwnerList
+                = advertisements.stream().map(advertisement -> new FindAllMyAdvertisementResponseDto.AdvertisementInfoForOwner(
+                        advertisement.getId(),
+                advertisement.getStore().getId(),
+                advertisement.getRejectReason(),
+                advertisement.getBidPrice(),
+                advertisement.getStatus()
+        )).toList();
+        return new FindAllMyAdvertisementResponseDto(advertisementInfoForOwnerList);
+    }
+
+    @Transactional
+    public UpdateAdvertisementResponseDto updateAdvertisement(Member member,Long advertisementId, UpdateAdvertisementRequestDto requestDto) {
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
+        }
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
+        if(!advertisement.getMember().getId().equals(member.getId())){
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        advertisement.retryBid(requestDto.getBidPrice());
+        return new UpdateAdvertisementResponseDto(advertisement.getId());
+    }
 
 
 }

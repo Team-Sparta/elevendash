@@ -1,5 +1,9 @@
 package com.example.elevendash.domain.member.controller;
 
+import com.example.elevendash.domain.advertisement.dto.request.UpdateAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.response.FindAllMyAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.response.UpdateAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.service.AdvertisementService;
 import com.example.elevendash.domain.coupon.dto.response.CouponListResponse;
 import com.example.elevendash.domain.coupon.service.CouponService;
 import com.example.elevendash.domain.member.dto.response.*;
@@ -28,6 +32,7 @@ public class MemberController {
     private final MemberService memberService;
     private final PointService pointService;
     private final CouponService couponService;
+    private final AdvertisementService advertisementService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<CommonResponse<SignUpResponse>> singUp(@Valid @RequestBody SignUpRequest request) {
@@ -79,6 +84,23 @@ public class MemberController {
             @LoginMember Member loginMember
     ) {
         return CommonResponse.success(SuccessCode.SUCCESS, memberService.findMyStores(loginMember));
+    }
+
+    @GetMapping("my/my-advertisements")
+    public ResponseEntity<CommonResponse<FindAllMyAdvertisementResponseDto>> findMyAdvertisements(
+            @LoginMember Member loginMember
+    ){
+        return CommonResponse.success(SuccessCode.SUCCESS, advertisementService.findAllMyAdvertisement(loginMember));
+    }
+
+    @PutMapping("my/my-advertisements/{advertisementId}")
+    public ResponseEntity<CommonResponse<UpdateAdvertisementResponseDto>> updateAdvertisement(
+            @RequestBody @Valid UpdateAdvertisementRequestDto requestDto,
+            @PathVariable Long advertisementId,
+            @LoginMember Member loginMember
+            ){
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,advertisementService.updateAdvertisement(
+                loginMember,advertisementId,requestDto));
     }
 
     @GetMapping("/my/points")

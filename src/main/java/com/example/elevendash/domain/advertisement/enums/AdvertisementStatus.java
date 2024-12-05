@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.advertisement.enums;
 
-public enum AdvertisementState {
+public enum AdvertisementStatus {
     WAITING,
     ACCEPTED,
     REJECTED,

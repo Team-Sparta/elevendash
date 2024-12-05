@@ -65,7 +65,9 @@ dependencies {
     // CircuitBreaker
     implementation 'io.github.resilience4j:resilience4j-spring-boot2:2.0.2'
 
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.mockito:mockito-core:4.8.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
