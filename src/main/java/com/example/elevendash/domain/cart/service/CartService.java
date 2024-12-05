@@ -31,10 +31,19 @@ public class CartService {
 
 
     public CartResponseDto createCookie(HttpServletResponse response, HttpServletRequest request, CartRequestDto requestDto) {
+        Cookie[] getCookie = request.getCookies();
+        for (Cookie cookieDail : getCookie) {
+            if(!cookieDail.getAttribute("store_id").equals(requestDto.getStoreId().toString())) {
+                cookieDail.setMaxAge(0);
+                cookieDail.setPath("/");
+                response.addCookie(cookieDail);
+            }
+        }
+
         List<Long> requestDtoMenuId = new ArrayList<>(requestDto.getMenuId());
         Long requestDtoStoreId = requestDto.getStoreId();
         Store store = storeRepository.findById(requestDtoStoreId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
-        List<String> orderSuccess = new ArrayList<>();
+        List<Long> orderSuccess = new ArrayList<>();
         List<Menu> storeMenu = store.getMenus();
         Integer totalPrice = 0;
 
@@ -42,7 +51,7 @@ public class CartService {
         for(Long menuId : requestDtoMenuId) {
             for (Menu storeMenuDetails : storeMenu) {
                 if (storeMenuDetails.getId().equals(menuId)) {
-                    orderSuccess.add(storeMenuDetails.getMenuName());
+                    orderSuccess.add(storeMenuDetails.getId());
                     Integer price = storeMenuDetails.getMenuPrice();
                     totalPrice += price;
                 }else {
@@ -52,11 +61,16 @@ public class CartService {
         }
 
 
-        Cookie cookie = new Cookie("menuName", String.valueOf(requestDto));
-        cookie.setPath("/");
-        cookie.setMaxAge(60 * 60 * 24);
-        response.addCookie(cookie);
-        return new CartResponseDto(orderSuccess, totalPrice);
+        Cookie orderMenuCookie = new Cookie("menu_id", String.valueOf(orderSuccess));
+        orderMenuCookie.setPath("/");
+        orderMenuCookie.setMaxAge(60 * 60 * 24);
+        response.addCookie(orderMenuCookie);
+
+        Cookie storeIdCookie = new Cookie("store_id", String.valueOf(store.getId()));
+        orderMenuCookie.setPath("/");
+        orderMenuCookie.setMaxAge(60 * 60 * 24);
+        response.addCookie(storeIdCookie);
+        return new CartResponseDto(store.getId(),orderSuccess, totalPrice);
     }
 
 }
