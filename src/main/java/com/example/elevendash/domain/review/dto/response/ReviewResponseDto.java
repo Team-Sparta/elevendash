@@ -1,9 +1,11 @@
 package com.example.elevendash.domain.review.dto.response;
 
 import com.example.elevendash.domain.review.entity.Review;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class ReviewResponseDto {
     private final Long reviewId;
     private final String storeName;

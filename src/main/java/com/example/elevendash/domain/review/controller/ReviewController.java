@@ -12,6 +12,9 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,9 +68,10 @@ public class ReviewController {
     public ResponseEntity<ReviewResponseDto> updateReview(
             @PathVariable Long storeId,
             @PathVariable Long reviewId,
+            @LoginMember Member loginmember,
             @Valid @RequestBody UpdateReviewDto dto
     ){
-        ReviewResponseDto responseDto = reviewService.updateReview(reviewId, dto);
+        ReviewResponseDto responseDto = reviewService.updateReview(reviewId, loginmember.getId(), dto);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

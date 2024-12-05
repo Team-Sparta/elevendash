@@ -28,7 +28,7 @@ public class ReviewService {
 //        if(!findOrder.getOrderStatus().equals("배달완료")){
 //            throw new BaseException(ErrorCode.NOT_DELIVERED);
 //        }
-//        Review review = new Review(dto);
+//        Review review = new Review(dto); //dto: orderId, content, starRating
 //        Review savedReview = reviewRepository.save(review);
 //
 //        return new ReviewResponseDto(savedReview);
@@ -60,8 +60,13 @@ public class ReviewService {
         return reviews;
     }
 
-    public ReviewResponseDto updateReview(Long reviewId, UpdateReviewDto dto){
+    public ReviewResponseDto updateReview(Long reviewId, Long loginMemberId, UpdateReviewDto dto){
         Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
+
+        if (!findReview.getMember().getId().equals(loginMemberId)) {
+            throw new BaseException(ErrorCode.UNAUTHORIZED_REVIEW_UPDATE);
+        }
+
         findReview.updateReview(dto);
         Review savedReview = reviewRepository.save(findReview);
 
