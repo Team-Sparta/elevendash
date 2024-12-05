@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.member.entity;
 
+import com.example.elevendash.domain.advertisement.entity.Advertisement;
 import com.example.elevendash.domain.bookmark.entity.Bookmark;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
@@ -68,6 +69,9 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     List<Bookmark> bookmarks = new ArrayList<>();
+
+    @OneToManyToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<Advertisement> advertisements = new ArrayList<>();
 
     @Builder
     private Member(SignUpRequest signUpRequest) {
