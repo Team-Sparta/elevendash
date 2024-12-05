@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.review.entity;
 
+import com.example.elevendash.domain.comment.entity.Comment;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
@@ -41,8 +42,7 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "comment_id")
+    @OneToOne(mappedBy = "review", cascade = CascadeType.ALL)
     private Comment comment;
 
     public Review(CreateReviewDto dto){
