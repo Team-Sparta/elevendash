@@ -13,6 +13,7 @@ import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -34,6 +35,7 @@ public class CommentService {
         return new CommentResponseDto(savedComment, findReview.getStore());
     }
 
+    @Transactional
     public CommentResponseDto updateComment(Member loginMember, Long commentId, CommentRequestDto dto){
 
         validateOwner(loginMember);
@@ -44,7 +46,14 @@ public class CommentService {
         Comment savedComment = commentRepository.save(findComment);
 
         return new CommentResponseDto(savedComment);
+    }
 
+    public void delete(Member loginMember, Long commentId) {
+
+        validateOwner(loginMember);
+
+        Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
+        commentRepository.delete(findComment);
     }
 
     private void validateOwner(Member loginMember){
