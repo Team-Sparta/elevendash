@@ -4,15 +4,13 @@ import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
 import com.example.elevendash.domain.menu.dto.request.UpdateMenuRequestDto;
-import com.example.elevendash.domain.menu.dto.response.AddMenuOptionResponseDto;
-import com.example.elevendash.domain.menu.dto.response.DeleteMenuResponseDto;
-import com.example.elevendash.domain.menu.dto.response.RegisterMenuResponseDto;
-import com.example.elevendash.domain.menu.dto.response.UpdateMenuResponseDto;
+import com.example.elevendash.domain.menu.dto.response.*;
 import com.example.elevendash.domain.menu.service.MenuService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,14 +29,13 @@ public class MenuController {
      * @param storeId 가게 식별자
      * @param member 로그인한 사용자 정보
      * @return 등록된 메뉴 정보
-     * @throws  가게를 찾을 수 없는 경우
-     * @throws  권한이 없는 경우
+
      */
     @PostMapping("/{storeId}/menus/register")
     public ResponseEntity<CommonResponse<RegisterMenuResponseDto>> registerMenu(
-            @RequestBody @Valid RegisterMenuRequestDto requestDto,
+            @RequestPart("request") @Valid RegisterMenuRequestDto requestDto,
             @PathVariable("storeId") Long storeId,
-            @RequestParam("menuImage") MultipartFile menuImage,
+            @RequestPart(name = "image", required = false) @NotNull MultipartFile menuImage,
             @LoginMember Member member) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.registerMenu(member, menuImage,storeId, requestDto));
     }
@@ -71,10 +68,19 @@ public class MenuController {
             @PathVariable("storeId") Long storeId,
             @PathVariable("menuId") Long menuId,
             @LoginMember Member member,
-            @RequestBody @Valid UpdateMenuRequestDto requestDto) {
-        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,storeId,menuId,requestDto));
+            @RequestPart(name = "image", required = false) @NotNull MultipartFile menuImage,
+            @RequestPart("request") @Valid UpdateMenuRequestDto requestDto) {
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,menuService.updateMenu(member,menuImage,storeId,menuId,requestDto));
     }
 
+    /**
+     * 메뉴 옵션 추가 API
+     * @param storeId
+     * @param menuId
+     * @param member
+     * @param requestDto
+     * @return
+     */
     @PostMapping("/{storeId}/menus/{menuId}/menu-options/add")
     public ResponseEntity<CommonResponse<AddMenuOptionResponseDto>> addMenuOption(
             @PathVariable("storeId") Long storeId,
@@ -83,5 +89,25 @@ public class MenuController {
             @RequestBody @Valid AddMenuOptionRequestDto requestDto) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,menuService.addOption(member,storeId,menuId,requestDto));
     }
+
+    /**
+     * 메누 삭제 API
+     * @param storeId
+     * @param menuId
+     * @param member
+     * @param menuOptionId
+     * @return
+     */
+    @DeleteMapping("/{storeId}/menus/{menuId}/menu-options/{menuOptionId}")
+    public ResponseEntity<CommonResponse<DeleteMenuOptionResponseDto>> deleteMenuOption(
+            @PathVariable("storeId") Long storeId,
+            @PathVariable("menuId") Long menuId,
+            @LoginMember Member member,
+            @PathVariable Long menuOptionId) {
+        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,menuService.deleteOption(member,storeId,menuId,menuOptionId));
+    }
+
+
+//    @PutMapping("/{storeId}/menus/{menuId}/menu-options/{menuOptionId}")
 
 }

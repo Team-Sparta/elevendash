@@ -21,10 +21,9 @@ public class UpdateMenuRequestDto {
     @Min(0)
     private Integer menuPrice;
 
-    @Lob
-    @NotBlank
-    private String menuImage;
-
     @NotNull
     private Categories menuCategory;
+
+    @Length(max = 250)
+    private String menuDescription;
 }

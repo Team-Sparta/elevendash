@@ -73,12 +73,18 @@ public enum ErrorCode {
      */
     NOT_FOUND_STORE(HttpStatus.NOT_FOUND, "상점 정보를 찾을 수 없습니다."),
     NOT_SAME_MEMBER(HttpStatus.NOT_ACCEPTABLE, "상점과 멤버정보가 일치하지 않습니다."),
+    NOT_VALID_OPEN_TIME(HttpStatus.BAD_REQUEST, "오픈시간이 마감시간보다 빠릅니다"),
+    ENOUGH_STORE(HttpStatus.BAD_REQUEST, "상점의 수가 3개입니다 더이상 추가할 수 없습니다"),
+    NOT_OWNER(HttpStatus.NOT_ACCEPTABLE, "OWNER 권한만 할 수 있습니다."),
 
     /**
      * Menu
      */
+
+    NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, "메뉴 정보를 찾을 수 없습니다."),
     NOT_SAME_STORE(HttpStatus.NOT_ACCEPTABLE, "상점과 메뉴정보가 일치하지 않습니다."),
+    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

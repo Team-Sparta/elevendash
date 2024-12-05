@@ -2,13 +2,22 @@ package com.example.elevendash.domain.store.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
+import com.example.elevendash.domain.menu.dto.CategoryInfo;
+import com.example.elevendash.domain.menu.enums.Categories;
+import com.example.elevendash.domain.menu.repository.CategoryRepository;
+import com.example.elevendash.domain.menu.repository.MenuRepository;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
+import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
 import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.FindStoreResponseDto;
 import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
+import com.example.elevendash.global.s3.S3Service;
+import com.example.elevendash.global.s3.UploadImageInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +29,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class StoreService {
     private final StoreRepository storeRepository;
+    private final S3Service s3Service;
+    private final CategoryRepository categoryRepository;
+    private final MenuRepository menuRepository;
 
     /**
      * 음식점 등록 메소드
@@ -39,18 +50,21 @@ public class StoreService {
     @Transactional
     public RegisterStoreResponseDto registerStore(Member member, MultipartFile multipartFile, RegisterStoreRequestDto dto) {
         // 오픈 마감시간 검증
-        if(isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
-            throw new BaseException("오픈시간이 마감시간보다 빠릅니다",ErrorCode.VALIDATION_ERROR);
+        if(!isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
+            throw new BaseException(ErrorCode.NOT_VALID_OPEN_TIME);
         }
         // 스토어 수 검증
-        if(isValidStoreNumber(member, 3L)) {
-            throw new BaseException("스토어 수가 이미 3개 입니다",ErrorCode.VALIDATION_ERROR);
+        if(!isValidStoreNumber(member, 3L)) {
+            throw new BaseException(ErrorCode.ENOUGH_STORE);
         }
         // OWNER 권한 검증
         if(!member.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException("OWNER만이 상점을 개설할 수 있습니다",ErrorCode.DISABLE_ACCOUNT);
+            throw new BaseException(ErrorCode.NOT_OWNER);
         }
-        String storeImage = convert(multipartFile);
+        String storeImage = null;
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            storeImage = convert(multipartFile);
+        }
         Store savedStore = Store.builder()
                 .storeName(dto.getStoreName())
                 .storeDescription(dto.getStoreDescription())
@@ -60,6 +74,7 @@ public class StoreService {
                 .member(member)
                 .openTime(dto.getOpenTime())
                 .closeTime(dto.getCloseTime())
+                .storeImage(storeImage)
                 .build();
         storeRepository.save(savedStore);
         return new RegisterStoreResponseDto(savedStore.getId());
@@ -77,10 +92,12 @@ public class StoreService {
         // 상점을 찾지 못한경우 예외
         Store deleteStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
                 .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
-
         // 상점의 멤버와 현재 멤버가 일치하지 않은경우 예외
         if(!deleteStore.getMember().equals(member)){
             throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
         }
         // soft delete
         deleteStore.delete();
@@ -88,14 +105,82 @@ public class StoreService {
     }
 
     /**
-     * 음식점 수 검증 메소드 (3개인 경우에 추가할경우 위반)
+     * 가게 수정 서비스 메소드
+     * @param member
+     * @param storeId
+     * @param multipartFile
+     * @param dto
+     * @return
+     */
+    @Transactional
+    public UpdateStoreResponseDto updateStore(Member member, Long storeId,MultipartFile multipartFile, UpdateStoreRequestDto dto) {
+        // 오픈 마감시간 검증
+        if(!isValidBusinessHours(dto.getOpenTime(),dto.getCloseTime())){
+            throw new BaseException(ErrorCode.NOT_VALID_OPEN_TIME);
+        }
+        // OWNER 권한 검증
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
+        }
+        String storeImage = null;
+        // 삭제된 상점 제외 조회
+        Store updateStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        // 상점 소유자 검증
+        if (!updateStore.getMember().equals(member)){
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            storeImage = convert(multipartFile);
+        }
+        updateStore.update(dto.getStoreName(),dto.getStoreDescription(),dto.getStoreAddress()
+                ,dto.getStorePhone(),dto.getLeastAmount(),storeImage,dto.getOpenTime(),dto.getCloseTime());
+        return new UpdateStoreResponseDto(updateStore.getId());
+    }
+
+    /**
+     * 상점 단건 조회 서비스 메소드
+     * @param storeId
+     * @return
+     */
+    @Transactional
+    public FindStoreResponseDto findStore(Long storeId) {
+        // 삭제된건 제외하고 조회
+        Store findStore = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE)
+                .orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        List<Object[]> categories = categoryRepository.findAllCategoryInfo(findStore);
+        Map<String,List<CategoryInfo.MenuInfoForCategory>> menuMap = new HashMap<>();
+
+        for(Object[] category : categories){
+            String categoryName = ((Categories)category[0]).getKoreanName();
+            String menuName = (String) category[1];
+            String menuDescription = (String) category[2];
+            Integer menuPrice = (Integer) category[3];
+            String menuImage = (String) category[4];
+
+            CategoryInfo.MenuInfoForCategory menuInfo = new CategoryInfo.MenuInfoForCategory(menuName,menuDescription,menuPrice,menuImage);
+            menuMap.putIfAbsent(categoryName, new ArrayList<>());
+            menuMap.get(categoryName).add(menuInfo);
+        }
+        List<CategoryInfo> categoryList = new ArrayList<>();
+        for(Map.Entry<String,List<CategoryInfo.MenuInfoForCategory>> entry : menuMap.entrySet()){
+            categoryList.add(new CategoryInfo(entry.getKey(),entry.getValue()));
+        }
+
+        return new FindStoreResponseDto(findStore.getStoreName()
+                ,findStore.getStoreDescription(),findStore.getOpenTime(),findStore.getCloseTime()
+                ,findStore.getStoreAddress(),findStore.getStorePhone(),findStore.getLeastAmount(),findStore.getStoreImage(),categoryList);
+    }
+
+    /**
+     * 음식점 수 검증 메소드 (3개 미만 경우에 가능)
      * @param member
      * @param LimitNumber
      * @return
      */
     public Boolean isValidStoreNumber(Member member,Long LimitNumber) {
         Long storeNumber = storeRepository.countByMemberAndIsDeleted(member, Boolean.FALSE);
-        return !storeNumber.equals(LimitNumber);
+        return storeNumber <(LimitNumber);
     }
     /**
      * 오픈 마감시간 검증 메소드
@@ -106,12 +191,13 @@ public class StoreService {
     public Boolean isValidBusinessHours(LocalTime openTime, LocalTime closeTime) {
         return openTime.isBefore(closeTime);
     }
-    /**
-     * 임시 파일 변환 메소드
-     * @param multipartFile
-     * @return
-     */
-    public static String convert (MultipartFile multipartFile) {
-        return "storePictureExample.jpg";
+
+    private String convert (MultipartFile image) {
+        String imageUrl = null;
+        if (image != null) {
+            UploadImageInfo uploadImageInfo = s3Service.uploadStoreImage(image);
+            imageUrl = uploadImageInfo.ImageUrl();
+        }
+        return imageUrl;
     }
 }

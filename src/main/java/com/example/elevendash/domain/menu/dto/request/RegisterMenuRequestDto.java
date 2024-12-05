@@ -23,10 +23,9 @@ public class RegisterMenuRequestDto {
     @Min(0)
     private final Integer menuPrice;
 
-    @Lob
-    @NotBlank
-    private final String menuImage;
-
     @NotNull
     private final Categories menuCategory;
+    @NotNull
+    @Length(max = 250)
+    private final String menuDescription;
 }
