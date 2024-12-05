@@ -22,7 +22,7 @@ public class CartController {
     private final CartService cartService;
     private final HttpMessageConverters messageConverters;
 
-    @PostMapping("/crats")
+    @PostMapping("/carts")
     public ResponseEntity<CartResponseDto> addCart(HttpServletResponse response, HttpServletRequest request, @Validated CartRequestDto requestDto) {
         return ResponseEntity.ok().body(cartService.createCookie(response, request, requestDto));
     }
