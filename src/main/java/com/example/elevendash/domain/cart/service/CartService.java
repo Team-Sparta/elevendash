@@ -8,6 +8,7 @@ import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.store.entity.Store;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,12 +26,12 @@ public class CartService {
         this.orderRepository = orderRepository;
     }
 
-    public CartResponseDto createCookie(Long storesId, Long orderId, HttpServletResponse response, CartRequestDto requestDto) {
-        Optional<Order> order = orderRepository.findById(orderId);
+    public CartResponseDto createCookie(Long storesId, Long orderId, HttpServletResponse response, CartRequestDto requestDto) throws ChangeSetPersister.NotFoundException {
+        Order order = orderRepository.findById(orderId).orElseThrow(ChangeSetPersister.NotFoundException::new);
         Store store = storeRepository.findById(storesId);
         List<Menu> orderMenuName = requestDto.getMenuName();
 
-        if (!order.get().getStore().getId().equals(storesId)) {
+        if (!order.getStore().getId().equals(storesId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "올바르지 못한 요청입니다");
         }
 
