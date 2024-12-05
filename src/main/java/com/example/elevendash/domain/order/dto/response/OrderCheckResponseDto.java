@@ -1,7 +1,10 @@
 package com.example.elevendash.domain.order.dto.response;
 
+import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.order.entity.Order;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 public class OrderCheckResponseDto {
@@ -10,15 +13,15 @@ public class OrderCheckResponseDto {
 
     private final Long price;
 
-    private final String menuName;
+    private final List<String> menus;
 
     private final String status;
 
 
-    public OrderCheckResponseDto(Long ordersid, Long price, String menuName, String status) {
+    public OrderCheckResponseDto(Long ordersid, Long price, List<String> menus, String status) {
         this.ordersid = ordersid;
         this.price = price;
-        this.menuName = menuName;
+        this.menus = menus;
         this.status = status;
     }
 
@@ -26,7 +29,7 @@ public class OrderCheckResponseDto {
         return new OrderCheckResponseDto(
                 order.getId(),
                 order.getPrice(),
-                order.getManuName(),
+                order.getManus(),
                 order.getOrderStatus()
         );
     }
