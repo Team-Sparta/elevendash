@@ -39,7 +39,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     Optional<Store> findByIdAndIsDeletedAndMember(Long id, Boolean isDeleted, @NotNull Member member);
 
-    @Query("select s from Store s left join s.advertisement where s.advertisement.status = :status order by s.advertisement.bidPrice ")
+    @Query("select s from Store s inner join s.advertisement a where a.status = :status order by a.bidPrice desc")
     Page<Store> findAllForAd (@Param("status") AdvertisementStatus status, Pageable pageable);
 
 }

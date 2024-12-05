@@ -17,5 +17,5 @@ public interface AdvertisementRepository extends JpaRepository<Advertisement, Lo
     List<Advertisement> findAllByMember(@NotNull Member member);
 
     @Query("select a from Advertisement a where a.status = :status order by a.bidPrice desc ")
-    List<Advertisement> findAllByStatusOrderPrice (@Param("status") AdvertisementStatus status);
+    List<Advertisement> findAllByStatusOrderByBidPriceDesc(@Param("status") AdvertisementStatus status);
 }

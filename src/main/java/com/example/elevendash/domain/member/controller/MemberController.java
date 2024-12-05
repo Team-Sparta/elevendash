@@ -93,7 +93,7 @@ public class MemberController {
         return CommonResponse.success(SuccessCode.SUCCESS, advertisementService.findAllMyAdvertisement(loginMember));
     }
 
-    @GetMapping("my/my-advertisements/{advertisementId}")
+    @PutMapping("my/my-advertisements/{advertisementId}")
     public ResponseEntity<CommonResponse<UpdateAdvertisementResponseDto>> updateAdvertisement(
             @RequestBody @Valid UpdateAdvertisementRequestDto requestDto,
             @PathVariable Long advertisementId,

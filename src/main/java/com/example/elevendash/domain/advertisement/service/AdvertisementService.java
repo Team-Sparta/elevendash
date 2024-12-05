@@ -17,9 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -122,7 +120,7 @@ public class AdvertisementService {
         if(!loginMember.getRole().equals(MemberRole.ADMIN)){
             throw new BaseException(ErrorCode.NOT_ADMIN);
         }
-        List<Advertisement> advertisements = advertisementRepository.findAllByStatusOrderPrice(AdvertisementStatus.WAITING);
+        List<Advertisement> advertisements = advertisementRepository.findAllByStatusOrderByBidPriceDesc(AdvertisementStatus.WAITING);
         List<FindAllAdvertisementResponseDto.AdvertisementInfo> advertisementInfos =
                 advertisements.stream().map(advertisement -> new FindAllAdvertisementResponseDto.AdvertisementInfo(
                     advertisement.getId(),
