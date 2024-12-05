@@ -2,6 +2,7 @@ package com.example.elevendash.domain.menu.entity;
 
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class MenuOption extends BaseTimeEntity {
 
     @Column
     @NotNull
+    @Min(0)
     private Integer optionPrice;
 
     @Column

@@ -159,8 +159,8 @@ public class StoreService {
             String menuImage = (String) category[4];
 
             CategoryInfo.MenuInfoForCategory menuInfo = new CategoryInfo.MenuInfoForCategory(menuName,menuDescription,menuPrice,menuImage);
-            menuMap.put(menuName,menuMap.getOrDefault(menuName,new ArrayList<>()));
-            menuMap.getOrDefault(menuName,new ArrayList<>()).add(menuInfo);
+            menuMap.putIfAbsent(categoryName, new ArrayList<>());
+            menuMap.get(categoryName).add(menuInfo);
         }
         List<CategoryInfo> categoryList = new ArrayList<>();
         for(Map.Entry<String,List<CategoryInfo.MenuInfoForCategory>> entry : menuMap.entrySet()){

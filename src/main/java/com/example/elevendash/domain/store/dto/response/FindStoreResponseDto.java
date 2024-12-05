@@ -1,12 +1,6 @@
 package com.example.elevendash.domain.store.dto.response;
 
 import com.example.elevendash.domain.menu.dto.CategoryInfo;
-import com.example.elevendash.domain.menu.dto.MenuInfo;
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
