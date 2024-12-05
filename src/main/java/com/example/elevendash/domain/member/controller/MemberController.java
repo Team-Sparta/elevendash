@@ -94,3 +94,4 @@ public class MemberController {
     ) {
         return CommonResponse.success(SuccessCode.SUCCESS, couponService.getMyCoupons(loginMember.getId()));
     }
+}

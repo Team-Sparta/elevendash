@@ -70,11 +70,11 @@ public enum ErrorCode {
     /**
      * Coupon
      */
-    NOT_FOUND_COUPON(HttpStatus.BAD_REQUEST, "쿠폰을 찾을수 없습니다."),
+    NOT_FOUND_COUPON(HttpStatus.NOT_FOUND, "쿠폰을 찾을수 없습니다."),
     ALREADY_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "이미 발급한 쿠폰입니다."),
     EXPIRED_COUPON(HttpStatus.BAD_REQUEST, "만료기간이 지난 쿠폰입니다."),
-    TOTAL_OVER_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "쿠폰 발급 한도를 초과했습니다."),
-    TODAY_OVER_ISSUED_COUPON(HttpStatus.BAD_REQUEST, "오늘의 쿠폰 발급 한도를 초과했습니다."),
+    TOTAL_OVER_ISSUED_COUPON(HttpStatus.CONFLICT, "쿠폰 발급 한도를 초과했습니다."),
+    DAILY_OVER_ISSUED_COUPON(HttpStatus.CONFLICT, "오늘의 쿠폰 발급 한도를 초과했습니다."),
     ALREADY_USED_COUPON(HttpStatus.BAD_REQUEST, "이미 사용한 쿠폰입니다."),
 
     /**

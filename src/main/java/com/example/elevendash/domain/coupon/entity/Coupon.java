@@ -13,6 +13,8 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,21 +32,30 @@ public class Coupon extends BaseCreatedTimeEntity {
     @Column(name = "name", nullable = false, columnDefinition = "varchar(255) comment '쿠폰 이름'")
     private String name;
 
+    @Column(name = "type", nullable = false, columnDefinition = "VARCHAR(20) COMMENT 'Type of Coupon (e.g., Fixed or Percentage)'")
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, columnDefinition = "varchar(20) comment '쿠폰 타입'")
     private CouponType type;
 
-    private BigDecimal discountValue; // 할인 금액 또는 할인 비율 (정액일 경우 금액, 정률일 경우 비율)
+    @Column(name = "discount_value", nullable = false, columnDefinition = "DECIMAL(10,2) COMMENT '할인 값 (fixed amount or percentage)'")
+    private BigDecimal discountValue;
 
-    private BigDecimal maxDiscountAmount; // 정률 쿠폰일 경우 최대 할인 금액 (없으면 null)
+    @Column(name = "max_discount_amount", nullable = true, columnDefinition = "DECIMAL(10,2) COMMENT '쿠폰의 최대 할인 금액'")
+    private BigDecimal maxDiscountAmount;
 
-    private LocalDateTime expirationDate; // 만료 일자
+    @Column(name = "expiration_date", nullable = false, columnDefinition = "DATETIME COMMENT '쿠폰 만료 일자'")
+    private LocalDateTime expirationDate;
 
-    private Integer totalIssuedCount; // 총 발급 가능 개수
+    @Column(name = "total_issued_count", nullable = false, columnDefinition = "INT UNSIGNED COMMENT '총 발급 가능 쿠폰 수'")
+    private Integer totalIssuedCount;
 
-    private Integer dailyIssuedCountLimit; // 하루 발급 한도
+    @Column(name = "daily_issued_count_limit", nullable = false, columnDefinition = "INT UNSIGNED COMMENT '하루 발급 가능 한도'")
+    private Integer dailyIssuedCountLimit;
 
-    private Integer issuedCount; // 현재 발급된 쿠폰 수
+    @Column(name = "issued_count", nullable = false, columnDefinition = "INT UNSIGNED DEFAULT 0 COMMENT '현재까지 발급된 쿠폰 수'")
+    private Integer issuedCount = 0;
+
+    @OneToMany(mappedBy = "coupon", fetch = FetchType.LAZY, cascade = CascadeType.REFRESH, orphanRemoval = true)
+    List<CouponUsage> couponUsages = new ArrayList<>();
 
     public void validateCoupon(LocalDateTime now, boolean isAlreadyIssued, Long todayIssuedCount) {
 
@@ -61,7 +72,7 @@ public class Coupon extends BaseCreatedTimeEntity {
         }
 
         if (todayIssuedCount >= this.getDailyIssuedCountLimit()) {
-            throw new BaseException(ErrorCode.TOTAL_OVER_ISSUED_COUPON);
+            throw new BaseException(ErrorCode.DAILY_OVER_ISSUED_COUPON);
         }
     }
 

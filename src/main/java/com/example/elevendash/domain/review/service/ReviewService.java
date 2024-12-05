@@ -3,9 +3,7 @@ package com.example.elevendash.domain.review.service;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
-import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
 import com.example.elevendash.domain.review.dto.response.ReviewResponseDto;
-import com.example.elevendash.domain.review.entity.Review;
 
 import com.example.elevendash.domain.review.repository.ReviewRepository;
 import com.example.elevendash.global.exception.BaseException;

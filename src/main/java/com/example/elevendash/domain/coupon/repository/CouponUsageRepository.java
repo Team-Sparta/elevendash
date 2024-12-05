@@ -29,7 +29,9 @@ public interface CouponUsageRepository extends JpaRepository<CouponUsage, Long> 
 
     @Query("""
             SELECT new com.example.elevendash.domain.coupon.dto.CouponSummary(cu.id, cu.coupon.name, cu.coupon.type, cu.coupon.discountValue, cu.createdAt, cu.coupon.expirationDate) FROM CouponUsage cu
-            WHERE cu.memberId = :memberId AND cu.used IS NOT TRUE
+            WHERE cu.memberId = :memberId AND cu.coupon.expirationDate > :now AND cu.used IS NOT TRUE
             """)
-    List<CouponSummary> findByMemberIdAndUsedIsFalse(Long memberId);
+    List<CouponSummary> findActiveCoupons(Long memberId, LocalDateTime now);
+
+
 }
