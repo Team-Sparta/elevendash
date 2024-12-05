@@ -84,7 +84,15 @@ public enum ErrorCode {
     NOT_FOUND_CATEGORY(HttpStatus.NOT_FOUND, "카테고리 정보를 찾을 수 없습니다."),
     NOT_FOUND_MENU(HttpStatus.NOT_FOUND, "메뉴 정보를 찾을 수 없습니다."),
     NOT_SAME_STORE(HttpStatus.NOT_ACCEPTABLE, "상점과 메뉴정보가 일치하지 않습니다."),
-    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다.")
+    NOT_FOUND_MENU_OPTION(HttpStatus.NOT_FOUND, "메뉴 옵션 정보를 찾을 수 없습니다."),
+
+
+    /**
+     * Review
+     */
+    NOT_DELIVERED(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다."),
+    BAD_STARRATING(HttpStatus.BAD_REQUEST, "최소 별점이 최대 별점보다 클 수 없습니다.")
+
     ;
 
     private final HttpStatus httpStatus;
