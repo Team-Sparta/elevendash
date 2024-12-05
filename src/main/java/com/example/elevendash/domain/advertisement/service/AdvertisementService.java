@@ -1,11 +1,14 @@
 package com.example.elevendash.domain.advertisement.service;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.request.RejectAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.response.RejectAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.entity.Advertisement;
 import com.example.elevendash.domain.advertisement.repository.AdvertisementRepository;
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
@@ -38,6 +41,13 @@ public class AdvertisementService {
         return new AddAdvertisementResponseDto(advertisement.getId());
     }
 
+    /**
+     * 광고 삭제 기능
+     * @param loginMember
+     * @param StoreId
+     * @param advertisementId
+     * @return
+     */
     @Transactional
     public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember, Long StoreId ,Long advertisementId) {
         // 쿠폰과 상점 일치 확인
@@ -56,6 +66,30 @@ public class AdvertisementService {
         return new DeleteAdvertisementResponseDto(advertisement.getId());
     }
 
+    /**
+     * 관리자의 광고 거절 메소드
+     * @param loginMember
+     * @param StoreId
+     * @param advertisementId
+     * @param requestDto
+     * @return
+     */
+    @Transactional
+    public RejectAdvertisementResponseDto rejectAdvertisement(Member loginMember, Long StoreId, Long advertisementId, RejectAdvertisementRequestDto requestDto) {
+        if(!loginMember.getRole().equals(MemberRole.ADMIN)){
+            throw new BaseException(ErrorCode.NOT_ADMIN);
+        }
+        Store store = storeRepository.findByIdAndIsDeleted(StoreId,Boolean.FALSE)
+                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_STORE));
+
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
+        if(!advertisement.getStore().getId().equals(store.getId())) {
+            throw new BaseException(ErrorCode.NOT_SAME_STORE);
+        }
+        advertisement.rejectBid(requestDto.getRejectReason());
+        return new RejectAdvertisementResponseDto(advertisement.getId());
+    }
 
 
 

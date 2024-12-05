@@ -1,8 +1,10 @@
 package com.example.elevendash.domain.advertisement.controller;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.request.RejectAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.response.RejectAdvertisementResponseDto;
 import com.example.elevendash.domain.advertisement.service.AdvertisementService;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.annotation.LoginMember;
@@ -41,5 +43,14 @@ public class AdvertisementController {
             @LoginMember Member loginMember,
             @RequestParam Long storeId) {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.deleteAdvertisement(loginMember,storeId,advertisementId));
+    }
+
+    @PutMapping("/{advertisementId}/reject")
+    public ResponseEntity<CommonResponse<RejectAdvertisementResponseDto>> rejectAdvertisement(
+            @PathVariable Long advertisementId,
+            @LoginMember Member loginMember,
+            @RequestParam Long storeId,
+            @RequestBody @Valid RejectAdvertisementRequestDto requestDto){
+        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.rejectAdvertisement(loginMember,storeId,advertisementId,requestDto));
     }
 }

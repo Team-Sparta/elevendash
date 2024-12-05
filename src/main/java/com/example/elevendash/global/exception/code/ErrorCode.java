@@ -59,7 +59,7 @@ public enum ErrorCode {
     NONE_NAME(HttpStatus.BAD_REQUEST, "이름은 필수값입니다."),
     BAD_PROVIDER(HttpStatus.BAD_REQUEST, "소셜로그인은 비밀번호가 없어야하며 providerId가 필수입니다."),
     BAD_EMAIL(HttpStatus.BAD_REQUEST, "이메일을 통한 회원가입은 비밀번호가 필수입니다."),
-
+    NOT_ADMIN(HttpStatus.NOT_ACCEPTABLE, "관리자가 아닌 사람은 접근할 수 없습니다"),
     /**
      * Image
      */
