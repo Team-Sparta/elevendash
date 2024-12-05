@@ -20,6 +20,9 @@ public class Order extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
+    private Long price;
+
+    @Column(nullable = false)
     private String orderStatus;
 
     @Column(nullable = false)
@@ -35,8 +38,9 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long id, String orderStatus, String manuName, String cart) {
+    public Order(Long id,Long price, String orderStatus, String manuName, String cart) {
         this.id = id;
+        this.price = price;
         this.orderStatus = orderStatus;
         this.manuName = manuName;
         this.cart = cart;
