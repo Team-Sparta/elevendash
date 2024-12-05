@@ -2,6 +2,7 @@ package com.example.elevendash.domain.advertisement.service;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.request.RejectAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.request.UpdateAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.response.*;
 import com.example.elevendash.domain.advertisement.entity.Advertisement;
 import com.example.elevendash.domain.advertisement.enums.AdvertisementStatus;
@@ -121,7 +122,7 @@ public class AdvertisementService {
         if(!loginMember.getRole().equals(MemberRole.ADMIN)){
             throw new BaseException(ErrorCode.NOT_ADMIN);
         }
-        List<Advertisement> advertisements = advertisementRepository.findAll();
+        List<Advertisement> advertisements = advertisementRepository.findAllByStatusOrderPrice(AdvertisementStatus.WAITING);
         List<FindAllAdvertisementResponseDto.AdvertisementInfo> advertisementInfos =
                 advertisements.stream().map(advertisement -> new FindAllAdvertisementResponseDto.AdvertisementInfo(
                     advertisement.getId(),
@@ -148,6 +149,19 @@ public class AdvertisementService {
         return new FindAllMyAdvertisementResponseDto(advertisementInfoForOwnerList);
     }
 
+    @Transactional
+    public UpdateAdvertisementResponseDto updateAdvertisement(Member member,Long advertisementId, UpdateAdvertisementRequestDto requestDto) {
+        if(!member.getRole().equals(MemberRole.OWNER)){
+            throw new BaseException(ErrorCode.NOT_OWNER);
+        }
+        Advertisement advertisement = advertisementRepository.findById(advertisementId)
+                .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
+        if(!advertisement.getMember().getId().equals(member.getId())){
+            throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
+        }
+        advertisement.retryBid(requestDto.getBidPrice());
+        return new UpdateAdvertisementResponseDto(advertisement.getId());
+    }
 
 
 }
