@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 public class OrderService {
@@ -35,6 +36,11 @@ public class OrderService {
     }
 
     public StatisticsResponse getStatistics(PeriodType periodType, LocalDate startDate, LocalDate endDate, Long storeId, Categories categories) {
+
+        if (endDate != null && startDate != null && endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("종료일이 시작일보다 앞설 수 없습니다");
+        }
+
         LocalDate now = LocalDate.now();
 
         switch (periodType) {
@@ -52,9 +58,11 @@ public class OrderService {
             }
         }
 
-        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
-        // Convert LocalDate to LocalDateTime at the end of the day
-        LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
+        LocalDateTime startDateTime = startDate != null ?
+                startDate.atStartOfDay().atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
+
+        LocalDateTime endDateTime = endDate != null ?
+                endDate.atTime(23, 59, 59).atZone(ZoneId.systemDefault()).toLocalDateTime() : null;
 
         return orderRepository.getStatistics(startDateTime, endDateTime, storeId);
     }
