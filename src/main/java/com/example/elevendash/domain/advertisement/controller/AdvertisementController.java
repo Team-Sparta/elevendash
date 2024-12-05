@@ -2,10 +2,7 @@ package com.example.elevendash.domain.advertisement.controller;
 
 import com.example.elevendash.domain.advertisement.dto.request.AddAdvertisementRequestDto;
 import com.example.elevendash.domain.advertisement.dto.request.RejectAdvertisementRequestDto;
-import com.example.elevendash.domain.advertisement.dto.response.AcceptAdvertisementResponseDto;
-import com.example.elevendash.domain.advertisement.dto.response.AddAdvertisementResponseDto;
-import com.example.elevendash.domain.advertisement.dto.response.DeleteAdvertisementResponseDto;
-import com.example.elevendash.domain.advertisement.dto.response.RejectAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.response.*;
 import com.example.elevendash.domain.advertisement.service.AdvertisementService;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.annotation.LoginMember;
@@ -81,5 +78,17 @@ public class AdvertisementController {
                 advertisementId
                 )
         );
+    }
+
+    /**
+     * 관리자 광고 조회 기능 API
+     * @param loginMember
+     * @return
+     */
+    @GetMapping
+    public ResponseEntity<CommonResponse<FindAllAdvertisementResponseDto>> findAllAdvertisement(
+            @LoginMember Member loginMember
+    ){
+        return CommonResponse.success(SuccessCode.SUCCESS,advertisementService.findAllAdvertisement(loginMember));
     }
 }
