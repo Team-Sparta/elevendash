@@ -27,10 +27,12 @@ public class AdvertisementService {
      */
     @Transactional
     public AddAdvertisementResponseDto addAdvertisement(Member member, AddAdvertisementRequestDto requestDto) {
-        Store advertieseStore = storeRepository.findByIdAndIsDeletedAndMember(requestDto.getStoreId(),Boolean.FALSE,member)
+        Store advertiseStore = storeRepository.findByIdAndIsDeletedAndMember(requestDto.getStoreId(),Boolean.FALSE,member)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        // database에서 중복되는 광고를 방지하는데 여기서 예외처리할지 고민
-        Advertisement advertisement = new Advertisement(requestDto.getBidPrice(),member,advertieseStore);
+        if (advertisementRepository.existsByStore(advertiseStore)) {
+            throw new BaseException(ErrorCode.DUPLICATE_ADVERTISEMENT);
+            }
+        Advertisement advertisement = new Advertisement(requestDto.getBidPrice(),member, advertiseStore);
         advertisementRepository.save(advertisement);
         return new AddAdvertisementResponseDto(advertisement.getId());
     }

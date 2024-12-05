@@ -7,6 +7,7 @@ import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,9 +27,9 @@ public class AdvertisementController {
      * @param loginMember
      * @return
      */
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<CommonResponse<AddAdvertisementResponseDto>> addAdvertisement(
-            @RequestBody AddAdvertisementRequestDto requestDto,
+            @RequestBody @Valid AddAdvertisementRequestDto requestDto,
             @LoginMember Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,advertisementService.addAdvertisement(
                 loginMember,requestDto

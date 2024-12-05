@@ -4,8 +4,9 @@ import com.example.elevendash.domain.advertisement.enums.AdvertisementState;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
+import com.example.elevendash.global.exception.BaseException;
+import com.example.elevendash.global.exception.code.ErrorCode;
 import jakarta.persistence.*;
-import jakarta.validation.Constraint;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -63,11 +64,17 @@ public class Advertisement extends BaseTimeEntity {
     }
     // 광고  거절
     public void rejectBid(String rejectReason) {
+        if (this.state != AdvertisementState.WAITING) {
+            throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
+        }
         this.rejectReason = rejectReason;
         this.state = AdvertisementState.REJECTED;
     }
     // 상점 주인의 광고 종료
     public void stop(Integer bidPrice){
+        if (this.state != AdvertisementState.ACCEPTED) {
+            throw new BaseException(ErrorCode.NOT_STATUS_ACCEPTED);
+        }
         this.state = AdvertisementState.STOPPED;
     }
 
