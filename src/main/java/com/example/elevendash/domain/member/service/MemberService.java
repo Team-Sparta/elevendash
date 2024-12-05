@@ -108,8 +108,7 @@ public class MemberService {
     }
 
     public MemberProfileResponse getMemberProfile(
-            Long memberId,
-            @LoginMember Member loginMember) {
+            Long memberId) {
         return memberRepository.findById(memberId)
                 .map(member -> new MemberProfileResponse(
                         member.getId(),

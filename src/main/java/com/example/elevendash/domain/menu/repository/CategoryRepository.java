@@ -16,6 +16,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByCategoryName(Categories categoryName);
 
     // 상점 조회시 필요한 정보들을 조회하는 쿼리
-    @Query("select c.categoryName, m.menuName, m.menuDescription, m.menuPrice, m.menuImage from Category c left join Menu m on c.id = m.category.id where m.store = :store ")
+    @Query("select c.categoryName, m.menuName, m.menuDescription, m.menuPrice, m.menuImage,m.id from Category c left join Menu m on c.id = m.category.id where m.store = :store ")
     List<Object[]> findAllCategoryInfo(@Param("store") Store store);
 }
