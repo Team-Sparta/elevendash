@@ -1,6 +1,8 @@
 package com.example.elevendash.domain.cart.dto.request;
 
 import com.example.elevendash.domain.menu.entity.Menu;
+import com.example.elevendash.domain.store.entity.Store;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
@@ -11,9 +13,12 @@ import java.util.List;
 public class CartRequestDto {
 
     @NotBlank(message = "메뉴를 입력해주세요")
-    private final List<Menu> menuName;
+    private final List<Long> menuId;
 
-    public CartRequestDto (List<Menu> menuName) {
-        this.menuName = new ArrayList<>(menuName);
+    private final Long storeId;
+
+    public CartRequestDto (List<Long> menuId, Long storeId) {
+        this.menuId = new ArrayList<>(menuId);
+        this.storeId = storeId;
     }
 }

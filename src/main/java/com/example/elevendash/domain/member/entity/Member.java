@@ -1,11 +1,14 @@
 package com.example.elevendash.domain.member.entity;
 
+import com.example.elevendash.domain.advertisement.entity.Advertisement;
 import com.example.elevendash.domain.bookmark.entity.Bookmark;
+import com.example.elevendash.domain.coupon.entity.CouponUsage;
 import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.member.enums.Provider;
 import com.example.elevendash.domain.order.entity.Order;
+import com.example.elevendash.domain.point.entity.Point;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
@@ -68,6 +71,16 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
     List<Bookmark> bookmarks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<Advertisement> advertisements = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<Point> points = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    List<CouponUsage> coupons = new ArrayList<>();
+
 
     @Builder
     private Member(SignUpRequest signUpRequest) {

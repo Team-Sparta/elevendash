@@ -2,6 +2,7 @@ package com.example.elevendash.domain.menu.service;
 
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
+import com.example.elevendash.domain.menu.dto.MenuOptionInfo;
 import com.example.elevendash.domain.menu.dto.request.AddMenuOptionRequestDto;
 import com.example.elevendash.domain.menu.dto.request.RegisterMenuRequestDto;
 import com.example.elevendash.domain.menu.dto.request.UpdateMenuOptionRequestDto;
@@ -24,6 +25,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -182,6 +186,25 @@ public class MenuService {
         updateOption.update(requestDto.getContent(),requestDto.getOptionPrice());
         return new UpdateMenuOptionResponseDto(updateOption.getId());
     }
+
+    public FindMenuResponseDto findMenu(Long storeId, Long menuId) {
+        Menu findMenu = menuRepository.findById(menuId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_MENU));
+        Store store = storeRepository.findByIdAndIsDeleted(storeId,Boolean.FALSE).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_STORE));
+        checkValidMenuAndStore(findMenu,store);
+        List<MenuOptionInfo> menuOptionInfoList = menuOptionRepository.findByMenu(findMenu).stream().map(
+                menuOption -> new MenuOptionInfo(menuOption.getId(),menuOption.getContent(), menuOption.getOptionPrice())
+        ).toList();
+        return new FindMenuResponseDto(
+                findMenu.getId(),
+                findMenu.getMenuName(),
+                findMenu.getCategory().getCategoryName(),
+                findMenu.getMenuImage(),
+                findMenu.getMenuDescription(),
+                findMenu.getMenuPrice(),
+                menuOptionInfoList
+        );
+    }
+
     /**
      * 유저 및 음식점 유효성 검증
      * @param member

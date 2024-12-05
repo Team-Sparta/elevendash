@@ -1,7 +1,11 @@
 package com.example.elevendash.domain.order.controller;
 
+import com.example.elevendash.domain.order.dto.response.OrderCheckResponseDto;
 import com.example.elevendash.domain.order.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,10 +13,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
-    OrderService orderService;
+    private final OrderService orderService;
 
-//    @PostMapping("/{orderId}/cart")
-//    public ResponseEntity<cartResponseDto> addCart(@PathVariable String orderId) {
-//        return null;
-//    }
+    @GetMapping("/{ordersId}")
+    public ResponseEntity<OrderCheckResponseDto> orderDetails(@PathVariable Long ordersId) {
+        return ResponseEntity.ok().body(orderService.orderDetails(ordersId));
+    }
 }

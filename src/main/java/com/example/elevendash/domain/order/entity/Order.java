@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -20,12 +23,15 @@ public class Order extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
+    private Long price;
+
+    @Column(nullable = false)
     private String orderStatus;
 
     @Column(nullable = false)
-    private String manuName;
-
-    private String cart;
+    @OneToMany()
+    @JoinColumn(name = "id")
+    private List<Menu> menu = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
@@ -35,11 +41,11 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long id, String orderStatus, String manuName, String cart) {
+    public Order(Long id,Long price, String orderStatus, List<Menu> manus) {
         this.id = id;
+        this.price = price;
         this.orderStatus = orderStatus;
-        this.manuName = manuName;
-        this.cart = cart;
+        this.menu = manus;
     }
 
     public void updateStatus(String orderStatus) {

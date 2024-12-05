@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.store.service;
 
+import com.example.elevendash.domain.advertisement.enums.AdvertisementStatus;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.enums.MemberRole;
 import com.example.elevendash.domain.menu.dto.CategoryInfo;
@@ -181,11 +182,18 @@ public class StoreService {
     public FindAllStoreResponseDto findAllStore(Member loginMember,Categories category,Integer pageSize, Integer pageNumber, SortMode sortMode) {
         Page<StoreInfo> storeInfoList = null;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable advertisePageable = PageRequest.of(0, 3);
+        // 광고 조회
+        Page<StoreInfo> advertisedStoreInfoList = storeRepository.findAllForAd(AdvertisementStatus.ACCEPTED, advertisePageable).map(store -> new StoreInfo(
+                store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
+                ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
+        ));
         if(sortMode.equals(SortMode.NORMAL)){
             storeInfoList = storeRepository.findAllByIsDeleted(Boolean.FALSE,pageable).map(store -> new StoreInfo(
                     store.getId(),store.getBookmarks().size(),store.getStoreName(),store.getOpenTime()
                     ,store.getCloseTime(),store.getStoreAddress(),store.getLeastAmount()
             ));
+
         }
         if(sortMode.equals(SortMode.BOOKMARK_RANKING)){
             storeInfoList = storeRepository.findAllByIsDeletedBookmarkSort(Boolean.FALSE,pageable).map(store -> new StoreInfo(
@@ -206,16 +214,21 @@ public class StoreService {
             ));
         }
 
-
         if(storeInfoList == null){
             throw new BaseException(ErrorCode.NOT_FOUND_STORE);
         }
 
-        return new FindAllStoreResponseDto(storeInfoList.getContent(),
+
+
+        return new FindAllStoreResponseDto(
+                advertisedStoreInfoList.getContent(),
+                storeInfoList.getContent(),
                 new FindAllStoreResponseDto.PageInfo(storeInfoList.getNumber()+1,
                         storeInfoList.getSize(),
                         storeInfoList.getTotalElements(),
-                        storeInfoList.getTotalPages()));
+                        storeInfoList.getTotalPages()
+                )
+        );
     }
 
 

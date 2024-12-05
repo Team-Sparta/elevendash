@@ -1,5 +1,11 @@
 package com.example.elevendash.domain.member.controller;
 
+import com.example.elevendash.domain.advertisement.dto.request.UpdateAdvertisementRequestDto;
+import com.example.elevendash.domain.advertisement.dto.response.FindAllMyAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.dto.response.UpdateAdvertisementResponseDto;
+import com.example.elevendash.domain.advertisement.service.AdvertisementService;
+import com.example.elevendash.domain.coupon.dto.response.CouponListResponse;
+import com.example.elevendash.domain.coupon.service.CouponService;
 import com.example.elevendash.domain.member.dto.response.*;
 import com.example.elevendash.domain.member.dto.request.EmailLoginRequest;
 import com.example.elevendash.domain.member.dto.request.OAuthLoginRequest;
@@ -7,7 +13,8 @@ import com.example.elevendash.domain.member.dto.request.SignUpRequest;
 import com.example.elevendash.domain.member.dto.request.UpdateProfileRequest;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.service.MemberService;
-import com.example.elevendash.domain.store.service.StoreService;
+import com.example.elevendash.domain.point.dto.response.TotalPointsResponse;
+import com.example.elevendash.domain.point.service.PointService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
@@ -23,6 +30,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
+    private final PointService pointService;
+    private final CouponService couponService;
+    private final AdvertisementService advertisementService;
 
     @PostMapping("/sign-up")
     public ResponseEntity<CommonResponse<SignUpResponse>> singUp(@Valid @RequestBody SignUpRequest request) {
@@ -61,18 +71,49 @@ public class MemberController {
         return CommonResponse.success(SuccessCode.SUCCESS, memberService.updateProfile(loginMember, request, image));
     }
 
-    @GetMapping("/{memberId}/my-stores")
-    public ResponseEntity<CommonResponse<FindMyStoreResponseDto>> findMyStores(
-            @LoginMember Member loginMember
-    ) {
-        return CommonResponse.success(SuccessCode.SUCCESS, memberService.findMyStores(loginMember));
-    }
-
     @DeleteMapping
     public ResponseEntity<CommonResponse<Void>> deleteMember(
             @LoginMember Member loginMember
     ) {
         memberService.deleteMember(loginMember);
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE);
+    }
+
+    @GetMapping("/my/my-stores")
+    public ResponseEntity<CommonResponse<FindMyStoreResponseDto>> findMyStores(
+            @LoginMember Member loginMember
+    ) {
+        return CommonResponse.success(SuccessCode.SUCCESS, memberService.findMyStores(loginMember));
+    }
+
+    @GetMapping("my/my-advertisements")
+    public ResponseEntity<CommonResponse<FindAllMyAdvertisementResponseDto>> findMyAdvertisements(
+            @LoginMember Member loginMember
+    ){
+        return CommonResponse.success(SuccessCode.SUCCESS, advertisementService.findAllMyAdvertisement(loginMember));
+    }
+
+    @PutMapping("my/my-advertisements/{advertisementId}")
+    public ResponseEntity<CommonResponse<UpdateAdvertisementResponseDto>> updateAdvertisement(
+            @RequestBody @Valid UpdateAdvertisementRequestDto requestDto,
+            @PathVariable Long advertisementId,
+            @LoginMember Member loginMember
+            ){
+        return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,advertisementService.updateAdvertisement(
+                loginMember,advertisementId,requestDto));
+    }
+
+    @GetMapping("/my/points")
+    public ResponseEntity<CommonResponse<TotalPointsResponse>> getPoints(
+            @LoginMember Member loginMember
+    ) {
+        return CommonResponse.success(SuccessCode.SUCCESS, pointService.getTotalPoints(loginMember.getId()));
+    }
+
+    @GetMapping("/my/coupons")
+    public ResponseEntity<CommonResponse<CouponListResponse>> getCoupons(
+            @LoginMember Member loginMember
+    ) {
+        return CommonResponse.success(SuccessCode.SUCCESS, couponService.getMyCoupons(loginMember.getId()));
     }
 }
