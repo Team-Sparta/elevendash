@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class FindStoreResponseDto {
+    private final Long storeId;
     private final String storeName;
     private final String storeDescription;
     private final LocalTime openTime;

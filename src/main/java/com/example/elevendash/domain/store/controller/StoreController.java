@@ -1,12 +1,11 @@
 package com.example.elevendash.domain.store.controller;
 
 import com.example.elevendash.domain.member.entity.Member;
+import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.store.dto.request.RegisterStoreRequestDto;
 import com.example.elevendash.domain.store.dto.request.UpdateStoreRequestDto;
-import com.example.elevendash.domain.store.dto.response.DeleteStoreResponseDto;
-import com.example.elevendash.domain.store.dto.response.FindStoreResponseDto;
-import com.example.elevendash.domain.store.dto.response.RegisterStoreResponseDto;
-import com.example.elevendash.domain.store.dto.response.UpdateStoreResponseDto;
+import com.example.elevendash.domain.store.dto.response.*;
+import com.example.elevendash.domain.store.enums.SortMode;
 import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
@@ -17,6 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -84,6 +84,17 @@ public class StoreController {
     @GetMapping("/{storeId}")
     ResponseEntity<CommonResponse<FindStoreResponseDto>> findStore(@PathVariable(name = "storeId") Long storeId){
         return CommonResponse.success(SuccessCode.SUCCESS, storeService.findStore(storeId));
+    }
+
+    @GetMapping
+    ResponseEntity<CommonResponse<FindAllStoreResponseDto>> findAllStore(
+            @LoginMember Member loginMember,
+            @RequestParam(defaultValue = "1") @Min(1) Integer pageSize,
+            @RequestParam(defaultValue = "10") Integer pageNumber,
+            @RequestParam SortMode sortMode,
+            @RequestParam(defaultValue = "CHICKEN") Categories category
+    ){
+        return CommonResponse.success(SuccessCode.SUCCESS, storeService.findAllStore(loginMember, category,pageSize, pageNumber -1, sortMode));
     }
 
 }
