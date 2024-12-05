@@ -74,4 +74,9 @@ public class ReviewService {
 
     }
 
+    public void delete(Long reviewId) {
+        Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
+        reviewRepository.delete(findReview);
+    }
+
 }
