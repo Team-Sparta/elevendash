@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.advertisement.entity;
 
-import com.example.elevendash.domain.advertisement.enums.AdvertisementState;
+import com.example.elevendash.domain.advertisement.enums.AdvertisementStatus;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
@@ -30,7 +30,7 @@ public class Advertisement extends BaseTimeEntity {
     @Column
     @NotNull
     @Enumerated(EnumType.STRING)
-    private AdvertisementState status = AdvertisementState.WAITING;
+    private AdvertisementStatus status = AdvertisementStatus.WAITING;
 
     @Column
     private String rejectReason;
@@ -60,29 +60,29 @@ public class Advertisement extends BaseTimeEntity {
     // 광고 금액 수정
     public void retryBid(Integer bidPrice) {
         this.bidPrice = bidPrice;
-        this.status = AdvertisementState.WAITING;
+        this.status = AdvertisementStatus.WAITING;
     }
     // 광고  거절
     public void rejectBid(String rejectReason) {
-        if (this.status != AdvertisementState.WAITING) {
+        if (this.status != AdvertisementStatus.WAITING) {
             throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
         }
         this.rejectReason = rejectReason;
-        this.status = AdvertisementState.REJECTED;
+        this.status = AdvertisementStatus.REJECTED;
     }
     // 상점 주인의 광고 종료
     public void stop(){
-        if (this.status != AdvertisementState.ACCEPTED) {
+        if (this.status != AdvertisementStatus.ACCEPTED) {
             throw new BaseException(ErrorCode.NOT_STATUS_ACCEPTED);
         }
-        this.status = AdvertisementState.STOPPED;
+        this.status = AdvertisementStatus.STOPPED;
     }
     // 관리자 광고 수락
     public void accept(){
-        if (this.status != AdvertisementState.WAITING) {
+        if (this.status != AdvertisementStatus.WAITING) {
             throw new BaseException(ErrorCode.NOT_STATUS_WAITING);
         }
-        this.status = AdvertisementState.ACCEPTED;
+        this.status = AdvertisementStatus.ACCEPTED;
     }
 
 }

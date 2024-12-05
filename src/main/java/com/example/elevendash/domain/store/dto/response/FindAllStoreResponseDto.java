@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 public class FindAllStoreResponseDto {
+    private final List<StoreInfo> advertisementStoreInfoList;
     private final List<StoreInfo> storeInfoList;
     private final PageInfo pageInfo;
 

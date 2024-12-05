@@ -91,4 +91,6 @@ public class AdvertisementController {
     ){
         return CommonResponse.success(SuccessCode.SUCCESS,advertisementService.findAllAdvertisement(loginMember));
     }
+
+
 }
