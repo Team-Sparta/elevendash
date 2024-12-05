@@ -30,4 +30,16 @@ public class CommentController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<CommentResponseDto> updateComment(
+            @PathVariable Long storeId,
+            @PathVariable Long reviewId,
+            @PathVariable Long commentId,
+            @LoginMember Member loginMember,
+            @Valid @RequestBody CommentRequestDto dto
+    ){
+        CommentResponseDto responseDto = commentService.updateComment(loginMember, commentId, dto);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
 }
