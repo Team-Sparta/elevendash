@@ -31,9 +31,10 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "review_id")
     private Review review;
 
-    public Comment(CommentRequestDto dto, Review review){
+    public Comment(CommentRequestDto dto, Review review, Member member){
         this.content = dto.getContent();
         this.review = review;
+        this.member = member;
     }
 
     public void updateComment(CommentRequestDto dto){
