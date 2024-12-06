@@ -28,7 +28,11 @@ public class SecurityConfig {
     private final AdminRoleFilter adminRoleFilter;
 
     private static final String[] PERMIT_PATHS = {
-            "/members/sign-up/**", "/members/login/**"
+            "/members/sign-up/**",
+            "/members/login/**",
+            "/swagger-ui/**",   // Swagger UI resources
+            "/v3/api-docs/**",  // OpenAPI spec resources (for Swagger)
+            "/api-docs/**"
     };
 
     private static final String[] ALLOW_ORIGINS = {
