@@ -28,6 +28,8 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private String orderStatus;
 
+    private String cancelMassage;
+
     @Column(nullable = false)
     @OneToMany()
     @JoinColumn(name = "id")
@@ -50,5 +52,9 @@ public class Order extends BaseTimeEntity {
 
     public void updateStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public void CancelMassage (String cancelMassage) {
+        this.cancelMassage = cancelMassage;
     }
 }
