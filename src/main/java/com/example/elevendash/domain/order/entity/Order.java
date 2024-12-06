@@ -29,8 +29,8 @@ public class Order extends BaseTimeEntity {
     private String orderStatus;
 
     @Column(nullable = false)
-    @OneToMany()
-    @JoinColumn(name = "id")
+    @OneToMany(fetch = FetchType.LAZY, targetEntity = Menu.class)
+    @JoinColumn(name = "menu_id")
     private List<Menu> menu = new ArrayList<>();
 
     @ManyToOne
