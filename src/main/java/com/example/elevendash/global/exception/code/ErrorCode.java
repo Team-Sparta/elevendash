@@ -109,7 +109,6 @@ public enum ErrorCode {
     NOT_DELIVERED(HttpStatus.BAD_REQUEST, "배달이 완료된 후에 리뷰를 작성하실 수 있습니다."),
     BAD_STARRATING(HttpStatus.BAD_REQUEST, "최소 별점이 최대 별점보다 클 수 없습니다."),
     UNAUTHORIZED_REVIEW(HttpStatus.UNAUTHORIZED, "리뷰에 대한 권한이 없습니다."),
-
     /**
      * Comment
      */
@@ -125,9 +124,9 @@ public enum ErrorCode {
      * Advertisement
      */
     DUPLICATE_ADVERTISEMENT(HttpStatus.BAD_REQUEST, "이미 광고가 존재합니다."),
-    NOT_STATUS_WAITING(HttpStatus.BAD_REQUEST,"대기 중인 광고만 거절할 수 있습니다." ),
-    NOT_STATUS_ACCEPTED(HttpStatus.BAD_REQUEST,"진행중인 광고만 중단할 수 있습니다" ),
-    NOT_FOUND_ADVERTISEMENT(HttpStatus.BAD_REQUEST,"광고가 존재하지 않습니다" );
+    NOT_STATUS_WAITING(HttpStatus.BAD_REQUEST, "대기 중인 광고만 거절할 수 있습니다."),
+    NOT_STATUS_ACCEPTED(HttpStatus.BAD_REQUEST, "진행중인 광고만 중단할 수 있습니다"),
+    NOT_FOUND_ADVERTISEMENT(HttpStatus.BAD_REQUEST, "광고가 존재하지 않습니다");
 
 
     private final HttpStatus httpStatus;
