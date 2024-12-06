@@ -42,4 +42,15 @@ public class CommentController {
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable Long storeId,
+            @PathVariable Long reviewId,
+            @PathVariable Long commentId,
+            @LoginMember Member loginMember
+    ){
+        commentService.delete(loginMember, commentId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }
