@@ -26,11 +26,17 @@ public class ReviewService {
     private final OrderRepository orderRepository;
     private final ReviewRepository reviewRepository;
 
-    public ReviewResponseDto create(Long storeId, CreateReviewDto dto){
+    public ReviewResponseDto create(Long storeId, Long longinMemberId, CreateReviewDto dto){
         Order findOrder = orderRepository.findByIdOrElseThrow(dto.getOrderId());
+
+        if(!findOrder.getMember().getId().equals(longinMemberId)){
+            throw new BaseException(ErrorCode.UNAUTHORIZED_REVIEW);
+        }
+
         if(!findOrder.getOrderStatus().equals("배달완료")){
             throw new BaseException(ErrorCode.NOT_DELIVERED);
         }
+
         Review review = new Review(dto, findOrder);
         Review savedReview = reviewRepository.save(review);
 
