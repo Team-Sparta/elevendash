@@ -114,7 +114,7 @@ public enum ErrorCode {
      * Comment
      */
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "댓글 정보를 찾을 수 없습니다."),
-    UNAUTHORIZED_COMMNET(HttpStatus.UNAUTHORIZED, "댓글에 대한 권한이 없습니다."),
+    UNAUTHORIZED_COMMENT(HttpStatus.UNAUTHORIZED, "댓글에 대한 권한이 없습니다."),
 
     /**
      * Order

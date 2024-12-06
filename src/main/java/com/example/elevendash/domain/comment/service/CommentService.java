@@ -67,7 +67,7 @@ public class CommentService {
 
     private void validateMember(Member loginMember, Comment findComment){
         if (!findComment.getMember().getId().equals(loginMember.getId())) {
-            throw new BaseException(ErrorCode.UNAUTHORIZED_COMMNET);
+            throw new BaseException(ErrorCode.UNAUTHORIZED_COMMENT);
         }
     }
 }
