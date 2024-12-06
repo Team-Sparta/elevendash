@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/stores/{storeId}/reviews/{reviewId}/comment")
+@RequestMapping("/stores/{storeId}/reviews/{reviewId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
@@ -30,7 +30,7 @@ public class CommentController {
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(
             @PathVariable Long storeId,
             @PathVariable Long reviewId,
