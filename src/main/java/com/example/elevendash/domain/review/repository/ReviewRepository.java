@@ -24,8 +24,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("select r from Review r where r.store.id=:storeId and r.starRating between :minStar and :maxStar")
     Page<Review> findByStarRating(Long storeId, int minStar, int maxStar, Pageable pageable);
 
-    Optional<Review> findByStoreId(Long storeId);
-
     default Review findByIdOrElseThrow(Long reviewId) {
         return findById(reviewId).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_REVIEW));
     }
