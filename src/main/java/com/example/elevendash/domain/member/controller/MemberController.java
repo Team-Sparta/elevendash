@@ -18,6 +18,8 @@ import com.example.elevendash.domain.point.service.PointService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,7 +45,7 @@ public class MemberController {
             description = "회원 가입을 진행한다."
     )
     @PostMapping("/sign-up")
-    public ResponseEntity<CommonResponse<SignUpResponse>> singUp(@Valid @RequestBody SignUpRequest request) {
+    public ResponseEntity<CommonResponse<SignUpResponse>> signUp(@Valid @RequestBody SignUpRequest request) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT, memberService.signUp(request));
     }
 

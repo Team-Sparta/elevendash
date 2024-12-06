@@ -12,8 +12,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("""
              SELECT new com.example.elevendash.domain.dashboard.dto.response.StatisticsResponse(
-                 COALESCE(COUNT(o), 0),
-                 COALESCE(SUM(o.price), 0)
+                 COUNT(o),
+                 SUM(o.price)
              )
              FROM Order o
              WHERE (:startDate IS NULL OR o.createdAt >= :startDate)
