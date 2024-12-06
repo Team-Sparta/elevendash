@@ -29,7 +29,7 @@ public class CommentService {
 
         Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
 
-        Comment comment = new Comment(dto, findReview);
+        Comment comment = new Comment(dto, findReview, loginMember);
         Comment savedComment = commentRepository.save(comment);
 
         return new CommentResponseDto(savedComment, findReview.getStore());
@@ -56,7 +56,7 @@ public class CommentService {
         Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
         validateMember(loginMember, findComment);
 
-        commentRepository.delete(findComment);
+        commentRepository.deleteCommentByCommentId(findComment.getId());
     }
 
     private void validateOwner(Member loginMember){

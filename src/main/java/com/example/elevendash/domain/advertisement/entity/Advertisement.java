@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "advertisements", uniqueConstraints = @UniqueConstraint(columnNames = {"member","store"}))
+@Table(name = "advertisements", uniqueConstraints = @UniqueConstraint(columnNames = {"member_id","store_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Advertisement extends BaseTimeEntity {
     @Id
