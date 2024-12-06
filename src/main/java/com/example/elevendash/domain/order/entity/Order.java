@@ -46,9 +46,9 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long price, List<Menu> manus, Member member, Store store) {
+    public Order(Long price, List<OrderItems> orderItems, Member member, Store store) {
         this.price = price;
-        this.menu = manus;
+        this.orderItems = orderItems;
         this.member = member;
         this.store = store;
     }
