@@ -1,6 +1,7 @@
 package com.example.elevendash.domain.comment.entity;
 
 import com.example.elevendash.domain.comment.dto.request.CommentRequestDto;
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.review.entity.Review;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -21,6 +22,10 @@ public class Comment extends BaseTimeEntity {
 
     @Column(name = "content", nullable = false)
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @OneToOne
     @JoinColumn(name = "review_id")
