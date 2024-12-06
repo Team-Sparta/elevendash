@@ -7,6 +7,7 @@ import com.example.elevendash.global.exception.code.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import com.example.elevendash.global.exception.code.ErrorCode;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +28,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                      @Param("storeId") Long storeId);
 
     default Order findByIdOrElseThrow(Long orderId) {
-        return findById(orderId).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ORDER));
+        return findById(orderId).orElseThrow(() -> new BaseException(ErrorCode.NOT_FOUND_ORDER));
     }
 }
