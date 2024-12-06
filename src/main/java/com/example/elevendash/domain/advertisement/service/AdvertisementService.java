@@ -46,20 +46,16 @@ public class AdvertisementService {
     /**
      * 광고 삭제 기능
      * @param loginMember
-     * @param StoreId
      * @param advertisementId
      * @return
      */
     @Transactional
-    public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember, Long StoreId ,Long advertisementId) {
-        // 쿠폰과 상점 일치 확인
-        Store store = storeRepository.findByIdAndIsDeleted(StoreId,Boolean.FALSE).orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_STORE));
-        if(!advertisementRepository.existsByStore(store)) {
-            throw new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT);
-        }
+    public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember ,Long advertisementId) {
+
+
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
-        // 쿠폰과 멤버 일치 확인
+
         if(!advertisement.getStore().getMember().getId().equals(loginMember.getId())) {
             throw new BaseException(ErrorCode.NOT_SAME_MEMBER);
         }
@@ -130,6 +126,11 @@ public class AdvertisementService {
         return new FindAllAdvertisementResponseDto(advertisementInfos);
     }
 
+    /**
+     * 자신의 광고 조회
+     * @param loginMember
+     * @return
+     */
     @Transactional
     public FindAllMyAdvertisementResponseDto findAllMyAdvertisement(Member loginMember) {
         if(!loginMember.getRole().equals(MemberRole.OWNER)){

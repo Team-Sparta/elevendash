@@ -12,4 +12,8 @@ public class UpdateAdvertisementRequestDto {
     @NotNull
     @Min(1)
     private final Integer bidPrice;
+
+    private UpdateAdvertisementRequestDto() {
+        this.bidPrice = 1;
+    }
 }

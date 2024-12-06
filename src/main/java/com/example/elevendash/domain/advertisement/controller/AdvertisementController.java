@@ -35,12 +35,18 @@ public class AdvertisementController {
         );
     }
 
+    /**
+     * 광고 삭제(stop) 하는 API
+     * @param advertisementId
+     * @param loginMember
+     * @param storeId
+     * @return
+     */
     @DeleteMapping("/{advertisementId}")
     public ResponseEntity<CommonResponse<DeleteAdvertisementResponseDto>> deleteAdvertisement(
             @PathVariable Long advertisementId,
-            @LoginMember Member loginMember,
-            @RequestParam Long storeId) {
-        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.deleteAdvertisement(loginMember,storeId,advertisementId));
+            @LoginMember Member loginMember) {
+        return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.deleteAdvertisement(loginMember,advertisementId));
     }
 
     /**

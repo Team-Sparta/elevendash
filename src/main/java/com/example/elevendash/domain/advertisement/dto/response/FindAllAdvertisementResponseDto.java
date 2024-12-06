@@ -9,7 +9,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FindAllAdvertisementResponseDto {
     private final List<AdvertisementInfo> advertisementInfoList;
-
+    @Getter
     public static class AdvertisementInfo{
         private final Long advertisementId;
         private final Long storeId;
