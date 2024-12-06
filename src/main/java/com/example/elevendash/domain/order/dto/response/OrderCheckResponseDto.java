@@ -4,6 +4,7 @@ import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.order.entity.Order;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter

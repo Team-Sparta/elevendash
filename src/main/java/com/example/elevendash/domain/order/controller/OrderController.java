@@ -1,12 +1,16 @@
 package com.example.elevendash.domain.order.controller;
 
+import com.example.elevendash.domain.order.dto.request.AddOrderRequestDto;
 import com.example.elevendash.domain.order.dto.request.CancelOrderRequestDto;
 import com.example.elevendash.domain.order.dto.request.orderStatusRequestDto;
+import com.example.elevendash.domain.order.dto.response.AddOrderResponseDto;
 import com.example.elevendash.domain.order.dto.response.CancelOrderResponseDto;
 import com.example.elevendash.domain.order.dto.response.OrderCheckResponseDto;
 import com.example.elevendash.domain.order.enums.OrderStauts;
 import com.example.elevendash.domain.order.service.OrderService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +35,10 @@ public class OrderController {
     @PatchMapping("/{ordersId}/cancelOrder")
     public ResponseEntity<CancelOrderResponseDto> cancelOrder (@PathVariable Long ordersId, CancelOrderRequestDto requestDto) {
         return ResponseEntity.ok().body(orderService.cancelOrder(ordersId,requestDto));
+    }
 
-
+    @PostMapping
+    public ResponseEntity<AddOrderResponseDto> addOrder (AddOrderRequestDto requestDto, HttpServletRequest servletRequest) throws JsonProcessingException {
+        return ResponseEntity.ok().body(orderService.addOrder(requestDto, servletRequest));
     }
 }
