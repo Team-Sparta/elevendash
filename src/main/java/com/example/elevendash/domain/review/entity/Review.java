@@ -45,9 +45,10 @@ public class Review extends BaseTimeEntity {
     @OneToOne(mappedBy = "review", cascade = CascadeType.ALL)
     private Comment comment;
 
-    public Review(CreateReviewDto dto){
+    public Review(CreateReviewDto dto, Order order){
         this.content = dto.getContent();
         this.starRating = dto.getStarRating();
+        this.order = order;
     }
 
     public void updateReview(UpdateReviewDto dto) {
