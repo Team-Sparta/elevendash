@@ -49,7 +49,6 @@ public class CommentService {
         return new CommentResponseDto(savedComment);
     }
 
-    @Transactional
     public void delete(Member loginMember, Long commentId) {
 
         validateOwner(loginMember);
@@ -57,7 +56,7 @@ public class CommentService {
         Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
         validateMember(loginMember, findComment);
 
-        commentRepository.delete(findComment);
+        commentRepository.deleteCommentByCommentId(findComment.getId());
     }
 
     private void validateOwner(Member loginMember){

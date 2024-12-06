@@ -28,7 +28,7 @@ public class Comment extends BaseTimeEntity {
     private Member member;
 
     @OneToOne
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", unique = true)
     private Review review;
 
     public Comment(CommentRequestDto dto, Review review, Member member){
