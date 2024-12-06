@@ -49,6 +49,8 @@ public class Review extends BaseTimeEntity {
         this.content = dto.getContent();
         this.starRating = dto.getStarRating();
         this.order = order;
+        this.member = order.getMember();
+        this.store = order.getStore();
     }
 
     public void updateReview(UpdateReviewDto dto) {

@@ -29,9 +29,10 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<ReviewResponseDto> create(
             @PathVariable Long storeId,
+            @LoginMember Member loginMember,
             @Valid @RequestBody CreateReviewDto dto
     ){
-        ReviewResponseDto responseDto = reviewService.create(storeId, dto);
+        ReviewResponseDto responseDto = reviewService.create(storeId, loginMember.getId(), dto);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
@@ -65,7 +66,7 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    @PatchMapping("/{reviewId}")
+    @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewResponseDto> updateReview(
             @PathVariable Long storeId,
             @PathVariable Long reviewId,
