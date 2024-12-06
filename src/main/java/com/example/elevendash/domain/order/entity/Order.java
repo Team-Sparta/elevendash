@@ -8,7 +8,9 @@ import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +27,14 @@ public class Order extends BaseTimeEntity {
     @Column(nullable = false)
     private Long price;
 
-    @Column(nullable = false)
+    @ColumnDefault("주문 완료")
     private String orderStatus;
 
+    @ColumnDefault("")
     private String cancelMassage;
 
-    @Column(nullable = false)
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Menu.class)
+
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private List<Menu> menu = new ArrayList<>();
 
@@ -43,18 +46,21 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long id,Long price, String orderStatus, List<Menu> manus) {
-        this.id = id;
+    public Order(Long price, List<Menu> manus, Member member, Store store) {
         this.price = price;
-        this.orderStatus = orderStatus;
         this.menu = manus;
+        this.member = member;
+        this.store = store;
     }
+
 
     public void updateStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
 
-    public void CancelMassage (String cancelMassage) {
-        this.cancelMassage = cancelMassage;
+    public void updatePrice(Long price) {
+        this.price = price;
     }
+
+
 }
