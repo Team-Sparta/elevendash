@@ -41,6 +41,7 @@ public class CommentService {
         validateOwner(loginMember);
 
         Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
+        validateMember(loginMember, findComment);
 
         findComment.updateComment(dto);
         Comment savedComment = commentRepository.save(findComment);
@@ -53,12 +54,20 @@ public class CommentService {
         validateOwner(loginMember);
 
         Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
+        validateMember(loginMember, findComment);
+
         commentRepository.delete(findComment);
     }
 
     private void validateOwner(Member loginMember){
         if(!loginMember.getRole().equals(MemberRole.OWNER)){
             throw new BaseException(ErrorCode.NOT_OWNER);
+        }
+    }
+
+    private void validateMember(Member loginMember, Comment findComment){
+        if (!findComment.getMember().getId().equals(loginMember.getId())) {
+            throw new BaseException(ErrorCode.UNAUTHORIZED_COMMENT);
         }
     }
 }

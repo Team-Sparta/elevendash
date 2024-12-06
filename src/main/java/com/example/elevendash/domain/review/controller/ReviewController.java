@@ -58,12 +58,11 @@ public class ReviewController {
             @Min(value = 1, message = "별점의 최하점은 1점입니다.")
             @Max(value = 5, message = "별점의 최고점은 5점입니다.")
             int maxStar,
-            int page
+            @PageableDefault(size = 2, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ){
 
-        Page<PageReviewResponseDto> reviews = reviewService.findBystarRating(storeId, minStar, maxStar, page);
+        Page<PageReviewResponseDto> reviews = reviewService.findBystarRating(storeId, minStar, maxStar, pageable);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
-
     }
 
     @PatchMapping("/{reviewId}")

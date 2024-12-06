@@ -3,6 +3,7 @@ package com.example.elevendash.domain.order.repository;
 import com.example.elevendash.domain.dashboard.dto.response.StatisticsResponse;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.global.exception.BaseException;
+import com.example.elevendash.global.exception.code.ErrorCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
