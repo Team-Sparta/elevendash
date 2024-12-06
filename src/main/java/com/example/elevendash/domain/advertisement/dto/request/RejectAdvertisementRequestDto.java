@@ -12,4 +12,8 @@ public class RejectAdvertisementRequestDto {
     @NotBlank
     @Size(min = 1, max = 255)
     private final String rejectReason;
+
+    private RejectAdvertisementRequestDto() {
+        this.rejectReason = "거절";
+    }
 }
