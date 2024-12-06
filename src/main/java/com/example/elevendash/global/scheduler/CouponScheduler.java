@@ -29,5 +29,4 @@ public class CouponScheduler {
             log.info("만료기간이 지난 쿠폰이 없습니다.");
         }
     }
-
 }
