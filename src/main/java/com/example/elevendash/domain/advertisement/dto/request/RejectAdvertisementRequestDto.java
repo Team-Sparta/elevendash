@@ -13,7 +13,7 @@ public class RejectAdvertisementRequestDto {
     @Size(min = 1, max = 255)
     private final String rejectReason;
 
-    public RejectAdvertisementRequestDto() {
-        this.rejectReason = "";
+    private RejectAdvertisementRequestDto() {
+        this.rejectReason = "거절";
     }
 }
