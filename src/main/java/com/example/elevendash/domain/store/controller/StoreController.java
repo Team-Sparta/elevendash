@@ -10,6 +10,10 @@ import com.example.elevendash.domain.store.service.StoreService;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +31,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Tag(
+        name = "가게 API",
+        description = "가게 관련 API"
+)
+
 @RestController
 @RequestMapping("/stores")
 @RequiredArgsConstructor
@@ -41,9 +50,13 @@ public class StoreController {
      * @param loginMember
      * @return
      */
+    @Operation(
+            summary = "가게 등록",
+            description = "가게 등록을 진행한다."
+    )
     @PostMapping(value = "/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     ResponseEntity<CommonResponse<RegisterStoreResponseDto>> registerStore(
-            @LoginMember Member loginMember,
+            @LoginMember @Parameter(hidden = true) Member loginMember,
             @Valid @RequestPart(value = "request") RegisterStoreRequestDto requestDto,
             @RequestPart(name = "image", required = false) MultipartFile storeImage) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT, storeService.registerStore(loginMember, storeImage, requestDto));
@@ -56,9 +69,13 @@ public class StoreController {
      * @param loginMember
      * @return
      */
+    @Operation(
+            summary = "가게 삭제",
+            description = "가게 삭제를 진행한다."
+    )
     @DeleteMapping("/{storeId}")
     ResponseEntity<CommonResponse<DeleteStoreResponseDto>> deleteStore(@PathVariable(name = "storeId") Long storeId,
-                                                                       @LoginMember Member loginMember) {
+                                                                       @LoginMember @Parameter(hidden = true) Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE, storeService.deleteStore(loginMember, storeId));
     }
 
@@ -68,9 +85,13 @@ public class StoreController {
      * @param loginMember
      * @return
      */
+    @Operation(
+            summary = "가게 수정",
+            description = "가게 수정을 진행한다."
+    )
     @PutMapping("/{storeId}")
     ResponseEntity<CommonResponse<UpdateStoreResponseDto>> updateStore(@PathVariable(name = "storeId") Long storeId,
-                                                                       @LoginMember Member loginMember,
+                                                                       @LoginMember @Parameter(hidden = true) Member loginMember,
                                                                        @RequestPart("request") @Valid UpdateStoreRequestDto requestDto,
                                                                        @RequestPart(name = "image", required = false) MultipartFile storeImage){
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE, storeService.updateStore(loginMember,storeId,storeImage,requestDto));
@@ -81,6 +102,10 @@ public class StoreController {
      * @param storeId
      * @return
      */
+    @Operation(
+            summary = "가게 단건 조회",
+            description = "가게 단건 조회를 진행한다."
+    )
     @GetMapping("/{storeId}")
     ResponseEntity<CommonResponse<FindStoreResponseDto>> findStore(@PathVariable(name = "storeId") Long storeId){
         return CommonResponse.success(SuccessCode.SUCCESS, storeService.findStore(storeId));
@@ -95,9 +120,13 @@ public class StoreController {
      * @param category 카테고리 필터 (기본값: CHICKEN)
      * @return 페이징된 상점 목록
      */
+    @Operation(
+            summary = "가게 다건 조회",
+            description = "가게 다건 조회를 진행한다."
+    )
     @GetMapping
     ResponseEntity<CommonResponse<FindAllStoreResponseDto>> findAllStore(
-            @LoginMember Member loginMember,
+            @LoginMember @Parameter(hidden = true) Member loginMember,
             @RequestParam(defaultValue = "1") @Min(1) Integer pageSize,
             @RequestParam(defaultValue = "10") @Min(1) Integer pageNumber,
             @RequestParam SortMode sortMode,
