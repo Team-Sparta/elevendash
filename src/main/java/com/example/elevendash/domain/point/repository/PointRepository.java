@@ -20,4 +20,6 @@ public interface PointRepository extends JpaRepository<Point, Long> {
     Long getTotalActivePoints(@Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
     List<Point> findByExpirationDateBefore(LocalDateTime now);
+
+    Point findTopByExpirationDateBefore(LocalDateTime expirationDateThreshold);
 }
