@@ -72,5 +72,4 @@ public class CartService {
         response.addCookie(storeIdCookie);
         return new CartResponseDto(store.getId(),orderSuccess, totalPrice);
     }
-
 }
