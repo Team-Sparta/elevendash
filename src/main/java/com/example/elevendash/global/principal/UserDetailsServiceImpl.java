@@ -26,6 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return userDetails;
     }
 
+
     private void validateAuthenticate(UserPrincipal member) {
         if (member == null) {
             throw new AuthenticationException(ErrorCode.INTERNAL_AUTHENTICATION_SERVICE);

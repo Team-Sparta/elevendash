@@ -53,12 +53,12 @@ public class KakaoProvider implements OAuthProvider {
     }
 
     public OAuthToken getOAuthTokenFallback(String redirectUri, String code, Throwable ex) {
-        log.error("Failed to fetch OAuth token from Kakao API", ex);
+        log.error(ex.getMessage());
         throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     public OAuthUser getOAuthUserFallback(String redirectUri, String code, Throwable ex) {
-        log.error("Failed to fetch User from Kakao API", ex);
+        log.error(ex.getMessage());
         throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 

@@ -16,7 +16,8 @@ public class AuthorizedMemberResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(Member.class) && parameter.hasParameterAnnotation(LoginMember.class);
+        return parameter.getParameterType().equals(Member.class)
+                && parameter.hasParameterAnnotation(LoginMember.class);
     }
 
     @Override
@@ -24,7 +25,10 @@ public class AuthorizedMemberResolver implements HandlerMethodArgumentResolver {
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
                                   WebDataBinderFactory binderFactory) throws Exception {
-        final UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        final UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getPrincipal();
         return Objects.isNull(userDetails) ? null : userDetails.member();
     }
 }

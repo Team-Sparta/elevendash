@@ -52,12 +52,12 @@ public class NaverProvider implements OAuthProvider {
     }
 
     public OAuthToken getOAuthTokenFallback(String redirectUri, String code, Throwable ex) {
-        log.error("Failed to fetch OAuth token from Naver API", ex);
+        log.error(ex.getMessage());
         throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
     public OAuthUser getOAuthUserFallback(String accessToken, Throwable ex) {
-        log.error("Failed to fetch User from Naver API", ex);
+        log.error(ex.getMessage());
         throw new BaseException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 
