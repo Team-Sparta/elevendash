@@ -57,8 +57,8 @@ public class AdvertisementController {
     )
     @DeleteMapping("/{advertisementId}")
     public ResponseEntity<CommonResponse<DeleteAdvertisementResponseDto>> deleteAdvertisement(
-            @PathVariable @Parameter(hidden = true) Long advertisementId,
-            @LoginMember Member loginMember) {
+            @PathVariable Long advertisementId,
+            @LoginMember @Parameter(hidden = true) Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.deleteAdvertisement(loginMember,advertisementId));
     }
 
