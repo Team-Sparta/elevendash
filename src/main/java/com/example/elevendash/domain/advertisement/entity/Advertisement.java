@@ -33,7 +33,7 @@ public class Advertisement extends BaseTimeEntity {
     private AdvertisementStatus status = AdvertisementStatus.WAITING;
 
     @Column
-    private String rejectReason;
+    private String rejectReason = "";
 
     /**
      * 연관 관계 설정

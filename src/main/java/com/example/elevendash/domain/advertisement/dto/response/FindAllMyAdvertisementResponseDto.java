@@ -11,12 +11,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FindAllMyAdvertisementResponseDto {
     private final List<AdvertisementInfoForOwner> advertisementInfoForOwner;
-    @RequiredArgsConstructor
+    @Getter
     public static class AdvertisementInfoForOwner {
         private final Long advertisementId;
         private final Long storeId;
         private final String rejectReason;
         private final Integer bidPrice;
         private final AdvertisementStatus status;
+
+        public AdvertisementInfoForOwner(Long advertisementId, Long storeId, String rejectReason, Integer bidPrice, AdvertisementStatus status) {
+            this.advertisementId = advertisementId;
+            this.storeId = storeId;
+            this.rejectReason = rejectReason;
+            this.bidPrice = bidPrice;
+            this.status = status;
+
+        }
     }
 }
