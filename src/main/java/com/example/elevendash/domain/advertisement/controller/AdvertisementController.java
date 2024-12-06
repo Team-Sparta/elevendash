@@ -8,11 +8,17 @@ import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.annotation.LoginMember;
 import com.example.elevendash.global.exception.code.SuccessCode;
 import com.example.elevendash.global.response.CommonResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+@Tag(
+        name = "광고 API",
+        description = "광고 관련 API"
+)
 @RestController
 @RequestMapping("/advertisements")
 @RequiredArgsConstructor
@@ -25,10 +31,14 @@ public class AdvertisementController {
      * @param loginMember
      * @return
      */
+    @Operation(
+            summary = "광고 생성",
+            description = "광고 생성을 진행한다."
+    )
     @PostMapping
     public ResponseEntity<CommonResponse<AddAdvertisementResponseDto>> addAdvertisement(
             @RequestBody @Valid AddAdvertisementRequestDto requestDto,
-            @LoginMember Member loginMember) {
+            @LoginMember @Parameter(hidden = true) Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT,advertisementService.addAdvertisement(
                 loginMember,requestDto
                 )
@@ -39,12 +49,15 @@ public class AdvertisementController {
      * 광고 삭제(stop) 하는 API
      * @param advertisementId
      * @param loginMember
-     * @param storeId
      * @return
      */
+    @Operation(
+            summary = "광고 삭제",
+            description = "광고 삭제를 진행한다."
+    )
     @DeleteMapping("/{advertisementId}")
     public ResponseEntity<CommonResponse<DeleteAdvertisementResponseDto>> deleteAdvertisement(
-            @PathVariable Long advertisementId,
+            @PathVariable @Parameter(hidden = true) Long advertisementId,
             @LoginMember Member loginMember) {
         return CommonResponse.success(SuccessCode.SUCCESS_DELETE,advertisementService.deleteAdvertisement(loginMember,advertisementId));
     }
@@ -56,9 +69,13 @@ public class AdvertisementController {
      * @param requestDto 거절 사유 정보
      * @return 거절된 광고 정보
      */
+    @Operation(
+            summary = "광고 거절",
+            description = "광고 거절을 진행한다."
+    )
     @PutMapping("/{advertisementId}/reject")
     public ResponseEntity<CommonResponse<RejectAdvertisementResponseDto>> rejectAdvertisement(
-            @PathVariable Long advertisementId,
+            @PathVariable @Parameter(hidden = true) Long advertisementId,
             @LoginMember Member loginMember,
             @RequestBody @Valid RejectAdvertisementRequestDto requestDto){
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,advertisementService.rejectAdvertisement(
@@ -74,9 +91,13 @@ public class AdvertisementController {
      * @param loginMember
      * @return
      */
+    @Operation(
+            summary = "광고 수락",
+            description = "광고 수락을 진행한다."
+    )
     @PutMapping("/{advertisementId}/accept")
     public ResponseEntity<CommonResponse<AcceptAdvertisementResponseDto>> acceptAdvertisement(
-            @PathVariable Long advertisementId,
+            @PathVariable @Parameter(hidden = true) Long advertisementId,
             @LoginMember Member loginMember
             ){
         return CommonResponse.success(SuccessCode.SUCCESS_UPDATE,advertisementService.acceptAdvertisement(
@@ -91,9 +112,13 @@ public class AdvertisementController {
      * @param loginMember
      * @return
      */
+    @Operation(
+            summary = "관리자 광고 조회",
+            description = "관리자 광고 조회를 진행한다."
+    )
     @GetMapping
     public ResponseEntity<CommonResponse<FindAllAdvertisementResponseDto>> findAllAdvertisement(
-            @LoginMember Member loginMember
+            @LoginMember @Parameter(hidden = true) Member loginMember
     ){
         return CommonResponse.success(SuccessCode.SUCCESS,advertisementService.findAllAdvertisement(loginMember));
     }
