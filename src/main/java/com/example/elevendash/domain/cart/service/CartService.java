@@ -1,12 +1,11 @@
 package com.example.elevendash.domain.cart.service;
 
 import com.example.elevendash.domain.cart.dto.request.CartRequestDto;
-import com.example.elevendash.domain.cart.dto.response.CartCookieResponseDto;
-import com.example.elevendash.domain.cart.dto.response.CartResponseDto;
 import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,10 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.SneakyThrows;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
@@ -29,55 +25,73 @@ public class CartService {
     private final ObjectMapper jacksonObjectMapper;
 
 
-    @SneakyThrows
-    public CartResponseDto createCookie(HttpServletResponse response, HttpServletRequest request, CartRequestDto requestDto) {
-        Cookie[] getCookie = request.getCookies();
-        for (Cookie cookieDail : getCookie) {
-            if(!cookieDail.getAttribute("store_id").equals(requestDto.getStoreId().toString())) {
-                cookieDail.setMaxAge(0);
-                cookieDail.setPath("/");
-                response.addCookie(cookieDail);
-            }
-        }
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String CART_COOKIE_NAME = "cart";
 
-
-        Long requestDtoStoreId = requestDto.getStoreId();
-        Store store = storeRepository.findById(requestDtoStoreId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
-        List<String> orderMenu = new ArrayList<>(requestDto.getMenus());
-        List<Menu> storeMenu = store.getMenus();
-        List<Menu> menuList = new ArrayList<>();
-        Integer totalPrice = 0;
-
-        // 클라이언트가 보내준 menu가 store에 있는 menu인지 확인
-        for(String menuName : orderMenu) {
-            for (Menu storeMenuDetails : storeMenu) {
-                if (storeMenuDetails.getMenuName().equals(menuName)) {
-                    menuList.add(storeMenuDetails);
-                    Integer price = storeMenuDetails.getMenuPrice();
-                    totalPrice += price;
-                }else {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "찾을 수 없는 메뉴입니다");
-                }
-            }
-        }
-
-
-        CartCookieResponseDto cartCookieResponseDto = new CartCookieResponseDto(menuList, requestDto.getMenuCount(), requestDtoStoreId);
-        Map<String, List<CartCookieResponseDto>> jsonTypeMenu = new HashMap<>();
-        jsonTypeMenu.put("menuList", Collections.singletonList(cartCookieResponseDto));
-        String StringTypeMenu = jacksonObjectMapper.writeValueAsString(jsonTypeMenu);
-
-
-        Cookie orderMenuCookie = new Cookie("menuList", StringTypeMenu);
-        orderMenuCookie.setPath("/");
-        orderMenuCookie.setMaxAge(60 * 60 * 24);
-        response.addCookie(orderMenuCookie);
-
-        Cookie storeIdCookie = new Cookie("store_id", requestDto.getStoreId().toString());
-        orderMenuCookie.setPath("/");
-        orderMenuCookie.setMaxAge(60 * 60 * 24);
-        response.addCookie(storeIdCookie);
-
-        return new CartResponseDto(store.getId(),requestDto.getMenus(), totalPrice);
+    public static ArrayList<CartRequestDto> getCartFromCookies(HttpServletRequest request) {
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> CART_COOKIE_NAME.equals(cookie.getName()))
+                .findFirst()
+                .map(cookie ->{
+                    try {
+                        return objectMapper.readValue(cookie.getValue(), objectMapper.getTypeFactory().constructCollectionType(List.class, Menu.class));
+                    } catch (JsonProcessingException e) {
+                        e.printStackTrace();
+                        return new ArrayList<CartRequestDto>();
+                    }
+                })
+                .orElse(new ArrayList<>());
     }
+
+    public static void saveCartToCookies(HttpServletResponse response, List<CartRequestDto> cart) {
+        try {
+            String cartJson = objectMapper.writeValueAsString(cart);
+            Cookie cartCookie = new Cookie(CART_COOKIE_NAME, cartJson);
+            cartCookie.setPath("/");
+            cartCookie.setHttpOnly(true);
+            cartCookie.setMaxAge(60 * 60 * 24);
+            response.addCookie(cartCookie);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<CartRequestDto> getCart(HttpServletRequest request) {
+        return getCartFromCookies(request);
+    }
+
+    public Store findStoreById(Long storeId) {
+        Store store = storeRepository.findById(storeId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
+        return store;
+    }
+
+    public List<CartRequestDto> addMenuToCart (HttpServletRequest request, HttpServletResponse response, List<CartRequestDto> cartRequestDto) {
+        List<CartRequestDto> selectedItemList = getCartFromCookies(request);
+        for (CartRequestDto newMenu : cartRequestDto) {
+            for (CartRequestDto selectedMenu : selectedItemList) {
+                Long storeId = newMenu.getStoreId();
+                Store store = findStoreById(storeId);
+                for (Menu menu : store.getMenus()) {
+                    if (menu.getMenuName().equals(newMenu.getMenuName()));
+                }
+
+
+                if (!newMenu.getStoreId().equals(selectedMenu.getStoreId())) {
+                    cartRequestDto.removeAll(selectedItemList);
+                    selectedItemList.add(newMenu);
+                } else if (newMenu.getMenuName().equals(selectedMenu.getMenuName())) {
+                    newMenu.setQuantity(newMenu.getQuantity() + selectedMenu.getQuantity());
+                } 
+            }
+            selectedItemList.add(newMenu);
+        }
+        saveCartToCookies(response, selectedItemList);
+        return selectedItemList;
+    }
+
+    public Long calculateTotal(HttpServletRequest request) {
+        List<CartRequestDto> cart = getCartFromCookies(request);
+        return cart.stream().mapToLong(CartRequestDto -> CartRequestDto.getPrice() * CartRequestDto.getQuantity()).sum();
+    }
+
 }
