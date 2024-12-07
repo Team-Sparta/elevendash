@@ -121,6 +121,10 @@ public enum ErrorCode {
     NOT_FOUND_ORDER(HttpStatus.NOT_FOUND, "주문 정보를 찾을 수 없습니다."),
 
     /**
+     * Cart
+     */
+    NOT_FOUND_CART(HttpStatus.NOT_FOUND, "카트 정보를 찾을 수 없습니다."),
+    /**
      * Advertisement
      */
     DUPLICATE_ADVERTISEMENT(HttpStatus.BAD_REQUEST, "이미 광고가 존재합니다."),

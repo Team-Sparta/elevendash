@@ -1,25 +1,25 @@
 package com.example.elevendash.domain.order.entity;
 
 
-import com.example.elevendash.domain.cart.dto.request.CartRequestDto;
+import com.example.elevendash.domain.coupon.entity.Coupon;
 import com.example.elevendash.domain.member.entity.Member;
-import com.example.elevendash.domain.menu.entity.Menu;
+import com.example.elevendash.domain.order.enums.OrderStatus;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
-import java.awt.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@Table(name = "orders")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "`orders`")
 public class Order extends BaseTimeEntity {
 
     @Id
@@ -27,17 +27,18 @@ public class Order extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long price;
+    private BigDecimal price = BigDecimal.ZERO;
 
-    @ColumnDefault("주문 완료")
-    private String orderStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OrderStatus orderStatus = OrderStatus.ORDER_COMPLETE;
 
-    @ColumnDefault("")
+    @Column
     private String cancelMassage;
 
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<OrderItems> orderItems;
+    @OneToMany(mappedBy = "order",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private List<OrderMenu> orderMenus;
 
     @ManyToOne
     @JoinColumn(name = "member_id", nullable = false)
@@ -47,19 +48,23 @@ public class Order extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long price, Member member, Store store) {
-        this.price = price;
+    @OneToOne
+    @JoinColumn(name = "coupone_id", nullable = true)
+    private Coupon coupon;
+
+    public Order(Member member, Store store, Coupon coupon) {
         this.member = member;
         this.store = store;
+        this.coupon = coupon;
     }
 
 
 
-    public void updateStatus(String orderStatus) {
+    public void updateStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
 
-    public void updatePrice(Long price) {
+    public void updatePrice(BigDecimal price) {
         this.price = price;
     }
 

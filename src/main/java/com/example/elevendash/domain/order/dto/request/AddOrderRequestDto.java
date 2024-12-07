@@ -4,15 +4,13 @@ import lombok.Getter;
 
 @Getter
 public class AddOrderRequestDto {
-    private final Long memberId;
 
-    private final Long point;
+    private final Long pointId;
 
     private final Long couponId;
 
-    public AddOrderRequestDto(Long memberId, Long point, Long couponId) {
-        this.memberId = memberId;
-        this.point = point;
+    public AddOrderRequestDto( Long point, Long couponId) {
+        this.pointId = point;
         this.couponId = couponId;
     }
 }
