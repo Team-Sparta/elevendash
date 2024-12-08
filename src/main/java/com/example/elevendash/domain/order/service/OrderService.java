@@ -6,22 +6,26 @@ import com.example.elevendash.domain.coupon.entity.Coupon;
 import com.example.elevendash.domain.coupon.entity.CouponUsage;
 import com.example.elevendash.domain.coupon.enums.CouponType;
 import com.example.elevendash.domain.coupon.repository.CouponRepository;
+import com.example.elevendash.domain.coupon.repository.CouponUsageRepository;
 import com.example.elevendash.domain.coupon.service.CouponService;
 import com.example.elevendash.domain.dashboard.dto.response.StatisticsResponse;
 import com.example.elevendash.domain.dashboard.enums.PeriodType;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.repository.MemberRepository;
+import com.example.elevendash.domain.menu.dto.MenuOptionInfo;
 import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.menu.entity.MenuOption;
 import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.menu.repository.MenuOptionRepository;
 import com.example.elevendash.domain.menu.repository.MenuRepository;
+import com.example.elevendash.domain.order.dto.OrderMenuInfo;
 import com.example.elevendash.domain.order.dto.request.AddOrderRequestDto;
 import com.example.elevendash.domain.order.dto.request.CancelOrderRequestDto;
 import com.example.elevendash.domain.order.dto.request.orderStatusRequestDto;
 import com.example.elevendash.domain.order.dto.response.AddOrderResponseDto;
 import com.example.elevendash.domain.order.dto.response.CancelOrderResponseDto;
 import com.example.elevendash.domain.order.dto.response.OrderCheckResponseDto;
+import com.example.elevendash.domain.order.dto.response.OrderOptionInfo;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.order.entity.OrderMenu;
 import com.example.elevendash.domain.order.entity.OrderMenuOption;
@@ -30,6 +34,7 @@ import com.example.elevendash.domain.order.repository.OrderItemsRepository;
 import com.example.elevendash.domain.order.repository.OrderMenuOptionRepository;
 import com.example.elevendash.domain.order.repository.OrderMenuRepository;
 import com.example.elevendash.domain.order.repository.OrderRepository;
+import com.example.elevendash.domain.point.entity.Point;
 import com.example.elevendash.domain.point.repository.PointRepository;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
@@ -41,6 +46,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Or;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -60,6 +67,7 @@ import static com.example.elevendash.domain.member.enums.MemberRole.OWNER;
 import static com.example.elevendash.domain.member.enums.MemberRole.valueOf;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private final ObjectMapper jacksonObjectMapper;
@@ -75,21 +83,9 @@ public class OrderService {
     private final OrderMenuOptionRepository orderMenuOptionRepository;
     private final OrderMenuRepository orderMenuRepository;
 
+    private final String CART_COOKIE_NAME = "cart";
+    private final CouponUsageRepository couponUsageRepository;
 
-    public OrderService(ObjectMapper jacksonObjectMapper, OrderRepository orderService, MemberRepository memberRepository, MenuRepository menuRepository, StoreRepository storeRepository, CouponRepository couponRepository, CouponService couponService, PointRepository pointRepository, OrderItemsRepository orderItemsRepository, MenuOptionRepository menuOptionRepository, OrderMenuOptionRepository orderMenuOptionRepository, OrderMenuRepository orderMenuRepository) {
-        this.jacksonObjectMapper = jacksonObjectMapper;
-        this.orderRepository = orderService;
-        this.memberRepository = memberRepository;
-        this.menuRepository = menuRepository;
-        this.storeRepository = storeRepository;
-        this.couponRepository = couponRepository;
-        this.couponService = couponService;
-        this.pointRepository = pointRepository;
-        this.orderItemsRepository = orderItemsRepository;
-        this.menuOptionRepository = menuOptionRepository;
-        this.orderMenuOptionRepository = orderMenuOptionRepository;
-        this.orderMenuRepository = orderMenuRepository;
-    }
 
     public Order findOrderById(Long ordersId) {
         return orderRepository.findById(ordersId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
@@ -100,9 +96,21 @@ public class OrderService {
         if (OrderStatus.ORDER_REJECTION.equals(order.getOrderStatus())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "주문을 찾을 수 없습니다");
         }
-        return new OrderCheckResponseDto(orderId,order.getPrice(),order.getOrderMenus(),order.getOrderStatus());
+        List<OrderMenuInfo> orderMenuInfoList= new ArrayList<>();
+        for(OrderMenu orderMenu : order.getOrderMenus()){
+            List<OrderOptionInfo> menuOptionInfoList = orderMenu.getOptions().stream().map(
+                    orderMenuOption -> new OrderOptionInfo(
+                            orderMenuOption.getOrderMenu().getId(),
+                            orderMenuOption.getMenuOption().getContent(),
+                            orderMenuOption.getQuantity()
+                    )
+            ).toList();
+            OrderMenuInfo orderMenuInfo = new OrderMenuInfo(orderMenu.getMenu().getId(),orderMenu.getMenu().getMenuName(), menuOptionInfoList);
+            orderMenuInfoList.add(orderMenuInfo);
+        }
+        return new OrderCheckResponseDto(orderId,order.getPrice(),orderMenuInfoList,order.getOrderStatus());
     }
-
+    @Transactional
     public StatisticsResponse getStatistics(PeriodType periodType, LocalDate startDate, LocalDate endDate, Long storeId, Categories categories) {
 
         if (endDate != null && startDate != null && endDate.isBefore(startDate)) {
@@ -134,7 +142,7 @@ public class OrderService {
 
         return orderRepository.getStatistics(startDateTime, endDateTime, storeId);
     }
-
+    @Transactional
     public String orderStatus (Long ordersId, orderStatusRequestDto requestDto, Member member) {
         Order order = findOrderById(ordersId);
 
@@ -163,9 +171,9 @@ public class OrderService {
         return new CancelOrderResponseDto(order.getOrderStatus(), requestDto.getCancelMassage());
     }
 
-
+    // 포인트 쿠폰 구현 하다말음 주문만 가능
     @Transactional
-    public AddOrderResponseDto addOrder (AddOrderRequestDto requestDto, HttpServletRequest request, Member member) throws JsonProcessingException {
+    public AddOrderResponseDto addOrder (AddOrderRequestDto requestDto, HttpServletRequest request, Member member, HttpServletResponse response) throws JsonProcessingException {
 
         BigDecimal totalPrice = new BigDecimal(0);
         if (request.getCookies() == null) {
@@ -184,14 +192,24 @@ public class OrderService {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
 
+        Cookie cookie = new Cookie(CART_COOKIE_NAME, null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+
         CartInfo cartInfo = objectMapper.readValue(cartString, new TypeReference<CartInfo>() {});
 
         Store store = storeRepository.findById(cartInfo.getCartMenus().get(0).getStoreId()).orElse(null);
         if (store == null) {
             throw new BaseException(ErrorCode.NOT_FOUND_STORE);
         }
+
         Coupon coupon = couponRepository.findById(requestDto.getCouponId()).orElse(null);
+        Point point = pointRepository.findByMember(member);
+
         Order order = new Order(member,store,coupon);
+
         orderRepository.saveAndFlush(order);
         for(CartMenuInfo cartMenuInfo : cartInfo.getCartMenus()) {
             Menu menu = menuRepository.findById(cartMenuInfo.getMenuId()).orElse(null);
@@ -208,20 +226,36 @@ public class OrderService {
                 }
                 totalPrice = totalPrice.add(BigDecimal.valueOf(menuOption.getOptionPrice()));
                 OrderMenuOption orderMenuOption = new OrderMenuOption(menuOption,menuOptionInfo.getOptionQuantity(),orderMenu);
-                orderMenuOptionRepository.saveAndFlush(orderMenuOption);
+                orderMenuOptionRepository.save(orderMenuOption);
             }
 
         }
+
+        if(point != null) {
+            totalPrice = totalPrice.subtract(BigDecimal.valueOf(point.getAmount()));
+        }
+
         if(coupon == null) {
+            if(totalPrice.compareTo(BigDecimal.valueOf(0))< 0){
+                totalPrice = BigDecimal.ZERO;
+            }
             order.updatePrice(totalPrice);
             return new AddOrderResponseDto(order.getId());
         }
         if(CouponType.PERCENTAGE.equals(coupon.getType())){
-            totalPrice = totalPrice.divide(coupon.getDiscountValue(),10, RoundingMode.HALF_UP);
+            BigDecimal discountRate = coupon.getDiscountValue().divide(new BigDecimal(100),3,RoundingMode.HALF_UP);
+            totalPrice = totalPrice.multiply(BigDecimal.ONE.subtract(discountRate));
         }
         if(CouponType.FIXED_AMOUNT.equals(coupon.getType())){
             totalPrice = totalPrice.add(coupon.getDiscountValue().multiply(BigDecimal.valueOf(-1)));
         }
+        // 가격이 0보다 작을경우 0이된다
+        if(totalPrice.compareTo(BigDecimal.valueOf(0))< 0){
+            totalPrice = BigDecimal.ZERO;
+        }
+        CouponUsage couponUsage = new CouponUsage(coupon,member,true);
+
+        couponUsageRepository.save(couponUsage);
         order.updatePrice(totalPrice);
         return new AddOrderResponseDto(order.getId());
 

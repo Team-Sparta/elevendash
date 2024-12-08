@@ -9,12 +9,17 @@ import com.example.elevendash.domain.order.dto.response.CancelOrderResponseDto;
 import com.example.elevendash.domain.order.dto.response.OrderCheckResponseDto;
 import com.example.elevendash.domain.order.service.OrderService;
 import com.example.elevendash.global.annotation.LoginMember;
+import com.example.elevendash.global.exception.BaseException;
+import com.example.elevendash.global.exception.code.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,14 +44,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<AddOrderResponseDto> addOrder (@RequestBody @Valid AddOrderRequestDto requestDto, HttpServletRequest servletRequest,
+    public ResponseEntity<AddOrderResponseDto> addOrder (@RequestBody @Valid AddOrderRequestDto requestDto, HttpServletRequest servletRequest, HttpServletResponse servletResponse,
                                                          @LoginMember Member loginMember) {
-        AddOrderResponseDto responseDto = null;
         try {
-            responseDto = orderService.addOrder(requestDto, servletRequest, loginMember);
-        }catch (JsonProcessingException e){
-            e.printStackTrace();
+            AddOrderResponseDto responseDto = orderService.addOrder(requestDto, servletRequest, loginMember, servletResponse);
+            return ResponseEntity.ok().body(responseDto);
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
-        return ResponseEntity.ok().body(responseDto);
     }
 }

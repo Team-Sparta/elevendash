@@ -11,8 +11,6 @@ public class orderStatusRequestDto {
     private final OrderStatus orderStatus;
 
 
-
-
     public orderStatusRequestDto(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }

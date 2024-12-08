@@ -21,11 +21,11 @@ public class OrderMenu extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id",nullable = false)
+    @JoinColumn(name = "menu_id",nullable = false,unique = false)
     private Menu menu;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false,unique = false)
     private Order order;
 
     @OneToMany(mappedBy = "orderMenu",cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)

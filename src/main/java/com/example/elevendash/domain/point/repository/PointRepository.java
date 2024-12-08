@@ -1,5 +1,6 @@
 package com.example.elevendash.domain.point.repository;
 
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.point.dto.response.TotalPointsResponse;
 import com.example.elevendash.domain.point.entity.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,4 +23,6 @@ public interface PointRepository extends JpaRepository<Point, Long> {
     List<Point> findByExpirationDateBefore(LocalDateTime now);
 
     Point findTopByExpirationDateBefore(LocalDateTime expirationDateThreshold);
+
+    Point findByMember(Member member);
 }

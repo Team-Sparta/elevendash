@@ -7,6 +7,8 @@ import com.example.elevendash.domain.store.repository.StoreRepository;
 import com.example.elevendash.global.exception.BaseException;
 import com.example.elevendash.global.exception.code.ErrorCode;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -31,28 +34,34 @@ public class CartService {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final String CART_COOKIE_NAME = "cart";
 
-    private CartInfo getCartFromCookies(HttpServletRequest request, HttpServletResponse response) {
+    private CartInfo getCartFromCookies(HttpServletRequest request, HttpServletResponse response)throws JsonProcessingException{
         if(request.getCookies() == null) {
             return new CartInfo(new ArrayList<>());
         }
         Cookie cartCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals(CART_COOKIE_NAME)).findFirst().orElse(null);
-        try {
-            assert cartCookie != null;
-            objectMapper.readTree(cartCookie.getValue());
-        } catch (Exception e){
-            Cookie cookie = new Cookie(CART_COOKIE_NAME, null);
-            cookie.setMaxAge(0);
-            cookie.setPath("/");
-            cookie.setHttpOnly(true);
-            response.addCookie(cookie);
+        if(cartCookie == null) {
+            return new CartInfo(new ArrayList<>());
         }
-        return objectMapper.convertValue(cartCookie, CartInfo.class);
+        String cartString;
+        try {
+            cartString = decodeCartCookie(cartCookie);
+        }catch (Exception e) {
+            throw new BaseException(ErrorCode.NOT_FOUND_CART);
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+
+        CartInfo cartInfo = objectMapper.readValue(cartString, new TypeReference<CartInfo>() {});
+
+
+        return cartInfo;
     }
 
 
 
-    public void addMenuToCart (HttpServletRequest request, HttpServletResponse response, CartMenuInfo cartMenuInfo) {
+    public void addMenuToCart (HttpServletRequest request, HttpServletResponse response, CartMenuInfo cartMenuInfo)throws JsonProcessingException {
         String encodedJson = null;
+
         CartInfo selectedItemList = getCartFromCookies(request,response);
 
         if(selectedItemList != null) {
@@ -81,6 +90,9 @@ public class CartService {
         cartCookie.setMaxAge(60 * 60 * 24);
         response.addCookie(cartCookie);
     }
-
+    private String decodeCartCookie(Cookie cartCookie) throws Exception {
+        // 쿠키 값 디코딩
+        return URLDecoder.decode(cartCookie.getValue(), StandardCharsets.UTF_8.toString());
+    }
 
 }

@@ -1,5 +1,7 @@
 package com.example.elevendash.domain.order.dto.response;
 
+import com.example.elevendash.domain.menu.dto.response.FindMenuResponseDto;
+import com.example.elevendash.domain.order.dto.OrderMenuInfo;
 import com.example.elevendash.domain.order.entity.Order;
 import com.example.elevendash.domain.order.entity.OrderMenu;
 import com.example.elevendash.domain.order.enums.OrderStatus;
@@ -17,7 +19,7 @@ public class OrderCheckResponseDto {
 
     private final BigDecimal price;
 
-    private final List<OrderMenu> orderItems;
+    private final List<OrderMenuInfo> orderMenuInfoList;
 
     private final OrderStatus status;
 

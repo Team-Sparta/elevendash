@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,18 +39,18 @@ public class Order extends BaseTimeEntity {
 
 
     @OneToMany(mappedBy = "order",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
-    private List<OrderMenu> orderMenus;
+    private List<OrderMenu> orderMenus = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    @OneToOne
-    @JoinColumn(name = "coupone_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id", nullable = true)
     private Coupon coupon;
 
     public Order(Member member, Store store, Coupon coupon) {

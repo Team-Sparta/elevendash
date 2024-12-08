@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CartInfo {
-    private List<CartMenuInfo> cartMenus = new ArrayList<>();
+    private List<CartMenuInfo> cartMenus;
 
     public CartInfo(){
         cartMenus = new ArrayList<>();

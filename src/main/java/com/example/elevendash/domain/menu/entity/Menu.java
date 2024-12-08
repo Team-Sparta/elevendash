@@ -66,9 +66,8 @@ public class Menu extends BaseTimeEntity {
     @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuOption> menuOptions;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OrderMenu_id")
-    private List<OrderMenu> OrderMenu;
+    @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderMenu> orderMenus;
 
 
     /**
