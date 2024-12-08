@@ -1,6 +1,6 @@
 package com.example.elevendash.domain.menu.entity;
 
-import com.example.elevendash.domain.order.entity.Order;
+import com.example.elevendash.domain.order.entity.OrderMenu;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -65,6 +65,9 @@ public class Menu extends BaseTimeEntity {
      */
     @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MenuOption> menuOptions;
+
+    @OneToMany(mappedBy = "menu", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderMenu> orderMenus;
 
 
     /**

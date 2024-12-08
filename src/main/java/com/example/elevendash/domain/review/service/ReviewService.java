@@ -3,6 +3,7 @@ package com.example.elevendash.domain.review.service;
 import com.example.elevendash.domain.comment.entity.Comment;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.order.entity.Order;
+import com.example.elevendash.domain.order.enums.OrderStatus;
 import com.example.elevendash.domain.order.repository.OrderRepository;
 import com.example.elevendash.domain.review.dto.request.CreateReviewDto;
 import com.example.elevendash.domain.review.dto.request.UpdateReviewDto;
@@ -33,7 +34,7 @@ public class ReviewService {
             throw new BaseException(ErrorCode.UNAUTHORIZED_REVIEW);
         }
 
-        if(!findOrder.getOrderStatus().equals("배달완료")){
+        if(!findOrder.getOrderStatus().equals(OrderStatus.DELIVERY_COMPLETE)){
             throw new BaseException(ErrorCode.NOT_DELIVERED);
         }
 

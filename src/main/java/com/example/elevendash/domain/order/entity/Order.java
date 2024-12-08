@@ -1,21 +1,26 @@
 package com.example.elevendash.domain.order.entity;
 
 
+import com.example.elevendash.domain.coupon.entity.Coupon;
 import com.example.elevendash.domain.member.entity.Member;
-import com.example.elevendash.domain.menu.entity.Menu;
+import com.example.elevendash.domain.order.enums.OrderStatus;
 import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@Table(name = "orders")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "`orders`")
 public class Order extends BaseTimeEntity {
 
     @Id
@@ -23,38 +28,46 @@ public class Order extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private Long price;
+    private BigDecimal price = BigDecimal.ZERO;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String orderStatus;
+    private OrderStatus orderStatus = OrderStatus.ORDER_COMPLETE;
 
+    @Column
     private String cancelMassage;
 
-    @Column(nullable = false)
-    @OneToMany(fetch = FetchType.LAZY, targetEntity = Menu.class)
-    @JoinColumn(name = "menu_id")
-    private List<Menu> menu = new ArrayList<>();
 
-    @ManyToOne
+    @OneToMany(mappedBy = "order",fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.REMOVE)
+    private List<OrderMenu> orderMenus = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
-    public Order(Long id,Long price, String orderStatus, List<Menu> manus) {
-        this.id = id;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id", nullable = true)
+    private Coupon coupon;
+
+    public Order(Member member, Store store, Coupon coupon) {
+        this.member = member;
+        this.store = store;
+        this.coupon = coupon;
+    }
+
+
+
+    public void updateStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public void updatePrice(BigDecimal price) {
         this.price = price;
-        this.orderStatus = orderStatus;
-        this.menu = manus;
     }
 
-    public void updateStatus(String orderStatus) {
-        this.orderStatus = orderStatus;
-    }
 
-    public void CancelMassage (String cancelMassage) {
-        this.cancelMassage = cancelMassage;
-    }
 }
