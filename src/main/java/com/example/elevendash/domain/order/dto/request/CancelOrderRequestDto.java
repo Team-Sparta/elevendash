@@ -4,12 +4,10 @@ import lombok.Getter;
 
 @Getter
 public class CancelOrderRequestDto {
-    private final String orderStatus;
 
     private final String cancelMassage;
 
-    public CancelOrderRequestDto(String orderStatus, String cancelMassage) {
-        this.orderStatus = orderStatus;
+    public CancelOrderRequestDto( String cancelMassage) {
         this.cancelMassage = cancelMassage;
     }
 }

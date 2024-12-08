@@ -1,12 +1,14 @@
 package com.example.elevendash.domain.cart.service;
 
-import com.example.elevendash.domain.cart.dto.request.CartRequestDto;
-import com.example.elevendash.domain.cart.dto.response.CartCookieResponseDto;
-import com.example.elevendash.domain.cart.dto.response.CartResponseDto;
-import com.example.elevendash.domain.menu.entity.Menu;
+import com.example.elevendash.domain.cart.dto.CartInfo;
+import com.example.elevendash.domain.cart.dto.CartMenuInfo;
 import com.example.elevendash.domain.order.repository.OrderRepository;
-import com.example.elevendash.domain.store.entity.Store;
 import com.example.elevendash.domain.store.repository.StoreRepository;
+import com.example.elevendash.global.exception.BaseException;
+import com.example.elevendash.global.exception.code.ErrorCode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,11 +16,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import lombok.RequiredArgsConstructor;
 
-import lombok.SneakyThrows;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -29,55 +31,68 @@ public class CartService {
     private final ObjectMapper jacksonObjectMapper;
 
 
-    @SneakyThrows
-    public CartResponseDto createCookie(HttpServletResponse response, HttpServletRequest request, CartRequestDto requestDto) {
-        Cookie[] getCookie = request.getCookies();
-        for (Cookie cookieDail : getCookie) {
-            if(!cookieDail.getAttribute("store_id").equals(requestDto.getStoreId().toString())) {
-                cookieDail.setMaxAge(0);
-                cookieDail.setPath("/");
-                response.addCookie(cookieDail);
-            }
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String CART_COOKIE_NAME = "cart";
+
+    private CartInfo getCartFromCookies(HttpServletRequest request, HttpServletResponse response)throws JsonProcessingException{
+        if(request.getCookies() == null) {
+            return new CartInfo(new ArrayList<>());
         }
-
-
-        Long requestDtoStoreId = requestDto.getStoreId();
-        Store store = storeRepository.findById(requestDtoStoreId).orElseThrow(() -> new IllegalArgumentException("잘못된 ID 값입니다"));
-        List<String> orderMenu = new ArrayList<>(requestDto.getMenus());
-        List<Menu> storeMenu = store.getMenus();
-        List<Menu> menuList = new ArrayList<>();
-        Integer totalPrice = 0;
-
-        // 클라이언트가 보내준 menu가 store에 있는 menu인지 확인
-        for(String menuName : orderMenu) {
-            for (Menu storeMenuDetails : storeMenu) {
-                if (storeMenuDetails.getMenuName().equals(menuName)) {
-                    menuList.add(storeMenuDetails);
-                    Integer price = storeMenuDetails.getMenuPrice();
-                    totalPrice += price;
-                }else {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "찾을 수 없는 메뉴입니다");
-                }
-            }
+        Cookie cartCookie = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals(CART_COOKIE_NAME)).findFirst().orElse(null);
+        if(cartCookie == null) {
+            return new CartInfo(new ArrayList<>());
         }
+        String cartString;
+        try {
+            cartString = decodeCartCookie(cartCookie);
+        }catch (Exception e) {
+            throw new BaseException(ErrorCode.NOT_FOUND_CART);
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+
+        CartInfo cartInfo = objectMapper.readValue(cartString, new TypeReference<CartInfo>() {});
 
 
-        CartCookieResponseDto cartCookieResponseDto = new CartCookieResponseDto(menuList, requestDto.getMenuCount(), requestDtoStoreId);
-        Map<String, List<CartCookieResponseDto>> jsonTypeMenu = new HashMap<>();
-        jsonTypeMenu.put("menuList", Collections.singletonList(cartCookieResponseDto));
-        String StringTypeMenu = jacksonObjectMapper.writeValueAsString(jsonTypeMenu);
-
-
-        Cookie orderMenuCookie = new Cookie("menuList", StringTypeMenu);
-        orderMenuCookie.setPath("/");
-        orderMenuCookie.setMaxAge(60 * 60 * 24);
-        response.addCookie(orderMenuCookie);
-
-        Cookie storeIdCookie = new Cookie("store_id", requestDto.getStoreId().toString());
-        orderMenuCookie.setPath("/");
-        orderMenuCookie.setMaxAge(60 * 60 * 24);
-        response.addCookie(storeIdCookie);
-
-        return new CartResponseDto(store.getId(),requestDto.getMenus(), totalPrice);
+        return cartInfo;
     }
+
+
+
+    public void addMenuToCart (HttpServletRequest request, HttpServletResponse response, CartMenuInfo cartMenuInfo)throws JsonProcessingException {
+        String encodedJson = null;
+
+        CartInfo selectedItemList = getCartFromCookies(request,response);
+
+        if(selectedItemList != null) {
+            selectedItemList.getCartMenus().add(cartMenuInfo);
+            try {
+                String jsonString = objectMapper.writeValueAsString(selectedItemList);
+                encodedJson = URLEncoder.encode(jsonString, StandardCharsets.UTF_8);
+            } catch (JsonProcessingException e) {
+                Cookie cookie = new Cookie(CART_COOKIE_NAME, null);
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+                throw new BaseException(ErrorCode.NOT_FOUND_CART);
+            }
+        }
+        else{
+            selectedItemList = new CartInfo(new ArrayList<>());
+            selectedItemList.getCartMenus().add(cartMenuInfo);
+        }
+
+        // 쿠키에 저장할때 "가 들어가서 오류 발생
+        Cookie cartCookie = new Cookie(CART_COOKIE_NAME, encodedJson);
+        cartCookie.setPath("/");
+        cartCookie.setHttpOnly(true);
+        cartCookie.setMaxAge(60 * 60 * 24);
+        response.addCookie(cartCookie);
+    }
+    private String decodeCartCookie(Cookie cartCookie) throws Exception {
+        // 쿠키 값 디코딩
+        return URLDecoder.decode(cartCookie.getValue(), StandardCharsets.UTF_8.toString());
+    }
+
 }

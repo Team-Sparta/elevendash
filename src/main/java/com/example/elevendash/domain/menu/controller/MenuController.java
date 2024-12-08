@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
         description = "메뉴 관련 API"
 )
 @RestController
-@RequestMapping("stores/")
+@RequestMapping("/stores")
 @RequiredArgsConstructor
 public class MenuController {
     private final MenuService menuService;
