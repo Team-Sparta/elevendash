@@ -12,12 +12,12 @@ import com.example.elevendash.domain.dashboard.dto.response.StatisticsResponse;
 import com.example.elevendash.domain.dashboard.enums.PeriodType;
 import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.domain.member.repository.MemberRepository;
-import com.example.elevendash.domain.menu.dto.MenuOptionInfo;
 import com.example.elevendash.domain.menu.entity.Menu;
 import com.example.elevendash.domain.menu.entity.MenuOption;
 import com.example.elevendash.domain.menu.enums.Categories;
 import com.example.elevendash.domain.menu.repository.MenuOptionRepository;
 import com.example.elevendash.domain.menu.repository.MenuRepository;
+import com.example.elevendash.domain.order.dto.OrderMenuOptionInfo;
 import com.example.elevendash.domain.order.dto.OrderMenuInfo;
 import com.example.elevendash.domain.order.dto.request.AddOrderRequestDto;
 import com.example.elevendash.domain.order.dto.request.CancelOrderRequestDto;
@@ -48,7 +48,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -209,27 +208,39 @@ public class OrderService {
         Point point = pointRepository.findByMember(member);
 
         Order order = new Order(member,store,coupon);
+        List<Long> menuIds = cartInfo.getCartMenus().stream().map(CartMenuInfo::getMenuId).toList();
+        List<Long> menuOptionIds = cartInfo.getCartMenus().stream().map(CartMenuInfo::getMenuId).toList();
 
-        orderRepository.saveAndFlush(order);
-        for(CartMenuInfo cartMenuInfo : cartInfo.getCartMenus()) {
-            Menu menu = menuRepository.findById(cartMenuInfo.getMenuId()).orElse(null);
-            if (menu == null) {
-                continue;
-            }
-            totalPrice = totalPrice.add(BigDecimal.valueOf(menu.getMenuPrice()));
+        Map<OrderMenu, List<OrderMenuOptionInfo>> menuOptionMap = new HashMap<>();
+        List<Menu> menus = menuRepository.findByIdIn(menuIds);
+        List<OrderMenu> orderMenus = new ArrayList<>();
+        List<MenuOption> menuOptions = menuOptionRepository.findByIdIn(menuOptionIds);
+        for(Menu menu : menus) {
             OrderMenu orderMenu = new OrderMenu(menu,order);
-            orderMenuRepository.saveAndFlush(orderMenu);
-            for(CartMenuInfo.menuOptionInfo menuOptionInfo : cartMenuInfo.getMenuOptions()) {
-                MenuOption menuOption = menuOptionRepository.findById(menuOptionInfo.getOptionId()).orElse(null);
-                if (menuOption == null) {
-                    continue;
+            orderMenus.add(orderMenu);
+            for(CartMenuInfo cartMenuInfo : cartInfo.getCartMenus()){
+                for(CartMenuInfo.MenuOptionInfo menuOptionInfo : cartMenuInfo.getMenuOptions()){
+                    menuOptionMap.putIfAbsent(orderMenu, new ArrayList<>());
+                    MenuOption putMenuOption = menuOptions.stream().filter(menuOption -> Objects.equals(menuOption.getId(), menuOptionInfo.getOptionId())).findAny()
+                            .orElse(null);
+                    if(putMenuOption == null){
+                        continue;
+                    }
+                    menuOptionMap.get(orderMenu).add(new OrderMenuOptionInfo(putMenuOption,menuOptionInfo.getOptionQuantity()));
                 }
-                totalPrice = totalPrice.add(BigDecimal.valueOf(menuOption.getOptionPrice()));
-                OrderMenuOption orderMenuOption = new OrderMenuOption(menuOption,menuOptionInfo.getOptionQuantity(),orderMenu);
-                orderMenuOptionRepository.save(orderMenuOption);
             }
-
         }
+        List<OrderMenuOption> orderMenuOptions = new ArrayList<>();
+        for(Map.Entry<OrderMenu, List<OrderMenuOptionInfo>> entry : menuOptionMap.entrySet()) {
+            OrderMenu orderMenu = entry.getKey();
+            for(OrderMenuOptionInfo orderMenuOptionInfo : entry.getValue()) {
+                orderMenuOptions.add(new OrderMenuOption(orderMenuOptionInfo.getMenuOption(),orderMenuOptionInfo.getQuantity(),orderMenu));
+            }
+        }
+        orderRepository.save(order);
+        orderMenuRepository.saveAll(orderMenus);
+        orderMenuOptionRepository.saveAll(orderMenuOptions);
+
 
         if(point != null) {
             totalPrice = totalPrice.subtract(BigDecimal.valueOf(point.getAmount()));

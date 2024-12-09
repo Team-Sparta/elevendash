@@ -6,10 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -22,9 +19,9 @@ public class CartMenuInfo {
     @Min(1)
     private final Long storeId;
 
-    private final List<menuOptionInfo> menuOptions;
+    private final List<MenuOptionInfo> menuOptions;
     @JsonCreator
-    public CartMenuInfo(@JsonProperty("menuId") Long menuId, @JsonProperty("storeId") Long storeId,@JsonProperty("menuOptions") List<menuOptionInfo> menuOptions) {
+    public CartMenuInfo(@JsonProperty("menuId") Long menuId, @JsonProperty("storeId") Long storeId,@JsonProperty("menuOptions") List<MenuOptionInfo> menuOptions) {
         this.menuId = menuId;
         this.storeId = storeId;
         this.menuOptions = menuOptions;
@@ -33,11 +30,11 @@ public class CartMenuInfo {
 
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class menuOptionInfo{
+    public static class MenuOptionInfo {
         private final Long optionId;
         private final Long optionQuantity;
         @JsonCreator
-        menuOptionInfo(@JsonProperty("optionId") Long optionId,@JsonProperty("optionQuantity") Long optionQuantity){
+        MenuOptionInfo(@JsonProperty("optionId") Long optionId, @JsonProperty("optionQuantity") Long optionQuantity){
             this.optionId = optionId;
             this.optionQuantity = optionQuantity;
         }
