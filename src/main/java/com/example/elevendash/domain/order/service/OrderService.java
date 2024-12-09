@@ -209,7 +209,8 @@ public class OrderService {
 
         Order order = new Order(member,store,coupon);
         List<Long> menuIds = cartInfo.getCartMenus().stream().map(CartMenuInfo::getMenuId).toList();
-        List<Long> menuOptionIds = cartInfo.getCartMenus().stream().map(CartMenuInfo::getMenuId).toList();
+        List<Long> menuOptionIds = cartInfo.getCartMenus().stream()
+                .flatMap(cartMenuInfo -> cartMenuInfo.getMenuOptions().stream()).map(CartMenuInfo.MenuOptionInfo::getOptionId).toList();
 
         Map<OrderMenu, List<OrderMenuOptionInfo>> menuOptionMap = new HashMap<>();
         List<Menu> menus = menuRepository.findByIdIn(menuIds);
@@ -219,14 +220,16 @@ public class OrderService {
             OrderMenu orderMenu = new OrderMenu(menu,order);
             orderMenus.add(orderMenu);
             for(CartMenuInfo cartMenuInfo : cartInfo.getCartMenus()){
-                for(CartMenuInfo.MenuOptionInfo menuOptionInfo : cartMenuInfo.getMenuOptions()){
-                    menuOptionMap.putIfAbsent(orderMenu, new ArrayList<>());
-                    MenuOption putMenuOption = menuOptions.stream().filter(menuOption -> Objects.equals(menuOption.getId(), menuOptionInfo.getOptionId())).findAny()
-                            .orElse(null);
-                    if(putMenuOption == null){
-                        continue;
+                if(menu.getId().equals(cartMenuInfo.getMenuId())) {
+                    for (CartMenuInfo.MenuOptionInfo menuOptionInfo : cartMenuInfo.getMenuOptions()) {
+                        menuOptionMap.putIfAbsent(orderMenu, new ArrayList<>());
+                        MenuOption putMenuOption = menuOptions.stream().filter(menuOption -> Objects.equals(menuOption.getId(), menuOptionInfo.getOptionId())).findAny()
+                                .orElse(null);
+                        if (putMenuOption == null) {
+                            continue;
+                        }
+                        menuOptionMap.get(orderMenu).add(new OrderMenuOptionInfo(putMenuOption, menuOptionInfo.getOptionQuantity()));
                     }
-                    menuOptionMap.get(orderMenu).add(new OrderMenuOptionInfo(putMenuOption,menuOptionInfo.getOptionQuantity()));
                 }
             }
         }
