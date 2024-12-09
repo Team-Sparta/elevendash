@@ -218,6 +218,7 @@ public class OrderService {
         List<MenuOption> menuOptions = menuOptionRepository.findByIdIn(menuOptionIds);
         for(Menu menu : menus) {
             OrderMenu orderMenu = new OrderMenu(menu,order);
+            totalPrice = totalPrice.add(BigDecimal.valueOf(menu.getMenuPrice()));
             orderMenus.add(orderMenu);
             for(CartMenuInfo cartMenuInfo : cartInfo.getCartMenus()){
                 if(menu.getId().equals(cartMenuInfo.getMenuId())) {
@@ -228,6 +229,7 @@ public class OrderService {
                         if (putMenuOption == null) {
                             continue;
                         }
+                        totalPrice = totalPrice.add(BigDecimal.valueOf(putMenuOption.getOptionPrice() * menuOptionInfo.getOptionQuantity()));
                         menuOptionMap.get(orderMenu).add(new OrderMenuOptionInfo(putMenuOption, menuOptionInfo.getOptionQuantity()));
                     }
                 }
