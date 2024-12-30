@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 @Tag(
         name = "광고 API",
@@ -74,6 +75,7 @@ public class AdvertisementController {
             description = "광고 거절을 진행한다."
     )
     @PutMapping("/{advertisementId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CommonResponse<RejectAdvertisementResponseDto>> rejectAdvertisement(
             @PathVariable @Parameter(hidden = true) Long advertisementId,
             @LoginMember Member loginMember,
@@ -96,6 +98,7 @@ public class AdvertisementController {
             description = "광고 수락을 진행한다."
     )
     @PutMapping("/{advertisementId}/accept")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CommonResponse<AcceptAdvertisementResponseDto>> acceptAdvertisement(
             @PathVariable @Parameter(hidden = true) Long advertisementId,
             @LoginMember Member loginMember
@@ -117,6 +120,7 @@ public class AdvertisementController {
             description = "관리자 광고 조회를 진행한다."
     )
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CommonResponse<FindAllAdvertisementResponseDto>> findAllAdvertisement(
             @LoginMember @Parameter(hidden = true) Member loginMember
     ){

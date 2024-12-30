@@ -36,6 +36,12 @@ public enum ErrorCode {
 
 
     /**
+     * Authorization
+     */
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, "접근할수 있는 권한이 없습니다."),
+
+
+    /**
      * Json Web Token
      */
     EXPIRED_JWT_EXCEPTION(HttpStatus.UNAUTHORIZED, "만료된 토큰입니다."),

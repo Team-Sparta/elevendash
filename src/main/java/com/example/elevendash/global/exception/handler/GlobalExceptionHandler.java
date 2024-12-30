@@ -5,7 +5,9 @@ import com.example.elevendash.global.exception.code.ErrorCode;
 import com.example.elevendash.global.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,5 +34,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CommonResponse<String>> handle(MethodArgumentNotValidException e) {
         log.error("MethodArgumentNotValidException : {}", e.getMessage());
         return CommonResponse.fail(ErrorCode.VALIDATION_ERROR, Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
+    }
+
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<CommonResponse<String>> handleAccessDeniedException(AccessDeniedException ex) {
+        return CommonResponse.fail(ErrorCode.UNAUTHORIZED_ACCESS, Objects.requireNonNull(ex.getMessage()));
     }
 }

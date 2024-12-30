@@ -23,9 +23,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final ReviewRepository reviewRepository;
 
-    public CommentResponseDto create(Member loginMember, Long reviewId, CommentRequestDto dto){
-
-        validateOwner(loginMember);
+    public CommentResponseDto create(Member loginMember, Long reviewId, CommentRequestDto dto) {
 
         Review findReview = reviewRepository.findByIdOrElseThrow(reviewId);
 
@@ -36,9 +34,7 @@ public class CommentService {
     }
 
     @Transactional
-    public CommentResponseDto updateComment(Member loginMember, Long commentId, CommentRequestDto dto){
-
-        validateOwner(loginMember);
+    public CommentResponseDto updateComment(Member loginMember, Long commentId, CommentRequestDto dto) {
 
         Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
         validateMember(loginMember, findComment);
@@ -51,21 +47,13 @@ public class CommentService {
 
     public void delete(Member loginMember, Long commentId) {
 
-        validateOwner(loginMember);
-
         Comment findComment = commentRepository.findByIdOrElseThrow(commentId);
         validateMember(loginMember, findComment);
 
         commentRepository.deleteCommentByCommentId(findComment.getId());
     }
 
-    private void validateOwner(Member loginMember){
-        if(!loginMember.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException(ErrorCode.NOT_OWNER);
-        }
-    }
-
-    private void validateMember(Member loginMember, Comment findComment){
+    private void validateMember(Member loginMember, Comment findComment) {
         if (!findComment.getMember().getId().equals(loginMember.getId())) {
             throw new BaseException(ErrorCode.UNAUTHORIZED_COMMENT);
         }

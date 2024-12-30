@@ -60,7 +60,7 @@ public class MemberService {
 
         memberRepository.save(member);
 
-        String token = jwtTokenProvider.createAccessToken(createClaims(member));
+        String token = jwtTokenProvider.createAccessToken(member);
 
         return new SignUpResponse(
                 member.getId(),
@@ -72,40 +72,6 @@ public class MemberService {
         if (memberRepository.existsByEmailAndDeletedAtIsNull(email)) {
             throw new InvalidParamException(ErrorCode.EXIST_EMAIL);
         }
-    }
-
-    private HashMap<String, Object> createClaims(Member member) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("id", member.getId());
-        hashMap.put("name", member.getName());
-        hashMap.put("email", member.getEmail());
-        hashMap.put("role", member.getRole());
-        return hashMap;
-    }
-
-    public EmailLoginResponse emailLogin(EmailLoginRequest request) {
-        Member member = memberRepository.findByEmailAndDeletedAtIsNull(request.email());
-
-        if (member == null) {
-            throw new AuthenticationException(ErrorCode.NOT_FOUND_MEMBER);
-        }
-
-        if (!passwordService.matches(request.password(), member.getPassword())) {
-            throw new AuthenticationException(ErrorCode.INVALID_AUTHENTICATION);
-        }
-
-        memberRepository.save(member);
-
-        String token = jwtTokenProvider.createAccessToken(createClaims(member));
-
-        return new EmailLoginResponse(
-                new Token(token, jwtTokenProvider.getExpirationByToken(token)),
-                new AuthUserInfo(
-                        member.getEmail(),
-                        member.getProviderId(),
-                        member.getProvider()
-                )
-        );
     }
 
     public MemberProfileResponse getMemberProfile(
@@ -182,7 +148,7 @@ public class MemberService {
             return new Token(null, null);
         } else {
             Member member = memberRepository.findByEmailAndDeletedAtIsNull(email);
-            String generatedToken = jwtTokenProvider.createAccessToken(createClaims(member));
+            String generatedToken = jwtTokenProvider.createAccessToken(member);
             return new Token(generatedToken, jwtTokenProvider.getExpirationByToken(generatedToken));
         }
     }

@@ -64,7 +64,6 @@ import java.time.ZoneId;
 import java.util.*;
 
 import static com.example.elevendash.domain.member.enums.MemberRole.OWNER;
-import static com.example.elevendash.domain.member.enums.MemberRole.valueOf;
 
 @Service
 @RequiredArgsConstructor

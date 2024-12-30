@@ -1,5 +1,6 @@
 package com.example.elevendash.global.provider;
 
+import com.example.elevendash.domain.member.entity.Member;
 import com.example.elevendash.global.constants.AuthConstants;
 import com.example.elevendash.global.exception.CustomJwtException;
 import com.example.elevendash.global.exception.InvalidParamException;
@@ -16,10 +17,7 @@ import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
 import java.time.Duration;
-import java.util.Base64;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -38,12 +36,12 @@ public class JwtTokenProvider {
         this.userDetailsService = userDetailsService;
     }
 
-    public String createAccessToken( Map<String, Object> additionalData) {
+    public String createAccessToken(Member member) {
         Date now = new Date();
         long accessTokenExpireTime = now.getTime() + ACCESS_TOKEN_EXPIRE_TIME;
 
         return Jwts.builder()
-                .claims(additionalData)
+                .claims(createClaims(member))
                 .issuedAt(now)
                 .expiration(new Date(accessTokenExpireTime))
                 .signWith(key)
@@ -53,7 +51,7 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         UserPrincipal userDetails = (UserPrincipal) userDetailsService.loadUserByUsername(getEmailByToken(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
     public String resolveToken(String header) {
@@ -98,6 +96,15 @@ public class JwtTokenProvider {
         } catch (IllegalArgumentException ex) {
             throw new CustomJwtException(ErrorCode.ILLEGAL_ARGUMENT_EXCEPTION);
         }
+    }
+
+    private HashMap<String, Object> createClaims(Member member) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("id", member.getId());
+        hashMap.put("name", member.getName());
+        hashMap.put("email", member.getEmail());
+        hashMap.put("role", member.getRole());
+        return hashMap;
     }
 
 }

@@ -24,11 +24,13 @@ public class AuthorizedMemberResolver implements HandlerMethodArgumentResolver {
     public Object resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) throws Exception {
+                                  WebDataBinderFactory binderFactory
+                                  ) throws Exception {
         final UserPrincipal userDetails = (UserPrincipal) SecurityContextHolder
                         .getContext()
                         .getAuthentication()
                         .getPrincipal();
+
         return Objects.isNull(userDetails) ? null : userDetails.member();
     }
 }

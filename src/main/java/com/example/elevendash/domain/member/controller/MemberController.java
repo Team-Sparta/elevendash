@@ -25,6 +25,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,16 +50,6 @@ public class MemberController {
     @PostMapping("/sign-up")
     public ResponseEntity<CommonResponse<SignUpResponse>> signUp(@Valid @RequestBody SignUpRequest request) {
         return CommonResponse.success(SuccessCode.SUCCESS_INSERT, memberService.signUp(request));
-    }
-
-    @Operation(
-            summary = "이메일 로그인",
-            description = "이메일과 비밀번호로 로그인한다.",
-            tags = {"회원 API"}
-    )
-    @PostMapping("/login/email")
-    public ResponseEntity<CommonResponse<EmailLoginResponse>> emailLogin(@Valid @RequestBody EmailLoginRequest request) {
-        return CommonResponse.success(SuccessCode.SUCCESS, memberService.emailLogin(request));
     }
 
     @Operation(
@@ -139,6 +130,7 @@ public class MemberController {
             tags = {"회원 API"}
     )
     @GetMapping("/my/my-advertisements")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<CommonResponse<FindAllMyAdvertisementResponseDto>> findMyAdvertisements(
             @Parameter(hidden = true) @LoginMember Member loginMember
     ) {
@@ -151,6 +143,7 @@ public class MemberController {
             tags = {"회원 API"}
     )
     @PutMapping("/my/my-advertisements/{advertisementId}")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<CommonResponse<UpdateAdvertisementResponseDto>> updateAdvertisement(
             @RequestBody @Valid UpdateAdvertisementRequestDto requestDto,
             @PathVariable Long advertisementId,

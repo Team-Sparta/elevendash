@@ -51,8 +51,6 @@ public class AdvertisementService {
      */
     @Transactional
     public DeleteAdvertisementResponseDto deleteAdvertisement(Member loginMember ,Long advertisementId) {
-
-
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
 
@@ -73,9 +71,6 @@ public class AdvertisementService {
      */
     @Transactional
     public RejectAdvertisementResponseDto rejectAdvertisement(Member loginMember, Long advertisementId, RejectAdvertisementRequestDto requestDto) {
-        if(!loginMember.getRole().equals(MemberRole.ADMIN)){
-            throw new BaseException(ErrorCode.NOT_ADMIN);
-        }
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
         if(!advertisement.getStatus().equals(AdvertisementStatus.WAITING)) {
@@ -93,9 +88,6 @@ public class AdvertisementService {
      */
     @Transactional
     public AcceptAdvertisementResponseDto acceptAdvertisement(Member loginMember, Long advertisementId) {
-        if(!loginMember.getRole().equals(MemberRole.ADMIN)){
-            throw new BaseException(ErrorCode.NOT_ADMIN);
-        }
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
         if(!advertisement.getStatus().equals(AdvertisementStatus.WAITING)) {
@@ -113,9 +105,6 @@ public class AdvertisementService {
      */
     @Transactional
     public FindAllAdvertisementResponseDto findAllAdvertisement(Member loginMember) {
-        if(!loginMember.getRole().equals(MemberRole.ADMIN)){
-            throw new BaseException(ErrorCode.NOT_ADMIN);
-        }
         List<Advertisement> advertisements = advertisementRepository.findAllByStatusOrderByBidPriceDesc(AdvertisementStatus.WAITING);
         List<FindAllAdvertisementResponseDto.AdvertisementInfo> advertisementInfos =
                 advertisements.stream().map(advertisement -> new FindAllAdvertisementResponseDto.AdvertisementInfo(
@@ -133,9 +122,6 @@ public class AdvertisementService {
      */
     @Transactional
     public FindAllMyAdvertisementResponseDto findAllMyAdvertisement(Member loginMember) {
-        if(!loginMember.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException(ErrorCode.NOT_OWNER);
-        }
         List<Advertisement> advertisements = advertisementRepository.findAllByMember(loginMember);
         List<FindAllMyAdvertisementResponseDto.AdvertisementInfoForOwner> advertisementInfoForOwnerList
                 = advertisements.stream().map(advertisement -> new FindAllMyAdvertisementResponseDto.AdvertisementInfoForOwner(
@@ -150,9 +136,6 @@ public class AdvertisementService {
 
     @Transactional
     public UpdateAdvertisementResponseDto updateAdvertisement(Member member,Long advertisementId, UpdateAdvertisementRequestDto requestDto) {
-        if(!member.getRole().equals(MemberRole.OWNER)){
-            throw new BaseException(ErrorCode.NOT_OWNER);
-        }
         Advertisement advertisement = advertisementRepository.findById(advertisementId)
                 .orElseThrow(()-> new BaseException(ErrorCode.NOT_FOUND_ADVERTISEMENT));
         if(!advertisement.getMember().getId().equals(member.getId())){

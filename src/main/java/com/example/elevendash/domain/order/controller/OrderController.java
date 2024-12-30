@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,6 +33,7 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.orderDetails(ordersId));
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @PatchMapping("/{ordersId}/order-status")
     public ResponseEntity<String> changeOrderStatus (@PathVariable Long ordersId, @RequestBody @Valid orderStatusRequestDto requestDto,
                                                      @LoginMember Member loginMember) {
